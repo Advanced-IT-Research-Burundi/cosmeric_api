@@ -1,5 +1,17 @@
 <?php
 
+use App\Http\Controllers\AssistanceController;
+use App\Http\Controllers\CategorieMembreController;
+use App\Http\Controllers\ConfigurationController;
+use App\Http\Controllers\CotisationController;
+use App\Http\Controllers\CreditController;
+use App\Http\Controllers\MembreController;
+use App\Http\Controllers\PeriodeController;
+use App\Http\Controllers\RapportController;
+use App\Http\Controllers\RemboursementController;
+use App\Http\Controllers\TransactionController;
+use App\Http\Controllers\TypeAssistanceController;
+use App\Http\Controllers\UserController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -8,24 +20,51 @@ Route::get('/user', function (Request $request) {
 })->middleware('auth:sanctum');
 
 
-Route::apiResource('categorie-membres', App\Http\Controllers\CategorieMembreController::class);
 
-Route::apiResource('membres', App\Http\Controllers\MembreController::class);
 
-Route::apiResource('periodes', App\Http\Controllers\PeriodeController::class);
+// Routes publiques
+Route::post('/register', [UserController::class, 'register']);
+Route::post('/login', [UserController::class, 'login']);
 
-Route::apiResource('cotisations', App\Http\Controllers\CotisationController::class);
+// Routes protégées
+Route::middleware('auth:sanctum')->group(function () {
+    // Authentification
+    Route::post('/logout', [UserController::class, 'logout']);
+    Route::post('/logout-all', [UserController::class, 'logoutAll']);
+    Route::get('/me', [UserController::class, 'me']);
+    Route::post('/refresh-token', [UserController::class, 'refreshToken']);
+    Route::post('/check-token', [UserController::class, 'checkToken']);
 
-Route::apiResource('credits', App\Http\Controllers\CreditController::class);
+    // Profil
+    Route::put('/profile', [UserController::class, 'updateProfile']);
+    Route::post('/change-password', [UserController::class, 'changePassword']);
 
-Route::apiResource('remboursements', App\Http\Controllers\RemboursementController::class);
+    // Gestion des tokens
+    Route::get('/tokens', [UserController::class, 'tokens']);
+    Route::delete('/tokens', [UserController::class, 'revokeToken']);
 
-Route::apiResource('type-assistances', App\Http\Controllers\TypeAssistanceController::class);
+    Route::apiResource('categorie-membres', CategorieMembreController::class);
 
-Route::apiResource('assistances', App\Http\Controllers\AssistanceController::class);
+    Route::apiResource('membres', MembreController::class);
 
-Route::apiResource('transactions', App\Http\Controllers\TransactionController::class);
+    Route::apiResource('periodes', PeriodeController::class);
 
-Route::apiResource('rapports', App\Http\Controllers\RapportController::class);
+    Route::apiResource('cotisations', CotisationController::class);
 
-Route::apiResource('configurations', App\Http\Controllers\ConfigurationController::class);
+    Route::apiResource('credits', CreditController::class);
+
+    Route::apiResource('remboursements', RemboursementController::class);
+
+Route::apiResource('type-assistances', TypeAssistanceController::class);
+
+Route::apiResource('assistances', AssistanceController::class);
+
+Route::apiResource('transactions', TransactionController::class);
+
+Route::apiResource('rapports', RapportController::class);
+
+Route::apiResource('configurations', ConfigurationController::class);
+
+});
+
+
