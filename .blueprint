@@ -1,0 +1,115 @@
+created:
+    - app/Http/Controllers/CategorieMembreController.php
+    - app/Http/Controllers/MembreController.php
+    - app/Http/Controllers/PeriodeController.php
+    - app/Http/Controllers/CotisationController.php
+    - app/Http/Controllers/CreditController.php
+    - app/Http/Controllers/RemboursementController.php
+    - app/Http/Controllers/TypeAssistanceController.php
+    - app/Http/Controllers/AssistanceController.php
+    - app/Http/Controllers/TransactionController.php
+    - app/Http/Controllers/RapportController.php
+    - app/Http/Controllers/ConfigurationController.php
+    - database/factories/CategorieMembreFactory.php
+    - database/factories/MembreFactory.php
+    - database/factories/PeriodeFactory.php
+    - database/factories/CotisationFactory.php
+    - database/factories/CreditFactory.php
+    - database/factories/RemboursementFactory.php
+    - database/factories/TypeAssistanceFactory.php
+    - database/factories/AssistanceFactory.php
+    - database/factories/TransactionFactory.php
+    - database/factories/RapportFactory.php
+    - database/factories/ConfigurationFactory.php
+    - database/migrations/2025_07_16_103243_create_categorie_membres_table.php
+    - database/migrations/2025_07_16_103244_create_membres_table.php
+    - database/migrations/2025_07_16_103245_create_periodes_table.php
+    - database/migrations/2025_07_16_103246_create_cotisations_table.php
+    - database/migrations/2025_07_16_103247_create_credits_table.php
+    - database/migrations/2025_07_16_103248_create_remboursements_table.php
+    - database/migrations/2025_07_16_103249_create_type_assistances_table.php
+    - database/migrations/2025_07_16_103250_create_assistances_table.php
+    - database/migrations/2025_07_16_103251_create_transactions_table.php
+    - database/migrations/2025_07_16_103252_create_rapports_table.php
+    - database/migrations/2025_07_16_103253_create_configurations_table.php
+    - app/Models/CategorieMembre.php
+    - app/Models/Membre.php
+    - app/Models/Periode.php
+    - app/Models/Cotisation.php
+    - app/Models/Credit.php
+    - app/Models/Remboursement.php
+    - app/Models/TypeAssistance.php
+    - app/Models/Assistance.php
+    - app/Models/Transaction.php
+    - app/Models/Rapport.php
+    - app/Models/Configuration.php
+    - tests/Feature/Http/Controllers/CategorieMembreControllerTest.php
+    - tests/Feature/Http/Controllers/MembreControllerTest.php
+    - tests/Feature/Http/Controllers/PeriodeControllerTest.php
+    - tests/Feature/Http/Controllers/CotisationControllerTest.php
+    - tests/Feature/Http/Controllers/CreditControllerTest.php
+    - tests/Feature/Http/Controllers/RemboursementControllerTest.php
+    - tests/Feature/Http/Controllers/TypeAssistanceControllerTest.php
+    - tests/Feature/Http/Controllers/AssistanceControllerTest.php
+    - tests/Feature/Http/Controllers/TransactionControllerTest.php
+    - tests/Feature/Http/Controllers/RapportControllerTest.php
+    - tests/Feature/Http/Controllers/ConfigurationControllerTest.php
+    - app/Http/Requests/CategorieMembreStoreRequest.php
+    - app/Http/Requests/CategorieMembreUpdateRequest.php
+    - app/Http/Requests/MembreStoreRequest.php
+    - app/Http/Requests/MembreUpdateRequest.php
+    - app/Http/Requests/PeriodeStoreRequest.php
+    - app/Http/Requests/PeriodeUpdateRequest.php
+    - app/Http/Requests/CotisationStoreRequest.php
+    - app/Http/Requests/CotisationUpdateRequest.php
+    - app/Http/Requests/CreditStoreRequest.php
+    - app/Http/Requests/CreditUpdateRequest.php
+    - app/Http/Requests/RemboursementStoreRequest.php
+    - app/Http/Requests/RemboursementUpdateRequest.php
+    - app/Http/Requests/TypeAssistanceStoreRequest.php
+    - app/Http/Requests/TypeAssistanceUpdateRequest.php
+    - app/Http/Requests/AssistanceStoreRequest.php
+    - app/Http/Requests/AssistanceUpdateRequest.php
+    - app/Http/Requests/TransactionStoreRequest.php
+    - app/Http/Requests/TransactionUpdateRequest.php
+    - app/Http/Requests/RapportStoreRequest.php
+    - app/Http/Requests/RapportUpdateRequest.php
+    - app/Http/Requests/ConfigurationStoreRequest.php
+    - app/Http/Requests/ConfigurationUpdateRequest.php
+    - app/Http/Resources/CategorieMembreCollection.php
+    - app/Http/Resources/CategorieMembreResource.php
+    - app/Http/Resources/MembreCollection.php
+    - app/Http/Resources/MembreResource.php
+    - app/Http/Resources/PeriodeCollection.php
+    - app/Http/Resources/PeriodeResource.php
+    - app/Http/Resources/CotisationCollection.php
+    - app/Http/Resources/CotisationResource.php
+    - app/Http/Resources/CreditCollection.php
+    - app/Http/Resources/CreditResource.php
+    - app/Http/Resources/RemboursementCollection.php
+    - app/Http/Resources/RemboursementResource.php
+    - app/Http/Resources/TypeAssistanceCollection.php
+    - app/Http/Resources/TypeAssistanceResource.php
+    - app/Http/Resources/AssistanceCollection.php
+    - app/Http/Resources/AssistanceResource.php
+    - app/Http/Resources/TransactionCollection.php
+    - app/Http/Resources/TransactionResource.php
+    - app/Http/Resources/RapportCollection.php
+    - app/Http/Resources/RapportResource.php
+    - app/Http/Resources/ConfigurationCollection.php
+    - app/Http/Resources/ConfigurationResource.php
+updated:
+    - routes/api.php
+models:
+    User: { name: string, email: string, email_verified_at: 'datetime nullable', password: string, remember_token: 'string nullable' }
+    CategorieMembre: { nom: 'string:100', montant_cotisation: 'decimal:10,2', devise: 'enum:FBU,USD', frequence_paiement: 'enum:mensuel,semestriel', description: text, timestamps: timestamps }
+    Membre: { user_id: 'id foreign', matricule: 'string:50 unique', nom: 'string:100', prenom: 'string:100', email: 'string:150', telephone: 'string:20', categorie_id: 'id foreign', statut: 'enum:actif,inactif,suspendu', date_adhesion: date, timestamps: timestamps }
+    Periode: { mois: integer, annee: integer, statut: 'enum:ouvert,ferme', date_debut: date, date_fin: date, timestamps: timestamps }
+    Cotisation: { membre_id: 'id foreign', periode_id: 'id foreign', montant: 'decimal:10,2', devise: 'enum:FBU,USD', date_paiement: date, statut: 'enum:paye,en_attente,en_retard', mode_paiement: 'string:50', reference_paiement: 'string:100', timestamps: timestamps }
+    Credit: { membre_id: 'id foreign', montant_demande: 'decimal:10,2', montant_accorde: 'decimal:10,2', taux_interet: 'decimal:5,2 default:3.00', duree_mois: 'integer default:12', montant_total_rembourser: 'decimal:10,2', montant_mensualite: 'decimal:10,2', date_demande: date, date_approbation: date, statut: 'enum:en_attente,approuve,rejete,en_cours,termine', motif: text, timestamps: timestamps }
+    Remboursement: { credit_id: 'id foreign', numero_echeance: integer, montant_prevu: 'decimal:10,2', montant_paye: 'decimal:10,2', date_echeance: date, date_paiement: date, statut: 'enum:prevu,paye,en_retard', penalite: 'decimal:10,2 default:0.00', timestamps: timestamps }
+    TypeAssistance: { nom: 'string:100', montant_standard: 'decimal:10,2', conditions: text, documents_requis: text, timestamps: timestamps }
+    Assistance: { membre_id: 'id foreign', type_assistance_id: 'id foreign', montant: 'decimal:10,2', date_demande: date, date_approbation: date, date_versement: date, statut: 'enum:en_attente,approuve,rejete,verse', justificatif: 'string:255', motif_rejet: text, timestamps: timestamps }
+    Transaction: { membre_id: 'id foreign', type_transaction: 'enum:cotisation,credit,remboursement,assistance', reference_transaction: integer, montant: 'decimal:10,2', devise: 'enum:FBU,USD', sens: 'enum:entree,sortie', date_transaction: date, description: text, created_at: timestamp }
+    Rapport: { titre: 'string:200', type_rapport: 'enum:mensuel,semestriel,annuel,personnalise', periode_debut: date, periode_fin: date, genere_par: 'id foreign', fichier_path: 'string:255', statut: 'enum:genere,envoye,archive', created_at: timestamp }
+    Configuration: { cle: 'string:100 unique', valeur: text, description: text, timestamps: timestamps }
