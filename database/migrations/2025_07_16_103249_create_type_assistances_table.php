@@ -20,6 +20,7 @@ return new class extends Migration
             $table->text('conditions');
             $table->text('documents_requis');
             $table->timestamps();
+            $table->softDeletes();
         });
 
         Schema::enableForeignKeyConstraints();

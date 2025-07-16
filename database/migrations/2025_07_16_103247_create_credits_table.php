@@ -27,6 +27,7 @@ return new class extends Migration
             $table->enum('statut', ["en_attente","approuve","rejete","en_cours","termine"]);
             $table->text('motif');
             $table->timestamps();
+            $table->softDeletes();
         });
 
         Schema::enableForeignKeyConstraints();

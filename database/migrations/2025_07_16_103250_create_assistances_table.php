@@ -25,6 +25,7 @@ return new class extends Migration
             $table->string('justificatif', 255);
             $table->text('motif_rejet');
             $table->timestamps();
+            $table->softDeletes();
         });
 
         Schema::enableForeignKeyConstraints();

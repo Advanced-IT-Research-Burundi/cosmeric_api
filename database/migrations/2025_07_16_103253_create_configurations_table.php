@@ -19,6 +19,7 @@ return new class extends Migration
             $table->text('valeur');
             $table->text('description');
             $table->timestamps();
+            $table->softDeletes();
         });
 
         Schema::enableForeignKeyConstraints();

@@ -22,8 +22,9 @@ return new class extends Migration
             $table->foreignId('genere_par')->constrained();
             $table->string('fichier_path', 255);
             $table->enum('statut', ["genere","envoye","archive"]);
-            $table->timestamp('created_at');
+
             $table->timestamps();
+            $table->softDeletes();
         });
 
         Schema::enableForeignKeyConstraints();

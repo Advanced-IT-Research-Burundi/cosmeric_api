@@ -25,6 +25,7 @@ return new class extends Migration
             $table->enum('statut', ["actif","inactif","suspendu"]);
             $table->date('date_adhesion');
             $table->timestamps();
+            $table->softDeletes();
         });
 
         Schema::enableForeignKeyConstraints();

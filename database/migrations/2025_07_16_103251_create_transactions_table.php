@@ -23,8 +23,8 @@ return new class extends Migration
             $table->enum('sens', ["entree","sortie"]);
             $table->date('date_transaction');
             $table->text('description');
-            $table->timestamp('created_at');
             $table->timestamps();
+            $table->softDeletes();
         });
 
         Schema::enableForeignKeyConstraints();

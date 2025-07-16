@@ -24,6 +24,7 @@ return new class extends Migration
             $table->enum('statut', ["prevu","paye","en_retard"]);
             $table->decimal('penalite', 10, 2)->default(0.00);
             $table->timestamps();
+            $table->softDeletes();
         });
 
         Schema::enableForeignKeyConstraints();

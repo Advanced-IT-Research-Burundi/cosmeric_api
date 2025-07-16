@@ -24,6 +24,7 @@ return new class extends Migration
             $table->string('mode_paiement', 50);
             $table->string('reference_paiement', 100);
             $table->timestamps();
+            $table->softDeletes();
         });
 
         Schema::enableForeignKeyConstraints();

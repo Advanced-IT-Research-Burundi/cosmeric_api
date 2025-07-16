@@ -19,6 +19,7 @@ return new class extends Migration
             $table->enum('frequence_paiement', ["mensuel","semestriel"]);
             $table->text('description');
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 
