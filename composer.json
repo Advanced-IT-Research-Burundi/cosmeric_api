@@ -33,7 +33,10 @@
         },
         "helpers": {
             "App\\Helpers\\": "app/Helpers/"
-        }
+        },
+        "files": [
+            "app/Helpers/Configuration.php"
+        ]
     },
     "autoload-dev": {
         "psr-4": {

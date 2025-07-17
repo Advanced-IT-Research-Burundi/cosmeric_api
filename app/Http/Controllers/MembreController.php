@@ -8,40 +8,39 @@ use App\Http\Resources\MembreCollection;
 use App\Http\Resources\MembreResource;
 use App\Models\Membre;
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
 
 class MembreController extends Controller
 {
-    public function index(Request $request): Response
+    public function index(Request $request)
     {
         $membres = Membre::all();
 
-        return new MembreCollection($membres);
+        return sendResponse($membres, 'Membres récupérés avec succès');
     }
 
-    public function store(MembreStoreRequest $request): Response
+    public function store(MembreStoreRequest $request)
     {
         $membre = Membre::create($request->validated());
 
-        return new MembreResource($membre);
+        return sendResponse($membre, 'Membre créé avec succès');
     }
 
-    public function show(Request $request, Membre $membre): Response
+    public function show(Request $request, Membre $membre)
     {
-        return new MembreResource($membre);
+        return sendResponse($membre, 'Membre récupéré avec succès');
     }
 
-    public function update(MembreUpdateRequest $request, Membre $membre): Response
+    public function update(MembreUpdateRequest $request, Membre $membre)
     {
         $membre->update($request->validated());
 
-        return new MembreResource($membre);
+        return sendResponse($membre, 'Membre mis à jour avec succès');
     }
 
-    public function destroy(Request $request, Membre $membre): Response
+    public function destroy(Request $request, Membre $membre)
     {
         $membre->delete();
 
-        return response()->noContent();
+        return sendResponse(null, 'Membre supprimé avec succès');
     }
 }
