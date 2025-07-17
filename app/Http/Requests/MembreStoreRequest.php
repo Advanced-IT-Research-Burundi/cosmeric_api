@@ -26,7 +26,7 @@ class MembreStoreRequest extends FormRequest
             'prenom' => ['required', 'string', 'max:100'],
             'email' => ['required', 'email', 'max:150'],
             'telephone' => ['required', 'string', 'max:20'],
-            'categorie_id' => ['required', 'integer', 'exists:categories,id'],
+            'categorie_id' => ['required', 'integer'],
             'statut' => ['required', 'in:actif,inactif,suspendu'],
             'date_adhesion' => ['required', 'date'],
         ];

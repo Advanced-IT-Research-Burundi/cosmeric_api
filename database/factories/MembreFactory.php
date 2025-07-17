@@ -5,6 +5,7 @@ namespace Database\Factories;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Str;
 use App\Models\Categorie;
+use App\Models\CategorieMembre;
 use App\Models\Membre;
 use App\Models\User;
 
@@ -29,7 +30,7 @@ class MembreFactory extends Factory
             'prenom' => fake()->regexify('[A-Za-z0-9]{100}'),
             'email' => fake()->safeEmail(),
             'telephone' => fake()->regexify('[A-Za-z0-9]{20}'),
-            'categorie_id' => Categorie::factory(),
+            'categorie_id' => CategorieMembre::factory(),
             'statut' => fake()->randomElement(["actif","inactif","suspendu"]),
             'date_adhesion' => fake()->date(),
         ];

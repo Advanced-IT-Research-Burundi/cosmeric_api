@@ -15,13 +15,13 @@ return new class extends Migration
 
         Schema::create('membres', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->constrained();
+            $table->foreignId('user_id')->nullable();
             $table->string('matricule', 50)->unique();
             $table->string('nom', 100);
             $table->string('prenom', 100);
             $table->string('email', 150);
             $table->string('telephone', 20);
-            $table->foreignId('categorie_id')->constrained('categories');
+            $table->foreignId('categorie_id')->nullable();
             $table->enum('statut', ["actif","inactif","suspendu"]);
             $table->date('date_adhesion');
             $table->timestamps();

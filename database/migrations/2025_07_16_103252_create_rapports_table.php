@@ -19,7 +19,7 @@ return new class extends Migration
             $table->enum('type_rapport', ["mensuel","semestriel","annuel","personnalise"]);
             $table->date('periode_debut');
             $table->date('periode_fin');
-            $table->foreignId('genere_par')->constrained();
+            $table->foreignId('genere_par')->nullable();
             $table->string('fichier_path', 255);
             $table->enum('statut', ["genere","envoye","archive"]);
 
