@@ -19,14 +19,14 @@ class DatabaseSeeder extends Seeder
     {
         // User::factory(10)->create();
 
-        // User::factory()->create([
-        //     'name' => 'Test User',
-        //     'nom' => 'Jean',
-        //     'prenom' => 'Lionel',
-        //     'email' => 'nijeanlionel@gmail.com',
-        //     'password' => Hash::make('password'),
-        //     'is_active' => true,
-        // ]);
+        User::factory()->create([
+            'name' => 'Test User',
+            'nom' => 'Jean',
+            'prenom' => 'Lionel',
+            'email' => 'nijeanlionel@gmail.com',
+            'password' => Hash::make('password'),
+            'is_active' => true,
+        ]);
 
         for ($i = 0; $i < 20; $i++) {
             CategorieMembre::factory()->create([

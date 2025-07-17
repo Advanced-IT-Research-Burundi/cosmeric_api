@@ -86,6 +86,10 @@ class UserController extends Controller
     }
 
     // ===== CONNEXION =====
+    /**
+     * @param Request $request
+     * @return JsonResponse
+     */
     public function login(Request $request): JsonResponse
     {
         try {
