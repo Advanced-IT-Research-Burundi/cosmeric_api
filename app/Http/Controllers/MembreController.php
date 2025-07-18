@@ -13,7 +13,7 @@ class MembreController extends Controller
 {
     public function index(Request $request)
     {
-        $membres = Membre::all();
+        $membres = Membre::paginate();
 
         return sendResponse($membres, 'Membres récupérés avec succès');
     }
