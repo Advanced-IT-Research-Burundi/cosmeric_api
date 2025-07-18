@@ -19,26 +19,26 @@ class DatabaseSeeder extends Seeder
     {
         // User::factory(10)->create();
 
-        User::factory()->create([
-            'name' => 'Test User',
-            'nom' => 'Jean',
-            'prenom' => 'Lionel',
-            'email' => 'nijeanlionel@gmail.com',
-            'password' => Hash::make('password'),
-            'is_active' => true,
-        ]);
+        // User::factory()->create([
+        //     'name' => 'Test User',
+        //     'nom' => 'Jean',
+        //     'prenom' => 'Lionel',
+        //     'email' => 'nijeanlionel@gmail.com',
+        //     'password' => Hash::make('password'),
+        //     'is_active' => true,
+        // ]);
 
         for ($i = 0; $i < 20; $i++) {
             CategorieMembre::factory()->create([
-                'nom' => fake()->regexify('[A-Za-z0-9]{100}'),
+                'nom' => fake()->name(),
             ]);
             Membre::factory()->create([
                 'user_id' => 1,
-                'matricule' => fake()->regexify('[A-Za-z0-9]{50}'),
-                'nom' => fake()->regexify('[A-Za-z0-9]{100}'),
-                'prenom' => fake()->regexify('[A-Za-z0-9]{100}'),
+                'matricule' => fake()->name(),
+                'nom' => fake()->name(),
+                'prenom' => fake()->name(),
                 'email' => fake()->safeEmail(),
-                'telephone' => fake()->regexify('[A-Za-z0-9]{20}'),
+                'telephone' => fake()->phoneNumber(),
                 'categorie_id' => 1,
                 'statut' => fake()->randomElement(["actif","inactif","suspendu"]),
                 'date_adhesion' => fake()->date(),
