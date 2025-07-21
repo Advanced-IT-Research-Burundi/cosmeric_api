@@ -13,7 +13,7 @@ class SeedDatabaseTest extends Command
     *
     * @var string
     */
-    protected $signature = 'app:seed-database-test';
+    protected $signature = 'app:seed';
     
     /**
     * The console command description.
