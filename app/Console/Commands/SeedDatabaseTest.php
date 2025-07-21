@@ -3,6 +3,7 @@
 namespace App\Console\Commands;
 
 use App\Models\Cotisation;
+use App\Models\Credit;
 use App\Models\Periode;
 use Illuminate\Console\Command;
 
