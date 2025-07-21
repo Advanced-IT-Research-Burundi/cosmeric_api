@@ -13,7 +13,19 @@ class MembreController extends Controller
 {
     public function index(Request $request)
     {
-        $membres = Membre::paginate();
+        $query = $request->input('query');
+        if ($query) {
+            $membres = Membre::where(function ($q) use ($query) {
+                $q->where('matricule', 'like', '%' . $query . '%')
+                  ->orWhere('nom', 'like', '%' . $query . '%')
+                  ->orWhere('email', 'like', '%' . $query . '%')
+                  ->orWhere('telephone', 'like', '%' . $query . '%')
+                  ->orWhere('statut', 'like', '%' . $query . '%')
+                  ->orWhere('date_adhesion', 'like', '%' . $query . '%');
+            })->paginate();
+        } else {
+            $membres = Membre::paginate();
+        }
 
         return sendResponse($membres, 'Membres récupérés avec succès');
     }
