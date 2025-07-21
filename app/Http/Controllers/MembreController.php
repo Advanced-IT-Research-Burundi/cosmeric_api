@@ -4,8 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\MembreStoreRequest;
 use App\Http\Requests\MembreUpdateRequest;
-use App\Http\Resources\MembreCollection;
-use App\Http\Resources\MembreResource;
+
 use App\Models\Membre;
 use Illuminate\Http\Request;
 
@@ -20,6 +19,7 @@ class MembreController extends Controller
 
     public function store(MembreStoreRequest $request)
     {
+        
         $membre = Membre::create($request->validated());
 
         return sendResponse($membre, 'Membre créé avec succès');

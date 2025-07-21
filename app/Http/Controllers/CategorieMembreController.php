@@ -12,33 +12,32 @@ use Illuminate\Http\Response;
 
 class CategorieMembreController extends Controller
 {
-    public function index(Request $request): Response
+    public function index(Request $request)
     {
         $categorieMembres = CategorieMembre::all();
 
-        return new CategorieMembreCollection($categorieMembres);
+        return sendResponse($categorieMembres, 'Categorie Membres retrieved successfully.'); 
     }
 
-    public function store(CategorieMembreStoreRequest $request): Response
+    public function store(CategorieMembreStoreRequest $request)
     {
         $categorieMembre = CategorieMembre::create($request->validated());
-
-        return new CategorieMembreResource($categorieMembre);
+        return sendResponse($categorieMembre, 'Categorie Membre created successfully.');
     }
 
-    public function show(Request $request, CategorieMembre $categorieMembre): Response
+    public function show(Request $request, CategorieMembre $categorieMembre)
     {
-        return new CategorieMembreResource($categorieMembre);
+        return sendResponse($categorieMembre, 'Categorie Membre retrieved successfully.');
     }
 
-    public function update(CategorieMembreUpdateRequest $request, CategorieMembre $categorieMembre): Response
+    public function update(CategorieMembreUpdateRequest $request, CategorieMembre $categorieMembre)
     {
         $categorieMembre->update($request->validated());
 
-        return new CategorieMembreResource($categorieMembre);
+        return sendResponse($categorieMembre, 'Categorie Membre updated successfully.');
     }
 
-    public function destroy(Request $request, CategorieMembre $categorieMembre): Response
+    public function destroy(Request $request, CategorieMembre $categorieMembre)
     {
         $categorieMembre->delete();
 
