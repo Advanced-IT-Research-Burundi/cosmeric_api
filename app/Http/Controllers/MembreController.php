@@ -14,18 +14,23 @@ class MembreController extends Controller
     public function index(Request $request)
     {
         $query = $request->input('query');
+        $sortBy = $request->input('sort_by', 'id');
+        $sortDirection = $request->input('sort_direction', 'desc');
+
+        $membresQuery = Membre::query();
+
         if ($query) {
-            $membres = Membre::where(function ($q) use ($query) {
+            $membresQuery->where(function ($q) use ($query) {
                 $q->where('matricule', 'like', '%' . $query . '%')
                   ->orWhere('nom', 'like', '%' . $query . '%')
                   ->orWhere('email', 'like', '%' . $query . '%')
                   ->orWhere('telephone', 'like', '%' . $query . '%')
                   ->orWhere('statut', 'like', '%' . $query . '%')
                   ->orWhere('date_adhesion', 'like', '%' . $query . '%');
-            })->paginate();
-        } else {
-            $membres = Membre::paginate();
+            });
         }
+
+        $membres = $membresQuery->orderBy($sortBy, $sortDirection)->paginate();
 
         return sendResponse($membres, 'Membres récupérés avec succès');
     }

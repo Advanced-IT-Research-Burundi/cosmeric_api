@@ -21,12 +21,12 @@ class MembreUpdateRequest extends FormRequest
     {
         return [
             'user_id' => ['required', 'integer', 'exists:users,id'],
-            'matricule' => ['required', 'string', 'max:50', 'unique:membres,matricule'],
+            'matricule' => ['required', 'string', 'max:50', 'unique:membres,matricule,' . $this->route('membre')->id],
             'nom' => ['required', 'string', 'max:100'],
             'prenom' => ['required', 'string', 'max:100'],
             'email' => ['required', 'email', 'max:150'],
             'telephone' => ['required', 'string', 'max:20'],
-            'categorie_id' => ['required', 'integer', 'exists:categories,id'],
+            'categorie_id' => ['required', 'integer', 'exists:categorie_membres,id'],
             'statut' => ['required', 'in:actif,inactif,suspendu'],
             'date_adhesion' => ['required', 'date'],
         ];
