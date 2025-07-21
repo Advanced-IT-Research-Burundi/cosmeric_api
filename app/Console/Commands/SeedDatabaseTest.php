@@ -37,6 +37,24 @@ class SeedDatabaseTest extends Command
     
     public function populate(){
         for($i = 0 ; $i < 15 ; $i++){
+
+            Credit::create(
+                [
+
+                    "membre_id" => 1,
+                    "montant_demande" => random_int(1000, 100000),
+                    "montant_accorde" => random_int(1000, 100000),
+                    "taux_interet" => random_int(1, 10),
+                    "duree_mois" => random_int(1, 24),
+                    "montant_total_rembourser" => 0,
+                    "montant_mensualite" => 0,
+                    "date_demande" => now(),
+                    "date_approbation" => now(),
+                    "statut" => "en_attente",
+                    "motif" => "string"
+                ]
+            );
+            
             Periode::create(
                 [
                  'mois' => random_int(1,12),
@@ -44,7 +62,6 @@ class SeedDatabaseTest extends Command
                 'statut' => 'ouvert',
                 'date_debut' => date('Y-m-d'),
                 'date_fin' =>  date('Y-m-d'),
-  
             ]
             );
             Cotisation::create([

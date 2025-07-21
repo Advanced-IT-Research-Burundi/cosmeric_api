@@ -26,6 +26,7 @@ return new class extends Migration
             $table->date('date_approbation');
             $table->enum('statut', ["en_attente","approuve","rejete","en_cours","termine"]);
             $table->text('motif');
+            $table->foreign('user_id');
             $table->timestamps();
             $table->softDeletes();
         });

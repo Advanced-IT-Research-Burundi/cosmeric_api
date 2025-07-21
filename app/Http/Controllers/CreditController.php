@@ -12,36 +12,35 @@ use Illuminate\Http\Response;
 
 class CreditController extends Controller
 {
-    public function index(Request $request): Response
+    public function index(Request $request)
     {
-        $credits = Credit::all();
-
-        return new CreditCollection($credits);
+        $credits = Credit::latest()->paginate();
+        return sendResponse($credits, 'Credits retrieved successfully.');
     }
 
-    public function store(CreditStoreRequest $request): Response
-    {
-        $credit = Credit::create($request->validated());
+    public function store(CreditStoreRequest $request)    {
+        $credit = Credit::create(array_merge($request->validated(), [
+            'user_id' => $request->user()->id,
+        ]));
 
         return new CreditResource($credit);
     }
 
-    public function show(Request $request, Credit $credit): Response
+    public function show(Request $request, Credit $credit)
     {
         return new CreditResource($credit);
     }
 
-    public function update(CreditUpdateRequest $request, Credit $credit): Response
+    public function update(CreditUpdateRequest $request, Credit $credit)
     {
         $credit->update($request->validated());
 
         return new CreditResource($credit);
     }
 
-    public function destroy(Request $request, Credit $credit): Response
+    public function destroy(Request $request, Credit $credit)
     {
         $credit->delete();
-
         return response()->noContent();
     }
 }
