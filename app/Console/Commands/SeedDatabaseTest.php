@@ -50,7 +50,7 @@ class SeedDatabaseTest extends Command
             );
             Assistance::create(
                 [
-                "membre_id" => random_int(1, 10),
+                "membre_id" => 1,
                 "type_assistance_id" => 1,
                 "montant" => random_int(1000, 100000),
                 "date_demande" => now(),
