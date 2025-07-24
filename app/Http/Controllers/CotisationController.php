@@ -67,29 +67,29 @@ class CotisationController extends Controller
         return sendResponse($cotisations, 'Cotisations retrieved successfully.');
     }
 
-    public function store(CotisationStoreRequest $request): Response
+    public function store(CotisationStoreRequest $request)
     {
         $cotisation = Cotisation::create($request->validated());
 
-        return new CotisationResource($cotisation);
+        return sendResponse($cotisation, 'Cotisation créée avec succès.');
     }
 
-    public function show(Request $request, Cotisation $cotisation): Response
+    public function show(Request $request, Cotisation $cotisation)
     {
-        return new CotisationResource($cotisation);
+        return sendResponse($cotisation, 'Détails de la cotisation récupérés avec succès.');
     }
 
-    public function update(CotisationUpdateRequest $request, Cotisation $cotisation): Response
+    public function update(CotisationUpdateRequest $request, Cotisation $cotisation)
     {
         $cotisation->update($request->validated());
 
-        return new CotisationResource($cotisation);
+        return sendResponse($cotisation, 'Cotisation mise à jour avec succès.');
     }
 
-    public function destroy(Request $request, Cotisation $cotisation): Response
+    public function destroy(Request $request, Cotisation $cotisation)
     {
         $cotisation->delete();
 
-        return response()->noContent();
+        return sendResponse(null, 'Cotisation supprimée avec succès.');
     }
 }
