@@ -12,33 +12,63 @@ use Illuminate\Http\Response;
 
 class AssistanceController extends Controller
 {
-    public function index(Request $request): Response
+    /**
+     * Display a listing of the resource.
+     *
+     * @param Request $request
+     * @return AssistanceCollection
+     */
+    public function index(Request $request)
     {
-        $assistances = Assistance::all();
+        $search = $request->input('search');
+        $attributes = [
+            'membre_id',
+            'type_assistance_id',
+            'montant',
+            'date_demande',
+            'date_approbation',
+            'date_versement',
+            'statut',
+            'justificatif'
+        ];
 
-        return new AssistanceCollection($assistances);
+        $assistances = Assistance::with(['membre', 'typeAssistance'])->when($search, function ($query)use ($attributes , $search) {
+            foreach ($attributes as $attribute) {
+                $query->orWhere($attribute, 'like', '%' . $search . '%');
+            }
+        })->latest()->paginate();
+
+        return sendResponse(
+            $assistances,
+            Response::HTTP_OK
+        );
     }
 
-    public function store(AssistanceStoreRequest $request): Response
+
+
+
+    public function store(AssistanceStoreRequest $request)
     {
         $assistance = Assistance::create($request->validated());
-
-        return new AssistanceResource($assistance);
+        return sendResponse(
+            $assistance,
+            Response::HTTP_CREATED,
+        );
     }
 
-    public function show(Request $request, Assistance $assistance): Response
+    public function show(Request $request, Assistance $assistance)
     {
-        return new AssistanceResource($assistance);
+        return sendResponse($assistance);
     }
 
-    public function update(AssistanceUpdateRequest $request, Assistance $assistance): Response
+    public function update(AssistanceUpdateRequest $request, Assistance $assistance)
     {
         $assistance->update($request->validated());
 
         return new AssistanceResource($assistance);
     }
 
-    public function destroy(Request $request, Assistance $assistance): Response
+    public function destroy(Request $request, Assistance $assistance)
     {
         $assistance->delete();
 

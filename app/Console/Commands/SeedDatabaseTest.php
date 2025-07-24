@@ -2,9 +2,11 @@
 
 namespace App\Console\Commands;
 
+use App\Models\Assistance;
 use App\Models\Cotisation;
 use App\Models\Credit;
 use App\Models\Periode;
+use App\Models\TypeAssistance;
 use Illuminate\Console\Command;
 
 class SeedDatabaseTest extends Command
@@ -38,10 +40,30 @@ class SeedDatabaseTest extends Command
     
     public function populate(){
         for($i = 0 ; $i < 15 ; $i++){
+            TypeAssistance::create(
+                [
+                    'nom' => 'Type d\'assistance ' . $i,
+        'montant_standard' => random_int(1000, 10000),
+        'conditions' => 'Conditions de l\'assistance ' . $i,
+        'documents_requis' => 'Documents requis pour l\'assistance ' . $i,
+                ]
+            );
+            Assistance::create(
+                [
+                "membre_id" => random_int(1, 10),
+                "type_assistance_id" => 1,
+                "montant" => random_int(1000, 100000),
+                "date_demande" => now(),
+                "date_approbation" => now(),
+                "date_versement" => now(),
+                "statut" => "en_attente",
+                "justificatif" => "string",
+                "motif_rejet" => "string"
+                ]  
+            );
 
             Credit::create(
                 [
-
                     "membre_id" => 1,
                     "montant_demande" => random_int(1000, 100000),
                     "montant_accorde" => random_int(1000, 100000),
