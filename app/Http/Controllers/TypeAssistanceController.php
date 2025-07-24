@@ -12,36 +12,36 @@ use Illuminate\Http\Response;
 
 class TypeAssistanceController extends Controller
 {
-    public function index(Request $request): Response
+    public function index(Request $request)
     {
         $typeAssistances = TypeAssistance::all();
 
-        return new TypeAssistanceCollection($typeAssistances);
+        return sendResponse($typeAssistances, 'Liste des types d\'assistance récupérée avec succès.');
     }
 
-    public function store(TypeAssistanceStoreRequest $request): Response
+    public function store(TypeAssistanceStoreRequest $request)
     {
         $typeAssistance = TypeAssistance::create($request->validated());
 
-        return new TypeAssistanceResource($typeAssistance);
+        return sendResponse($typeAssistance, 'Type d\'assistance créé avec succès.');
     }
 
-    public function show(Request $request, TypeAssistance $typeAssistance): Response
+    public function show(Request $request, TypeAssistance $typeAssistance)
     {
-        return new TypeAssistanceResource($typeAssistance);
+        return sendResponse($typeAssistance, 'Détails du type d\'assistance récupérés avec succès.');
     }
 
-    public function update(TypeAssistanceUpdateRequest $request, TypeAssistance $typeAssistance): Response
+    public function update(TypeAssistanceUpdateRequest $request, TypeAssistance $typeAssistance)
     {
         $typeAssistance->update($request->validated());
 
-        return new TypeAssistanceResource($typeAssistance);
+        return sendResponse($typeAssistance, 'Type d\'assistance mis à jour avec succès.');
     }
 
-    public function destroy(Request $request, TypeAssistance $typeAssistance): Response
+    public function destroy(Request $request, TypeAssistance $typeAssistance)
     {
         $typeAssistance->delete();
 
-        return response()->noContent();
+        return sendResponse(null, 'Type d\'assistance supprimé avec succès.');
     }
 }

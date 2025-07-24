@@ -44,9 +44,6 @@ class AssistanceController extends Controller
         );
     }
 
-
-
-
     public function store(AssistanceStoreRequest $request)
     {
         $assistance = Assistance::create($request->validated());
@@ -58,7 +55,7 @@ class AssistanceController extends Controller
 
     public function show(Request $request, Assistance $assistance)
     {
-        return sendResponse($assistance);
+        return sendResponse($assistance, 'Détails de l\'assistance récupérés avec succès.');
     }
 
     public function update(AssistanceUpdateRequest $request, Assistance $assistance)
