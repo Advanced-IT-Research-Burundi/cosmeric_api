@@ -10,6 +10,8 @@ class Cotisation extends Model
 {
     use HasFactory;
 
+    protected $with = ['membre', 'periode'];
+
     /**
      * The attributes that are mass assignable.
      *

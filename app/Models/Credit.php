@@ -10,6 +10,8 @@ class Credit extends Model
 {
     use HasFactory;
 
+    protected $with = ['membre'];
+
     /**
      * The attributes that are mass assignable.
      *

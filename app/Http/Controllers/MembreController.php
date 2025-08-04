@@ -12,7 +12,36 @@ class MembreController extends Controller
 {
     public function index(Request $request)
     {
-        $membres = Membre::paginate();
+        $query = Membre::query();
+
+        // Search
+        if ($request->has('search') && $request->search) {
+            $searchTerm = $request->search;
+            $query->where(function ($q) use ($searchTerm) {
+                $q->whereAny(['matricule', 'nom', 'email', 'prenom'], 'LIKE', "%{$searchTerm}%");
+            });
+        }
+
+        // Filters
+        if ($request->has('filter')) {
+            foreach ($request->filter as $field => $value) {
+                if ($value) {
+                    $query->where($field, 'LIKE', "%{$value}%");
+                }
+            }
+        }
+
+        // Sorting
+        if ($request->has('sort_field') && $request->sort_field) {
+            $query->orderBy(
+                $request->sort_field, 
+                $request->sort_order ?? 'asc'
+            );
+        }
+
+        // Pagination
+        $perPage = $request->per_page ?? 10;
+        $membres = $query->paginate($perPage);
 
         return sendResponse($membres, 'Membres récupérés avec succès');
     }

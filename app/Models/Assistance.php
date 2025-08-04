@@ -10,6 +10,8 @@ class Assistance extends Model
 {
     use HasFactory;
 
+    protected $with = ['membre', 'typeAssistance'];
+
     /**
      * The attributes that are mass assignable.
      *

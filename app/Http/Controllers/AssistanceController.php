@@ -20,23 +20,36 @@ class AssistanceController extends Controller
      */
     public function index(Request $request)
     {
-        $search = $request->input('search');
-        $attributes = [
-            'membre_id',
-            'type_assistance_id',
-            'montant',
-            'date_demande',
-            'date_approbation',
-            'date_versement',
-            'statut',
-            'justificatif'
-        ];
+        $query = Assistance::query();
 
-        $assistances = Assistance::with(['membre', 'typeAssistance'])->when($search, function ($query)use ($attributes , $search) {
-            foreach ($attributes as $attribute) {
-                $query->orWhere($attribute, 'like', '%' . $search . '%');
+        // Search
+        if ($request->has('search') && $request->search) {
+            $searchTerm = $request->search;
+            $query->where(function ($q) use ($searchTerm) {
+                $q->whereAny(['membre_id', 'type_assistance_id', 'montant', 'date_demande', 'date_approbation', 'date_versement', 'statut', 'justificatif'], 'LIKE', "%{$searchTerm}%");
+            });
+        }
+
+        // Filters
+        if ($request->has('filter')) {
+            foreach ($request->filter as $field => $value) {
+                if ($value) {
+                    $query->where($field, 'LIKE', "%{$value}%");
+                }
             }
-        })->latest()->paginate();
+        }
+
+        // Sorting
+        if ($request->has('sort_field') && $request->sort_field) {
+            $query->orderBy(
+                $request->sort_field, 
+                $request->sort_order ?? 'asc'
+            );
+        }
+
+        // Pagination
+        $perPage = $request->per_page ?? 10;
+        $assistances = $query->paginate($perPage);
 
         return sendResponse(
             $assistances,

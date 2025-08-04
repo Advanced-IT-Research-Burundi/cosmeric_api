@@ -1,6 +1,4 @@
 models:
-
-
   CategorieMembre:
     nom: string:100
     montant_cotisation: decimal:10,2
@@ -53,8 +51,7 @@ models:
     statut: enum:en_attente,approuve,rejete,en_cours,termine
     motif: text
     timestamps: true
-
-
+  
   Remboursement:
     credit_id: id foreign
     numero_echeance: integer
@@ -65,7 +62,6 @@ models:
     statut: enum:prevu,paye,en_retard
     penalite: decimal:10,2 default:0.00
     timestamps: true
-
 
   TypeAssistance:
     nom: string:100

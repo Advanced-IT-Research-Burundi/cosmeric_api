@@ -14,7 +14,36 @@ class CreditController extends Controller
 {
     public function index(Request $request)
     {
-        $credits = Credit::latest()->paginate();
+        $query = Credit::query();
+
+        // Search
+        if ($request->has('search') && $request->search) {
+            $searchTerm = $request->search;
+            $query->where(function ($q) use ($searchTerm) {
+                $q->whereAny(['montant_demande', 'montant_accorde', 'taux_interet', 'duree_mois', 'montant_total_rembourser', 'montant_mensualite'], 'LIKE', "%{$searchTerm}%");
+            });
+        }
+
+        // Filters
+        if ($request->has('filter')) {
+            foreach ($request->filter as $field => $value) {
+                if ($value) {
+                    $query->where($field, 'LIKE', "%{$value}%");
+                }
+            }
+        }
+
+        // Sorting
+        if ($request->has('sort_field') && $request->sort_field) {
+            $query->orderBy(
+                $request->sort_field, 
+                $request->sort_order ?? 'asc'
+            );
+        }
+
+        // Pagination
+        $perPage = $request->per_page ?? 10;
+        $credits = $query->paginate($perPage);
         return sendResponse($credits, 'Credits retrieved successfully.');
     }
 
