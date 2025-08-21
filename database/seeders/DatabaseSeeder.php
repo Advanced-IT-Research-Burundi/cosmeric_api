@@ -4,8 +4,11 @@ namespace Database\Seeders;
 
 use App\Models\Assistance;
 use App\Models\CategorieMembre;
+use App\Models\Cotisation;
+use App\Models\Credit;
 use App\Models\Membre;
 use App\Models\User;
+use Database\Factories\AssistanceFactory;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
@@ -27,6 +30,12 @@ class DatabaseSeeder extends Seeder
             'password' => Hash::make('password'),
             'is_active' => true,
         ]);
+
+        $typesassistances = ['mariage', 'retraite', 'deces'];
+
+        foreach ($typesassistances as $key => $value) {
+
+        }
 
         $categorieMembres = [
             [
@@ -84,5 +93,9 @@ class DatabaseSeeder extends Seeder
             //     'motif_rejet' => fake()->regexify('[A-Za-z0-9]{255}'),
             // ]);
         }
+
+        Assistance::factory()->count(10)->create();
+        Cotisation::factory()->count(10)->create();
+        Credit::factory()->count(10)->create();
     }
 }

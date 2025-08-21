@@ -21,8 +21,10 @@ class PeriodeFactory extends Factory
     public function definition(): array
     {
         return [
+            'type' => fake()->randomElement(["mensuel","semestriel"]),
             'mois' => fake()->numberBetween(-10000, 10000),
-            'annee' => fake()->numberBetween(-10000, 10000),
+            'semestre' => fake()->numberBetween(-10000, 10000),
+            'annee' => fake()->year(),
             'statut' => fake()->randomElement(["ouvert","ferme"]),
             'date_debut' => fake()->date(),
             'date_fin' => fake()->date(),

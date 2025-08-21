@@ -15,12 +15,12 @@ return new class extends Migration
 
         Schema::create('periodes', function (Blueprint $table) {
             $table->id();
-            $table->enum('type', ["mensuel","semestriel"]);
+            $table->enum('type', ["mensuel","semestriel"])->nullable();
             $table->integer('mois')->nullable();
             $table->integer('semestre')->nullable();
             $table->year('annee')->nullable();
-            $table->enum('statut', ["ouvert","ferme"]);
-            $table->date('date_debut');
+            $table->enum('statut', ["ouvert","ferme"])->nullable();
+            $table->date('date_debut')->nullable();
             $table->date('date_fin');
             $table->timestamps();
             $table->softDeletes();
