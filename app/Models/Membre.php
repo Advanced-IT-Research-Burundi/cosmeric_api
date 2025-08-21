@@ -27,6 +27,8 @@ class Membre extends Model
         'date_adhesion',
     ];
 
+    protected $appends = ['full_name'];
+
     public static function boot()
     {
         parent::boot();
@@ -67,6 +69,11 @@ class Membre extends Model
 
     public function categorie(): BelongsTo
     {
-        return $this->belongsTo(Categorie::class);
+        return $this->belongsTo(CategorieMembre::class);
+    }
+
+    public function getFullNameAttribute(): string
+    {
+        return "{$this->nom} {$this->prenom}";
     }
 }

@@ -19,30 +19,59 @@ class DatabaseSeeder extends Seeder
     {
         // User::factory(10)->create();
 
-        // User::factory()->create([
-        //     'name' => 'Test User',
-        //     'nom' => 'Jean',
-        //     'prenom' => 'Lionel',
-        //     'email' => 'nijeanlionel@gmail.com',
-        //     'password' => Hash::make('password'),
-        //     'is_active' => true,
-        // ]);
+        User::factory()->create([
+            'name' => 'Test User',
+            'nom' => 'Jean',
+            'prenom' => 'Lionel',
+            'email' => 'nijeanlionel@gmail.com',
+            'password' => Hash::make('password'),
+            'is_active' => true,
+        ]);
+
+        $categorieMembres = [
+            [
+                'nom' => 'cadre_contractuel',
+                'montant_cotisation' => 4000,
+                'devise' => "FBU",
+                'frequence_paiement' => "mensuel",
+                'description' => 'Cadre Contractuel ou non',
+            ],
+            [
+                'nom' => 'collaborateur_a2',
+                'montant_cotisation' => 2000,
+                'devise' => "FBU",
+                'frequence_paiement' => "mensuel",
+                'description' => 'Collaborateur (Niveau A2)',
+            ],
+            [
+                'nom' => 'chauffeur_planton',
+                'montant_cotisation' => 1000,
+                'devise' => "FBU",
+                'frequence_paiement' => "mensuel",
+                'description' => 'Chauffeur / Planton',
+            ],
+            [
+                'nom' => 'service_externe_10',
+                'montant_cotisation' => 10,
+                'devise' => "USD",
+                'frequence_paiement' => "semestriel",
+                'description' => 'Service Externe (Cadres)',
+            ],
+            [
+                'nom' => 'service_externe_5',
+                'montant_cotisation' => 5,
+                'devise' => "USD",
+                'frequence_paiement' => "semestriel",
+                'description' => 'Service Externe (Secrétaires d\’ambassade)',
+            ],
+        ];
+
+        foreach ($categorieMembres as $categorie) {
+            CategorieMembre::factory()->create($categorie);
+        }
 
         for ($i = 0; $i < 20; $i++) {
-            CategorieMembre::factory()->create([
-                'nom' => fake()->name(),
-            ]);
-            Membre::factory()->create([
-                'user_id' => 1,
-                'matricule' => fake()->name(),
-                'nom' => fake()->name(),
-                'prenom' => fake()->name(),
-                'email' => fake()->safeEmail(),
-                'telephone' => fake()->phoneNumber(),
-                'categorie_id' => 1,
-                'statut' => fake()->randomElement(["actif","inactif","suspendu"]),
-                'date_adhesion' => fake()->date(),
-            ]);
+            Membre::factory()->create();
             // Assistance::factory()->create([
             //     'membre_id' => $i,
             //     'type_assistance_id' => 1,

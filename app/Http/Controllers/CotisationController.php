@@ -14,8 +14,8 @@ class CotisationController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Cotisation::query();
-    
+        $query = Cotisation::with('periode');
+
         // Recherche textuelle
         if ($request->has('search')) {
             $search = $request->get('search');

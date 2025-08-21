@@ -12,7 +12,7 @@ class MembreController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Membre::query();
+        $query = Membre::with('categorie');
 
         // Search
         if ($request->has('search') && $request->search) {
@@ -33,16 +33,21 @@ class MembreController extends Controller
 
         // Sorting
         if ($request->has('sort_field') && $request->sort_field) {
-            $query->orderBy(
-                $request->sort_field, 
-                $request->sort_order ?? 'asc'
-            );
+            if($request->sort_field === 'full_name') {
+                $query->orderByRaw("CONCAT(nom, ' ', prenom) " . ($request->sort_order ?? 'asc'));
+            } else if($request->sort_field === 'categorie.description') {
+                $query->join('categorie_membres', 'membres.categorie_id', '=', 'categorie_membres.id')
+                      ->orderBy('categorie_membres.description', $request->sort_order ?? 'asc');
+            } else {
+                $query->orderBy($request->sort_field, $request->sort_order ?? 'asc');
+            }
         }
 
         // Pagination
         $perPage = $request->per_page ?? 10;
         $membres = $query->paginate($perPage);
 
+    // Format response
         return sendResponse($membres, 'Membres récupérés avec succès');
     }
 

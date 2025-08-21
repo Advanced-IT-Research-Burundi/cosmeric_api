@@ -15,7 +15,7 @@ return new class extends Migration
 
         Schema::create('credits', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('membre_id')->constrained();
+        $table->foreignId('membre_id')->constrained();
             $table->decimal('montant_demande', 10, 2);
             $table->decimal('montant_accorde', 10, 2);
             $table->decimal('taux_interet', 5, 2)->default(3.00);
@@ -26,7 +26,7 @@ return new class extends Migration
             $table->date('date_approbation');
             $table->enum('statut', ["en_attente","approuve","rejete","en_cours","termine"]);
             $table->text('motif');
-            $table->foreign('user_id');
+            $table->foreignId('user_id');
             $table->timestamps();
             $table->softDeletes();
         });

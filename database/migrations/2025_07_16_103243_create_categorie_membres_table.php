@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('categorie_membres', function (Blueprint $table) {
             $table->id();
             $table->string('nom', 100);
-            $table->decimal('montant_cotisation', 10, 2);
+            $table->integer('montant_cotisation');
             $table->enum('devise', ["FBU","USD"]);
             $table->enum('frequence_paiement', ["mensuel","semestriel"]);
             $table->text('description');
