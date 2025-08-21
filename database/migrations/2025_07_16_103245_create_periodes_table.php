@@ -15,8 +15,10 @@ return new class extends Migration
 
         Schema::create('periodes', function (Blueprint $table) {
             $table->id();
-            $table->integer('mois');
-            $table->integer('annee');
+            $table->enum('type', ["mensuel","semestriel"]);
+            $table->integer('mois')->nullable();
+            $table->integer('semestre')->nullable();
+            $table->year('annee')->nullable();
             $table->enum('statut', ["ouvert","ferme"]);
             $table->date('date_debut');
             $table->date('date_fin');
