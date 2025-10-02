@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\MembreStoreRequest;
 use App\Http\Requests\MembreUpdateRequest;
 
+use App\Http\Resources\MembreCollection;
 use App\Models\Membre;
 use Illuminate\Http\Request;
 
@@ -18,6 +19,8 @@ class MembreController extends Controller
         if ($request->has('search') && $request->search) {
             $searchTerm = $request->search;
             $query->where(function ($q) use ($searchTerm) {
+
+                
                 $q->whereAny(['matricule', 'nom', 'email', 'prenom'], 'LIKE', "%{$searchTerm}%");
             });
         }
@@ -48,7 +51,7 @@ class MembreController extends Controller
         $membres = $query->paginate($perPage);
 
     // Format response
-        return sendResponse($membres, 'Membres récupérés avec succès');
+        return sendResponse( new MembreCollection($membres)  , 'Membres récupérés avec succès');
     }
 
     public function store(MembreStoreRequest $request)

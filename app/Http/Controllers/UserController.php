@@ -16,6 +16,17 @@ use Laravel\Sanctum\PersonalAccessToken;
 
 class UserController extends Controller
 {
+    public function __construct()
+    {
+        // Middleware pour protéger les routes sauf pour l'inscription et la connexion
+       
+    }
+
+    public function index()
+    {
+        $users = User::latest()->paginate();
+        return sendResponse($users, 'Users retrieved successfully.');
+    }
     // ===== INSCRIPTION =====
     public function register(Request $request): JsonResponse
     {

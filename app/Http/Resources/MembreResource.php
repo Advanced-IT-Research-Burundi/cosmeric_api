@@ -16,13 +16,13 @@ class MembreResource extends JsonResource
             'id' => $this->id,
             'user_id' => $this->user_id,
             'matricule' => $this->matricule,
-            'nom' => $this->nom,
-            'prenom' => $this->prenom,
+            'full_name' =>   $this->nom ."  " . $this->prenom,
             'email' => $this->email,
             'telephone' => $this->telephone,
             'categorie_id' => $this->categorie_id,
             'statut' => $this->statut,
             'date_adhesion' => $this->date_adhesion,
+            "categorie" => $this->categorie?->nom
         ];
     }
 }
