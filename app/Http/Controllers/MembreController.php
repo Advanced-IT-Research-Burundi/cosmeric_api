@@ -19,8 +19,6 @@ class MembreController extends Controller
         if ($request->has('search') && $request->search) {
             $searchTerm = $request->search;
             $query->where(function ($q) use ($searchTerm) {
-
-                
                 $q->whereAny(['matricule', 'nom', 'email', 'prenom'], 'LIKE', "%{$searchTerm}%");
             });
         }

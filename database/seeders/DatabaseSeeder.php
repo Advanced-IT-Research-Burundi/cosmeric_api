@@ -63,14 +63,14 @@ class DatabaseSeeder extends Seeder
                 'nom' => 'service_externe_10',
                 'montant_cotisation' => 10,
                 'devise' => "USD",
-                'frequence_paiement' => "semestriel",
+                'frequence_paiement' => "mensuel",
                 'description' => 'Service Externe (Cadres)',
             ],
             [
                 'nom' => 'service_externe_5',
                 'montant_cotisation' => 5,
                 'devise' => "USD",
-                'frequence_paiement' => "semestriel",
+                'frequence_paiement' => "mensuel",
                 'description' => 'Service Externe (Secrétaires d\’ambassade)',
             ],
         ];

@@ -21,7 +21,7 @@ class MembreUpdateRequest extends FormRequest
     {
         return [
 
-            'matricule' => ['required', 'string', 'max:50', 'unique:membres,matricule'],
+            'matricule' => ['required', 'string', 'max:50'],
             'nom' => ['required', 'string', 'max:100'],
             'prenom' => ['required', 'string', 'max:100'],
             'email' => ['required', 'email', 'max:150'],
