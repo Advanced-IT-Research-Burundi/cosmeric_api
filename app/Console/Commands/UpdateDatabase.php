@@ -41,28 +41,28 @@ class UpdateDatabase extends Command
                 'nom' => 'Cadre Contractuel ou non',
                 'montant_cotisation' => 4000,
                 'devise' => 'FBU',
-                'frequence_paiement' => 'Mensuelle',
+                'frequence_paiement' => 'mensuel',
                 'description' => 'Cadre Contractuel ou non'
             ],
             [
                 'nom' => 'Collaborateur (Niveau A2)',
                 'montant_cotisation' => 2000,
                 'devise' => 'FBU',
-                'frequence_paiement' => 'Mensuelle',
+                'frequence_paiement' => 'mensuel',
                 'description' => 'Collaborateur (Niveau A2)'
             ],
             [
                 'nom' => 'Chauffeur et planton',
                 'montant_cotisation' => 1000,
                 'devise' => 'FBU',
-                'frequence_paiement' => 'Mensuelle',
+                'frequence_paiement' => 'mensuel',
                 'description' => 'Chauffeur et planton'
             ],
             [
                 'nom' => 'Service Externe (Cadres)',
                 'montant_cotisation' => 10,
                 'devise' => 'USD',
-                'frequence_paiement' => 'Mensuelle',
+                'frequence_paiement' => 'mensuel',
                 'description' => 'Service Externe (Cadres)'
                 
             ],
