@@ -49,7 +49,7 @@ class CreditController extends Controller
 
     public function store(CreditStoreRequest $request)    {
         $credit = Credit::create(array_merge($request->validated(), [
-            'user_id' => $request->user()->id,
+            'user_id' => $request->user()->id ?? 1,
         ]));
 
         return new CreditResource($credit);
