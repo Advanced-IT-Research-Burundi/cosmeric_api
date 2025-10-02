@@ -3,6 +3,7 @@
 namespace App\Console\Commands;
 
 use App\Models\Periode;
+use App\Models\TypeAssistance;
 use Illuminate\Console\Command;
 
 class UpdateDatabase extends Command
@@ -77,14 +78,30 @@ class UpdateDatabase extends Command
         $this->info('Catégories de membres mises à jour avec succès.');
 
         // Creer le Periode 
-
     Periode::firstOrCreate([
         'mois' => date('m'),
         'annee' => date('Y'),
-        'statut' => 'ouverte',
+        'statut' => 'ouvert',
         'date_debut' => \Carbon\Carbon::now()->startOfMonth()->toDateString(),
         'date_fin' => \Carbon\Carbon::now()->endOfMonth()->toDateString(),
     ]);
+
+    $this->info('Periode mise à jour'); // 
+
+    // Types assistance : [mariage, retraite, décès]
+
+    $typesAssistances = [[ 'mariage', 500000], ['retraite', 400000], ['deces', 300000]];
+
+    foreach ($typesAssistances as $type) {
+        TypeAssistance::firstOrCreate([
+            'nom' => $type[0],
+            'montant_standard' => $type[1],
+            'conditions' => 'Conditions pour ' . $type[0],
+            'documents_requis' => 'Documents requis pour ' . $type[0],
+        ]);
+    }
+
+    $this->info('Types d\'assistance mis à jour'); //
 
     }
 }
