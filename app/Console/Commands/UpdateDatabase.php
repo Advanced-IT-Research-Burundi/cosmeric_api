@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Models\Periode;
 use Illuminate\Console\Command;
 
 class UpdateDatabase extends Command
@@ -30,9 +31,11 @@ class UpdateDatabase extends Command
         //         Cadre Contractuels ou non	4 000 FBU
         // Collaborateur (Niveau A2):	2 000 FBU
         // Chauffeur et planton	1 000 FBU
+        //Service Externe	10 USD ou 5 USD
         
         
         $categoriesMembres = [
+           
             [
                 'nom' => 'Cadre Contractuel ou non',
                 'montant_cotisation' => 4000,
@@ -54,6 +57,14 @@ class UpdateDatabase extends Command
                 'frequence_paiement' => 'Mensuelle',
                 'description' => 'Chauffeur et planton'
             ],
+            [
+                'nom' => 'Service Externe (Cadres)',
+                'montant_cotisation' => 10,
+                'devise' => 'USD',
+                'frequence_paiement' => 'Mensuelle',
+                'description' => 'Service Externe (Cadres)'
+                
+            ],
         ];
         
         foreach ($categoriesMembres as $categorieMembre) {
@@ -62,7 +73,18 @@ class UpdateDatabase extends Command
                 $categorieMembre
             );
         }
-        
-        
+
+        $this->info('Catégories de membres mises à jour avec succès.');
+
+        // Creer le Periode 
+
+    Periode::firstOrCreate([
+        'mois' => date('m'),
+        'annee' => date('Y'),
+        'statut' => 'ouverte',
+        'date_debut' => \Carbon\Carbon::now()->startOfMonth()->toDateString(),
+        'date_fin' => \Carbon\Carbon::now()->endOfMonth()->toDateString(),
+    ]);
+
     }
 }
