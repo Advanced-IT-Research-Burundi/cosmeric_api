@@ -20,7 +20,9 @@ class PeriodeStoreRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'mois' => ['required', 'integer'],
+            'type' => ['required', 'in:mensuel,semestre'],
+            'mois' => ['nullable', 'integer'],
+            'semestre' => ['nullable', 'integer'],
             'annee' => ['required', 'integer'],
             'statut' => ['required', 'in:ouvert,ferme'],
             'date_debut' => ['required', 'date'],
