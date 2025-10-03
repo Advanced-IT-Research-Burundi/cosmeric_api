@@ -21,6 +21,9 @@ class CreditController extends Controller
             $searchTerm = $request->search;
             $query->where(function ($q) use ($searchTerm) {
                 $q->whereAny(['montant_demande', 'montant_accorde', 'taux_interet', 'duree_mois', 'montant_total_rembourser', 'montant_mensualite'], 'LIKE', "%{$searchTerm}%");
+            })
+            ->orWhereHas('membre', function ($q) use ($searchTerm) {
+                $q->whereAny(['nom', 'prenom', 'matricule'], 'LIKE', "%{$searchTerm}%");
             });
         }
 
