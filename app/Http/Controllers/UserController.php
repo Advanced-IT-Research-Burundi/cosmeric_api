@@ -14,6 +14,8 @@ use Illuminate\Validation\Rules\Password;
 use Illuminate\Validation\ValidationException;
 use Laravel\Sanctum\PersonalAccessToken;
 
+use function PHPSTORM_META\map;
+
 class UserController extends Controller
 {
     public function __construct()
@@ -28,73 +30,53 @@ class UserController extends Controller
         return sendResponse($users, 'Users retrieved successfully.');
     }
     // ===== INSCRIPTION =====
-    public function register(Request $request): JsonResponse
+    public function register(Request $request)
     {
-        try {
-            // Validation des données
-            $validator = Validator::make($request->all(), [
-                'nom' => ['required', 'string', 'max:100'],
-                'prenom' => ['required', 'string', 'max:100'],
-                'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
-                'telephone' => ['nullable', 'string', 'max:20'],
-                'password' => ['required', 'confirmed', Password::defaults()],
-                'role' => ['required', 'in:admin,gestionnaire,membre'],
-            ], [
-                'nom.required' => 'Le nom est obligatoire.',
-                'prenom.required' => 'Le prénom est obligatoire.',
-                'email.required' => 'L\'adresse email est obligatoire.',
-                'email.unique' => 'Cette adresse email est déjà utilisée.',
-                'email.email' => 'L\'adresse email doit être valide.',
-                'password.required' => 'Le mot de passe est obligatoire.',
-                'password.confirmed' => 'La confirmation du mot de passe ne correspond pas.',
-                'role.required' => 'Le rôle est obligatoire.',
-                'role.in' => 'Le rôle doit être admin, gestionnaire ou membre.',
-            ]);
+        $request->validate([
+            'matricule' => ['required', 'string', 'max:50', 'unique:membres,matricule'],
+            'categorie_id' => ['required', 'exists:categorie_membres,id'],
+            'nom' => ['required', 'string', 'max:100'],
+            'prenom' => ['required', 'string', 'max:100'],
+            'email' => ['required', 'email', 'unique:users,email'],
+            'password' => ['required', 'confirmed'],
+            'telephone' => ['nullable', 'string', 'max:20'],
+        ], [
+            'matricule.required' => 'Le matricule est obligatoire.',
+            'matricule.unique' => 'Ce matricule est déjà utilisé.',
+            'categorie_id.required' => 'La catégorie est obligatoire.',
+            'categorie_id.exists' => 'La catégorie sélectionnée est invalide.',
+            'nom.required' => 'Le nom est obligatoire.',
+            'prenom.required' => 'Le prénom est obligatoire.',
+            'email.required' => 'L\'adresse email est obligatoire.',
+            'email.email' => 'L\'adresse email doit être valide.',
+            'email.unique' => 'Cette adresse email est déjà utilisée.',
+            'password.required' => 'Le mot de passe est obligatoire.',
+            'password.confirmed' => 'La confirmation du mot de passe ne correspond pas.',
+        ]);
 
-            if ($validator->fails()) {
-                return response()->json([
-                    'message' => 'Erreur de validation',
-                    'errors' => $validator->errors()
-                ], 422);
-            }
+        $user = User::create([
+            'name' => $request->nom . ' ' . $request->prenom,
+            'nom' => $request->nom,
+            'prenom' => $request->prenom,
+            'email' => $request->email,
+            'telephone' => $request->telephone,
+            'password' => Hash::make($request->password),
+            'role' => 'membre',
+            'is_active' => true,
+        ]);
 
-            // Création de l'utilisateur
-            $user = User::create([
-                'nom' => $request->nom,
-                'prenom' => $request->prenom,
-                "name" => $request->prenom . ' ' . $request->nom,
-                'email' => $request->email,
-                'telephone' => $request->telephone,
-                'password' => Hash::make($request->password),
-                'role' => $request->role,
-                'is_active' => true,
-                'email_verified_at' => now(),
-            ]);
+        $membre = $user->membre()->create([
+            'matricule' => $request->matricule,
+            'categorie_id' => $request->categorie_id,
+            'nom' => $request->nom,
+            'prenom' => $request->prenom,
+            'email' => $request->email,
+            'telephone' => $request->telephone,
+            'statut' => 'inactif',
+            'date_adhesion' => now(),
+        ]);
 
-            // Création du token
-            $tokenName = $request->device_name ?? 'registration_token';
-            $abilities = $this->getTokenAbilities($user->role);
-            $expiresAt = now()->addHours(24);
-
-            $token = $user->createToken($tokenName, $abilities, $expiresAt);
-
-            // Mise à jour de la dernière connexion
-            $user->updateLastLogin();
-
-            return response()->json([
-                'message' => 'Inscription réussie',
-                'user' => $this->formatUserResponse($user),
-                'access_token' => $token->plainTextToken,
-                'token_type' => 'Bearer',
-                'expires_at' => $token->accessToken->expires_at,
-            ], 201);
-
-        } catch (\Exception $e) {
-            return response()->json([
-                'message' => 'Erreur lors de l\'inscription',
-                'error' => config('app.debug') ? $e->getMessage() : 'Erreur interne du serveur'
-            ], 500);
-        }
+        return sendResponse($user, 'Membre créé avec succès.');
     }
 
     // ===== CONNEXION =====
