@@ -79,6 +79,86 @@ class UserController extends Controller
         return sendResponse($user, 'Membre créé avec succès.');
     }
 
+    // ===== EDIT (Récupérer un utilisateur pour édition) =====
+    public function show(User $user)
+    {
+        return sendResponse($user, 'Utilisateur récupéré avec succès.');
+    }
+
+    // ===== STORE (Créer un utilisateur) =====
+    public function store(Request $request)
+    {
+        $validator = $request->validate([
+            'nom' => ['required', 'string', 'max:100'],
+            'prenom' => ['required', 'string', 'max:100'],
+            'email' => ['required', 'email', 'unique:users,email'],
+            'password' => ['required'],
+            'telephone' => ['nullable', 'string', 'max:20'],
+            'role' => ['sometimes', 'in:admin,gestionnaire,membre'],
+            'is_active' => ['sometimes', 'boolean'],
+        ]);
+
+        $user = User::create([
+            'nom' => $request->nom,
+            'prenom' => $request->prenom,
+            'name' => $request->prenom . ' ' . $request->nom,
+            'email' => $request->email,
+            'telephone' => $request->telephone,
+            'password' => Hash::make($request->password),
+            'role' => $request->role ?? 'membre',
+            'is_active' => $request->has('is_active') ? (bool)$request->is_active : true,
+        ]);
+
+        return sendResponse($user, 'Utilisateur créé avec succès', 201);
+    }
+
+    public function update(Request $request, User $user)
+    {
+        $validator = $request->validate([
+            'nom' => ['sometimes', 'required', 'string', 'max:100'],
+            'prenom' => ['sometimes', 'required', 'string', 'max:100'],
+            'email' => ['sometimes', 'required', 'email', 'unique:users,email,' . $user->id],
+            'telephone' => ['nullable', 'string', 'max:20'],
+            'password' => ['nullable', 'confirmed', 'string'],
+            'role' => ['sometimes', 'in:admin,gestionnaire,membre'],
+            'is_active' => ['sometimes', 'boolean'],
+        ]);
+
+        $data = $request->only(['nom', 'prenom', 'email', 'telephone', 'role']);
+
+        if ($request->filled('password')) {
+            $data['password'] = Hash::make($request->password);
+        }
+
+        if ($request->has('is_active')) {
+            $data['is_active'] = (bool) $request->is_active;
+        }
+
+        // Keep name in sync with prenom + nom if either provided
+        $nom = $data['nom'] ?? $user->nom;
+        $prenom = $data['prenom'] ?? $user->prenom;
+        $data['name'] = $prenom . ' ' . $nom;
+
+        $user->update($data);
+
+        return sendResponse($user->fresh(), 'Utilisateur mis à jour avec succès');
+    }
+
+    // ===== DELETE (Supprimer un utilisateur) =====
+    public function destroy(Request $request, User $user)
+    {
+        // Optionnel : révoquer tous les tokens avant suppression
+        try {
+            $user->tokens()->delete();
+        } catch (\Throwable $e) {
+            // ignore token deletion errors
+        }
+
+        $user->delete();
+
+        return sendResponse(null, 'Utilisateur supprimé avec succès');
+    }
+
     // ===== CONNEXION =====
     /**
      * @param Request $request
