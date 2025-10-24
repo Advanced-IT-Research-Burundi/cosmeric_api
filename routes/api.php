@@ -5,6 +5,7 @@ use App\Http\Controllers\CategorieMembreController;
 use App\Http\Controllers\ConfigurationController;
 use App\Http\Controllers\CotisationController;
 use App\Http\Controllers\CreditController;
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\MembreController;
 use App\Http\Controllers\PeriodeController;
 use App\Http\Controllers\RapportController;
@@ -58,6 +59,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::apiResource('rapports', RapportController::class);
     Route::apiResource('configurations', ConfigurationController::class);
     Route::apiResource('users', UserController::class);
+    Route::get('/dashboard', [DashboardController::class, 'index']);
 
 });
 
