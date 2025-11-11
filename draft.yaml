@@ -1,146 +1,18 @@
 models:
-  CategorieMembre:
-    nom: string:100
-    montant_cotisation: decimal:10,2
-    devise: enum:FBU,USD
-    frequence_paiement: enum:mensuel,semestriel
-    description: text
-    timestamps: true
+  CotisationMensuelle:
+    name: string 255 nullable            
+    matricule: string 255 nullable
+    nomero_dossier: string 255 nullable
+    global: string 255 nullable
+    regle: string 255 nullable
+    restant: string 255 nullable
+    retenu: string 255 nullable
+    date_cotisation: string 255 nullable
+    user_id: integer nullable
 
-  Membre:
-    user_id: id foreign
-    matricule: string:50 unique
-    nom: string:100
-    prenom: string:100
-    email: string:150
-    telephone: string:20
-    categorie_id: id foreign
-    statut: enum:actif,inactif,suspendu
-    date_adhesion: date
-    timestamps: true
-
-  Periode:
-    mois: integer
-    annee: integer
-    statut: enum:ouvert,ferme
-    date_debut: date
-    date_fin: date
-    timestamps: true
-
-  Cotisation:
-    membre_id: id foreign
-    periode_id: id foreign
-    montant: decimal:10,2
-    devise: enum:FBU,USD
-    date_paiement: date
-    statut: enum:paye,en_attente,en_retard
-    mode_paiement: string:50
-    reference_paiement: string:100
-    timestamps: true
-
-  Credit:
-    membre_id: id foreign
-    montant_demande: decimal:10,2
-    montant_accorde: decimal:10,2
-    taux_interet: decimal:5,2 default:3.00
-    duree_mois: integer default:12
-    montant_total_rembourser: decimal:10,2
-    montant_mensualite: decimal:10,2
-    date_demande: date
-    date_approbation: date
-    statut: enum:en_attente,approuve,rejete,en_cours,termine
-    motif: text
-    timestamps: true
-  
-  Remboursement:
-    credit_id: id foreign
-    numero_echeance: integer
-    montant_prevu: decimal:10,2
-    montant_paye: decimal:10,2
-    date_echeance: date
-    date_paiement: date
-    statut: enum:prevu,paye,en_retard
-    penalite: decimal:10,2 default:0.00
-    timestamps: true
-
-  TypeAssistance:
-    nom: string:100
-    montant_standard: decimal:10,2
-    conditions: text
-    documents_requis: text
-    timestamps: true
-
-  Assistance:
-    membre_id: id foreign
-    type_assistance_id: id foreign
-    montant: decimal:10,2
-    date_demande: date
-    date_approbation: date
-    date_versement: date
-    statut: enum:en_attente,approuve,rejete,verse
-    justificatif: string:255
-    motif_rejet: text
-    timestamps: true
-
-  Transaction:
-    membre_id: id foreign
-    type_transaction: enum:cotisation,credit,remboursement,assistance
-    reference_transaction: integer
-    montant: decimal:10,2
-    devise: enum:FBU,USD
-    sens: enum:entree,sortie
-    date_transaction: date
-    description: text
-    created_at: timestamp
-
-  Rapport:
-    titre: string:200
-    type_rapport: enum:mensuel,semestriel,annuel,personnalise
-    periode_debut: date
-    periode_fin: date
-    genere_par: id foreign
-    fichier_path: string:255
-    statut: enum:genere,envoye,archive
-    created_at: timestamp
-
-  Configuration:
-    cle: string:100 unique
-    valeur: text
-    description: text
-    timestamps: true
-
-seeder: CategorieMembre , Membre , Periode , Cotisation , Credit , Remboursement , TypeAssistance , Assistance , Transaction , Rapport , Configuration
 
 controllers:
-  CategorieMembre:
+  CotisationMensuelle:
     resource: api
 
-  Membre:
-    resource: api
-
-  Periode:
-    resource: api
-
-  Cotisation:
-    resource: api
-
-  Credit:
-    resource: api
-
-  Remboursement:
-    resource: api
-
-  TypeAssistance:
-    resource: api
-
-  Assistance:
-    resource: api
-
-  Transaction:
-    resource: api
-
-  Rapport:
-    resource: api
-
-  Configuration:
-    resource: api
+ 

@@ -63,3 +63,6 @@ Route::middleware('auth:sanctum')->group(function () {
 });
 
 
+
+
+Route::apiResource('cotisation-mensuelles', App\Http\Controllers\CotisationMensuelleController::class);
