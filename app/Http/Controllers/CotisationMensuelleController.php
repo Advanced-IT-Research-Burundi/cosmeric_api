@@ -12,33 +12,33 @@ use Illuminate\Http\Response;
 
 class CotisationMensuelleController extends Controller
 {
-    public function index(Request $request): Response
+    public function index(Request $request)
     {
-        $cotisationMensuelles = CotisationMensuelle::all();
+        $cotisationMensuelles = CotisationMensuelle::latest()->paginate();
 
-        return new CotisationMensuelleCollection($cotisationMensuelles);
+        return sendResponse(    $cotisationMensuelles, 'Cotisation mensuelles retrieved successfully.');
     }
 
-    public function store(CotisationMensuelleStoreRequest $request): Response
+    public function store(CotisationMensuelleStoreRequest $request)
     {
         $cotisationMensuelle = CotisationMensuelle::create($request->validated());
 
         return new CotisationMensuelleResource($cotisationMensuelle);
     }
 
-    public function show(Request $request, CotisationMensuelle $cotisationMensuelle): Response
+    public function show(Request $request, CotisationMensuelle $cotisationMensuelle)
     {
         return new CotisationMensuelleResource($cotisationMensuelle);
     }
 
-    public function update(CotisationMensuelleUpdateRequest $request, CotisationMensuelle $cotisationMensuelle): Response
+    public function update(CotisationMensuelleUpdateRequest $request, CotisationMensuelle $cotisationMensuelle)
     {
         $cotisationMensuelle->update($request->validated());
 
         return new CotisationMensuelleResource($cotisationMensuelle);
     }
 
-    public function destroy(Request $request, CotisationMensuelle $cotisationMensuelle): Response
+    public function destroy(Request $request, CotisationMensuelle $cotisationMensuelle)
     {
         $cotisationMensuelle->delete();
 

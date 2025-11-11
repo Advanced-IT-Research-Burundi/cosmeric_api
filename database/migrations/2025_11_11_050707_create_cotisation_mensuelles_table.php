@@ -23,6 +23,7 @@ return new class extends Migration
             $table->string('date_cotisation')->nullable();
             $table->integer('user_id')->nullable();
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 
