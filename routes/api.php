@@ -6,6 +6,7 @@ use App\Http\Controllers\ConfigurationController;
 use App\Http\Controllers\CotisationController;
 use App\Http\Controllers\CreditController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\ImportationController;
 use App\Http\Controllers\MembreController;
 use App\Http\Controllers\PeriodeController;
 use App\Http\Controllers\RapportController;
@@ -45,11 +46,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::delete('/tokens', [UserController::class, 'revokeToken']);
 
     Route::apiResource('categorie-membres', CategorieMembreController::class);
-
     Route::apiResource('membres', MembreController::class);
-
     Route::apiResource('periodes', PeriodeController::class);
-
     Route::apiResource('cotisations', CotisationController::class);
     Route::apiResource('credits', CreditController::class);
     Route::apiResource('remboursements', RemboursementController::class);
@@ -60,6 +58,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::apiResource('configurations', ConfigurationController::class);
     Route::apiResource('users', UserController::class);
     Route::get('/dashboard', [DashboardController::class, 'index']);
+    Route::post("importation", [ImportationController::class , 'cotisation']);
 
 });
 
