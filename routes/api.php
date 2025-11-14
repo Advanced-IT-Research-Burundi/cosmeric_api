@@ -50,7 +50,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::apiResource('periodes', PeriodeController::class);
     Route::apiResource('cotisations', CotisationController::class);
     Route::apiResource('credits', CreditController::class);
-    Route::get('mes-credits', [CreditController::class, 'mesCredits']);
+    Route::get('mescredits', [CreditController::class, 'mesCredits']);
+    Route::get('mesCotisations', [CotisationController::class, 'mesCotisations']);
     Route::apiResource('remboursements', RemboursementController::class);
     Route::apiResource('type-assistances', TypeAssistanceController::class);
     Route::apiResource('assistances', AssistanceController::class);
