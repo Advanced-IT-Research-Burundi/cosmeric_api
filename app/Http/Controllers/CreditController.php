@@ -12,8 +12,8 @@ use Illuminate\Http\Request;
 class CreditController extends Controller
 {
     public function mesCredits(){
-        $credits = Credit::where('membre_id', auth()->user()->membre->id)->latest()->paginate();
-        return sendError($credits, 'Credits retrieved successfully.');
+        $credits = Credit::where('membre_id', auth()->user()->id)->latest()->paginate();
+        return sendResponse($credits, 'Credits retrieved successfully.');
     }
     public function index(Request $request)
     {

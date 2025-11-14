@@ -15,8 +15,7 @@ class CotisationController extends Controller
 
     public function mesCotisations(){
         // get Member
-
-        $cotisations = Cotisation::where('membre_id', auth()->user()->membre_id)->get();
+        $cotisations = Cotisation::where('membre_id', auth()->user()->id)->get();
         return sendResponse($cotisations, 'Cotisations retrieved successfully.');
     }
     public function index(Request $request)
