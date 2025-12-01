@@ -43,13 +43,10 @@ Route::middleware('auth:sanctum')->group(function () {
     // Gestion des tokens
     Route::get('/tokens', [UserController::class, 'tokens']);
     Route::delete('/tokens', [UserController::class, 'revokeToken']);
-
+    
     Route::apiResource('categorie-membres', CategorieMembreController::class);
-
     Route::apiResource('membres', MembreController::class);
-
     Route::apiResource('periodes', PeriodeController::class);
-
     Route::apiResource('cotisations', CotisationController::class);
     Route::apiResource('credits', CreditController::class);
     Route::apiResource('remboursements', RemboursementController::class);

@@ -6,60 +6,68 @@ use App\Models\Assistance;
 use App\Models\Cotisation;
 use App\Models\Credit;
 use App\Models\Periode;
+use App\Models\Transaction;
 use App\Models\TypeAssistance;
 use Illuminate\Console\Command;
 
 class SeedDatabaseTest extends Command
 {
     /**
-    * The name and signature of the console command.
-    *
-    * @var string
-    */
+     * The name and signature of the console command.
+     *
+     * @var string
+     */
     protected $signature = 'app:seed';
-    
+
     /**
-    * The console command description.
-    *
-    * @var string
-    */
+     * The console command description.
+     *
+     * @var string
+     */
     protected $description = 'Command description';
-    
+
     /**
-    * Execute the console command.
-    */
+     * Execute the console command.
+     */
     public function handle()
     {
         //
         $this->info('Seeding database for testing purposes...');
-        $this->populate();
-        
+        // $this->populate();
+
+        Periode::factory(10)->create();
         $this->info("finish");
     }
-    
-    
-    public function populate(){
-        for($i = 0 ; $i < 15 ; $i++){
+
+    public function populateByModel(Transaction $name)
+    {
+        $name::factory(10)->create();
+    }
+
+
+    public function populate()
+    {
+        for ($i = 0; $i < 15; $i++) {
             TypeAssistance::create(
                 [
                     'nom' => 'Type d\'assistance ' . $i,
-        'montant_standard' => random_int(1000, 10000),
-        'conditions' => 'Conditions de l\'assistance ' . $i,
-        'documents_requis' => 'Documents requis pour l\'assistance ' . $i,
+                    'montant_standard' => random_int(1000, 10000),
+                    'conditions' => 'Conditions de l\'assistance ' . $i,
+                    'documents_requis' => 'Documents requis pour l\'assistance ' . $i,
                 ]
             );
             Assistance::create(
                 [
-                "membre_id" => 1,
-                "type_assistance_id" => 1,
-                "montant" => random_int(1000, 100000),
-                "date_demande" => now(),
-                "date_approbation" => now(),
-                "date_versement" => now(),
-                "statut" => "en_attente",
-                "justificatif" => "string",
-                "motif_rejet" => "string"
-                ]  
+                    "membre_id" => 1,
+                    "type_assistance_id" => 1,
+                    "montant" => random_int(1000, 100000),
+                    "date_demande" => now(),
+                    "date_approbation" => now(),
+                    "date_versement" => now(),
+                    "statut" => "en_attente",
+                    "justificatif" => "string",
+                    "motif_rejet" => "string"
+                ]
             );
 
             Credit::create(
@@ -77,15 +85,15 @@ class SeedDatabaseTest extends Command
                     "motif" => "string"
                 ]
             );
-            
+
             Periode::create(
                 [
-                 'mois' => random_int(1,12),
-                 'annee'=> random_int(2000,2060),
-                'statut' => 'ouvert',
-                'date_debut' => date('Y-m-d'),
-                'date_fin' =>  date('Y-m-d'),
-            ]
+                    'mois' => random_int(1, 12),
+                    'annee' => random_int(2000, 2060),
+                    'statut' => 'ouvert',
+                    'date_debut' => date('Y-m-d'),
+                    'date_fin' =>  date('Y-m-d'),
+                ]
             );
             Cotisation::create([
                 'membre_id' => 1,

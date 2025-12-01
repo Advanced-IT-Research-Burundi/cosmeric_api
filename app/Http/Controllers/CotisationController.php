@@ -71,7 +71,7 @@ class CotisationController extends Controller
     {
         $cotisation = Cotisation::create($request->validated());
 
-        return sendResponse($cotisation, 'Cotisation créée avec succès.');
+        return sendResponse( new CotisationResource($cotisation), 'Cotisation créée avec succès.');
     }
 
     public function show(Request $request, Cotisation $cotisation)

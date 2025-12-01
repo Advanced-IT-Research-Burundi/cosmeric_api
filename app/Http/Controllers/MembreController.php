@@ -34,11 +34,11 @@ class MembreController extends Controller
 
         // Sorting
         if ($request->has('sort_field') && $request->sort_field) {
-            if($request->sort_field === 'full_name') {
+            if ($request->sort_field === 'full_name') {
                 $query->orderByRaw("CONCAT(nom, ' ', prenom) " . ($request->sort_order ?? 'asc'));
-            } else if($request->sort_field === 'categorie.description') {
+            } else if ($request->sort_field === 'categorie.description') {
                 $query->join('categorie_membres', 'membres.categorie_id', '=', 'categorie_membres.id')
-                      ->orderBy('categorie_membres.description', $request->sort_order ?? 'asc');
+                    ->orderBy('categorie_membres.description', $request->sort_order ?? 'asc');
             } else {
                 $query->orderBy($request->sort_field, $request->sort_order ?? 'asc');
             }
@@ -48,13 +48,13 @@ class MembreController extends Controller
         $perPage = $request->per_page ?? 10;
         $membres = $query->paginate($perPage);
 
-    // Format response
-        return sendResponse( new MembreCollection($membres)  , 'Membres récupérés avec succès');
+        // Format response
+        return sendResponse(new MembreCollection($membres), 'Membres récupérés avec succès');
     }
 
     public function store(MembreStoreRequest $request)
     {
-        
+
         $membre = Membre::create($request->validated());
 
         return sendResponse($membre, 'Membre créé avec succès');
