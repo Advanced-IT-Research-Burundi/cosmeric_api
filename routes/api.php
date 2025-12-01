@@ -13,6 +13,7 @@ use App\Http\Controllers\RapportController;
 use App\Http\Controllers\RemboursementController;
 use App\Http\Controllers\TransactionController;
 use App\Http\Controllers\TypeAssistanceController;
+use App\Http\Controllers\CotisationMensuelleController;
 use App\Http\Controllers\UserController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -61,7 +62,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::apiResource('users', UserController::class);
     Route::get('/dashboard', [DashboardController::class, 'index']);
     Route::post("importation", [ImportationController::class , 'cotisation']);
-    Route::apiResource('cotisation-mensuelles', App\Http\Controllers\CotisationMensuelleController::class);
+    Route::apiResource('cotisation-mensuelles', CotisationMensuelleController::class);
 
 
 });
