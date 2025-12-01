@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
+use App\Models\Membre;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -65,7 +66,7 @@ class UserController extends Controller
             'is_active' => true,
         ]);
 
-        $membre = $user->membre()->create([
+        $membre = Membre::create([
             'matricule' => $request->matricule,
             'categorie_id' => $request->categorie_id,
             'nom' => $request->nom,
@@ -74,6 +75,7 @@ class UserController extends Controller
             'telephone' => $request->telephone,
             'statut' => 'inactif',
             'date_adhesion' => now(),
+            'user_id' => $user->id,
         ]);
 
         return sendResponse($user, 'Membre créé avec succès.');

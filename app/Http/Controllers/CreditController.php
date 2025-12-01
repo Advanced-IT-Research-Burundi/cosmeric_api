@@ -8,10 +8,13 @@ use App\Http\Resources\CreditCollection;
 use App\Http\Resources\CreditResource;
 use App\Models\Credit;
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
 
 class CreditController extends Controller
 {
+    public function mesCredits(){
+        $credits = Credit::where('membre_id', auth()->user()->id)->latest()->paginate();
+        return sendResponse($credits, 'Credits retrieved successfully.');
+    }
     public function index(Request $request)
     {
         $query = Credit::query();

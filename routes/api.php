@@ -6,12 +6,14 @@ use App\Http\Controllers\ConfigurationController;
 use App\Http\Controllers\CotisationController;
 use App\Http\Controllers\CreditController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\ImportationController;
 use App\Http\Controllers\MembreController;
 use App\Http\Controllers\PeriodeController;
 use App\Http\Controllers\RapportController;
 use App\Http\Controllers\RemboursementController;
 use App\Http\Controllers\TransactionController;
 use App\Http\Controllers\TypeAssistanceController;
+use App\Http\Controllers\CotisationMensuelleController;
 use App\Http\Controllers\UserController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -49,6 +51,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::apiResource('periodes', PeriodeController::class);
     Route::apiResource('cotisations', CotisationController::class);
     Route::apiResource('credits', CreditController::class);
+    Route::get('mescredits', [CreditController::class, 'mesCredits']);
+    Route::get('mescotisations', [CotisationController::class, 'mesCotisations']);
     Route::apiResource('remboursements', RemboursementController::class);
     Route::apiResource('type-assistances', TypeAssistanceController::class);
     Route::apiResource('assistances', AssistanceController::class);
@@ -57,7 +61,12 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::apiResource('configurations', ConfigurationController::class);
     Route::apiResource('users', UserController::class);
     Route::get('/dashboard', [DashboardController::class, 'index']);
+    Route::post("importation", [ImportationController::class , 'cotisation']);
+    Route::apiResource('cotisation-mensuelles', CotisationMensuelleController::class);
+
 
 });
+
+
 
 
