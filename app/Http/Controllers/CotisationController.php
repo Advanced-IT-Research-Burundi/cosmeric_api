@@ -13,7 +13,8 @@ use Illuminate\Http\Response;
 class CotisationController extends Controller
 {
 
-    public function mesCotisations(){
+    public function mesCotisations()
+    {
         // get Member
         $cotisations = Cotisation::where('membre_id', auth()->user()->id)->get();
         return sendResponse($cotisations, 'Cotisations retrieved successfully.');
@@ -25,9 +26,9 @@ class CotisationController extends Controller
         // Recherche textuelle
         if ($request->has('search')) {
             $search = $request->get('search');
-            $query->where(function($q) use ($search) {
+            $query->where(function ($q) use ($search) {
                 $q->where('reference_paiement', 'like', "%{$search}%")
-                ->orWhere('membre_id', 'like', "%{$search}%");
+                    ->orWhere('membre_id', 'like', "%{$search}%");
             });
         }
 
@@ -77,7 +78,7 @@ class CotisationController extends Controller
     {
         $cotisation = Cotisation::create($request->validated());
 
-        return sendResponse( new CotisationResource($cotisation), 'Cotisation créée avec succès.');
+        return sendResponse(new CotisationResource($cotisation), 'Cotisation créée avec succès.');
     }
 
     public function show(Request $request, Cotisation $cotisation)
