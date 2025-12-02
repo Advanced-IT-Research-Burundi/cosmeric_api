@@ -60,7 +60,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::apiResource('rapports', RapportController::class);
     Route::apiResource('configurations', ConfigurationController::class);
     Route::apiResource('users', UserController::class);
-    Route::get('/dashboard', [DashboardController::class, 'index']);
+    Route::get('/dashboard', [DashboardController::class, 'getDashboardData']);
     Route::get('/dashboard-member', [DashboardController::class, 'dashboardMember']);
     Route::post("importation", [ImportationController::class , 'cotisation']);
     Route::apiResource('cotisation-mensuelles', CotisationMensuelleController::class);
