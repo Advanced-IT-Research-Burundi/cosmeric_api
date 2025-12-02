@@ -148,4 +148,140 @@ class DashboardController extends Controller
 
         return response()->json($response);
     }
+
+    function dashboardMember(Request $request)
+    {
+        $user = $request->user();
+        if (!$user) {
+            return response()->json(['success' => false, 'message' => 'Unauthenticated'], 401);
+        }
+
+        // KPI: member-specific
+        $cotisationsCeMois = (float) Cotisation::where('membre_id', $user->id)
+            ->whereYear('created_at', now()->year)
+            ->whereMonth('created_at', now()->month)
+            ->sum('montant');
+
+        // Credits: total due, total paid, remaining
+        $creditsTotalDue = (float) Credit::where('membre_id', $user->id)->sum('montant_total_rembourser');
+
+        $creditsId = Credit::where('membre_id', $user->id)->pluck('id')->toArray();
+
+        $creditsTotalPaid = (float) Remboursement::whereIn('credit_id', $creditsId)->sum('montant_paye');
+        $creditsRemaining = max(0, $creditsTotalDue - $creditsTotalPaid);
+
+        // Montants reçus en assistance (for member)
+        $assistancesReceived = (float) Assistance::where('membre_id', $user->id)->sum('montant');
+
+        // Anomalies / retards
+        $anomaliesCount = (int) Credit::where('membre_id', $user->id)
+            ->where(function ($q) {
+                $q->where('statut', 'Anomalies')
+                    ->orWhere('statut', 'anomalie')
+                    ->orWhere('statut', 'anomalies');
+            })->count();
+
+        // Charts: last 12 months (cotisations / tendance) - member scope
+        $labels12 = [];
+        $cotisationsValues = [];
+        $creditsValuesForTrend = [];
+        $assistancesValuesForTrend = [];
+
+        for ($i = 11; $i >= 0; $i--) {
+            $dt = Carbon::now()->subMonths($i);
+            $labels12[] = $dt->translatedFormat('M Y');
+
+            $cotisationsValues[] = (float) Cotisation::where('membre_id', $user->id)
+                ->whereYear('created_at', $dt->year)
+                ->whereMonth('created_at', $dt->month)
+                ->sum('montant');
+
+            $creditsValuesForTrend[] = (float) Credit::where('membre_id', $user->id)
+                ->whereYear('created_at', $dt->year)
+                ->whereMonth('created_at', $dt->month)
+                ->sum('montant_total_rembourser');
+
+            $assistancesValuesForTrend[] = (float) Assistance::where('membre_id', $user->id)
+                ->whereYear('created_at', $dt->year)
+                ->whereMonth('created_at', $dt->month)
+                ->sum('montant');
+        }
+
+        // Credits vs remboursements (last 6 months) + statuses per month for this member
+        $labels6 = [];
+        $creditsAccordes6 = [];
+        $rembourses6 = [];
+        $creditsStatus6 = []; // array of status counts per month
+
+        for ($i = 5; $i >= 0; $i--) {
+            $dt = Carbon::now()->subMonths($i);
+            $labels6[] = $dt->translatedFormat('M Y');
+
+            $creditsAccordes6[] = (float) Credit::where('membre_id', $user->id)
+                ->whereYear('created_at', $dt->year)
+                ->whereMonth('created_at', $dt->month)
+                ->sum('montant_total_rembourser');
+
+            // $rembourses6[] = (float) Remboursement::where('membre_id', $user->id)
+            //     ->whereYear('created_at', $dt->year)
+            //     ->whereMonth('created_at', $dt->month)
+            //     ->sum('montant_paye');
+
+            // statuses counts grouped by statut
+            $statusRows = Credit::select('statut', DB::raw('COUNT(*) as total'))
+                ->where('membre_id', $user->id)
+                ->whereYear('created_at', $dt->year)
+                ->whereMonth('created_at', $dt->month)
+                ->groupBy('statut')
+                ->get()
+                ->pluck('total', 'statut')
+                ->toArray();
+
+            // normalize into known keys
+            $creditsStatus6[] = [
+                'approuve' => (int) ($statusRows['approuve'] ?? $statusRows['approuved'] ?? 0),
+                'en_cours' => (int) ($statusRows['en cours'] ?? $statusRows['en_cours'] ?? $statusRows['en-cours'] ?? 0),
+                'anomalies' => (int) ($statusRows['Anomalies'] ?? $statusRows['anomalies'] ?? $statusRows['anomalie'] ?? 0),
+                'refuse' => (int) ($statusRows['refuse'] ?? $statusRows['refusé'] ?? 0),
+                'autres' => (int) (array_sum($statusRows) - (
+                    ($statusRows['approuve'] ?? 0) +
+                    ($statusRows['en cours'] ?? 0) +
+                    ($statusRows['Anomalies'] ?? 0) +
+                    ($statusRows['refuse'] ?? 0)
+                )),
+            ];
+        }
+
+        $response = [
+            'success' => true,
+            'stats' => [
+                'cotisationsMois' => $cotisationsCeMois,
+                'creditsTotal' => $creditsTotalDue,
+                'creditsTotalPaye' => $creditsTotalPaid,
+                'creditsEnCours' => $creditsRemaining,
+                'montantsAssistancesRecus' => $assistancesReceived,
+                'anomalies' => $anomaliesCount,
+            ],
+            'charts' => [
+                'cotisations' => [
+                    'labels' => $labels12,
+                    'values' => $cotisationsValues,
+                ],
+                'credits' => [
+                    'labels' => $labels6,
+                    'accordes' => $creditsAccordes6,
+                    'rembourses' => $rembourses6 ?? [],
+                    'statuses' => $creditsStatus6, // per-month status breakdown for the member
+                ],
+                'tendance' => [
+                    'labels' => $labels12,
+                    'cotisations' => $cotisationsValues,
+                    'credits' => $creditsValuesForTrend,
+                    'assistances' => $assistancesValuesForTrend,
+                ],
+            ],
+        ];
+
+        return response()->json($response);
+    }
 }

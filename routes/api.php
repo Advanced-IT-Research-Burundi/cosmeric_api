@@ -61,6 +61,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::apiResource('configurations', ConfigurationController::class);
     Route::apiResource('users', UserController::class);
     Route::get('/dashboard', [DashboardController::class, 'index']);
+    Route::get('/dashboard-member', [DashboardController::class, 'dashboardMember']);
     Route::post("importation", [ImportationController::class , 'cotisation']);
     Route::apiResource('cotisation-mensuelles', CotisationMensuelleController::class);
 
