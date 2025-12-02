@@ -16,12 +16,17 @@ class MembreController extends Controller
         $query = Membre::with('categorie');
 
         // Search
-        if ($request->has('search') && $request->search) {
+        if ($request->filled('search')) {
             $searchTerm = $request->search;
+
             $query->where(function ($q) use ($searchTerm) {
-                $q->whereAny(['matricule', 'nom', 'email', 'prenom'], 'LIKE', "%{$searchTerm}%");
+                $q->where('matricule', 'LIKE', "%{$searchTerm}%")
+                ->orWhere('nom', 'LIKE', "%{$searchTerm}%")
+                ->orWhere('prenom', 'LIKE', "%{$searchTerm}%")
+                ->orWhere('email', 'LIKE', "%{$searchTerm}%");
             });
         }
+
 
         // Filters
         if ($request->has('filter')) {
