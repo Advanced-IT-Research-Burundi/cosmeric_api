@@ -14,7 +14,7 @@ use Carbon\Carbon;
 class DashboardController extends Controller
 {
     //
-    public function index()
+    public function getDashboardData()
     {
         // NOTE: this implementation assumes monetary columns are named 'montant'.
         // If your schema uses another column name (e.g. 'amount'), replace 'montant' accordingly.
