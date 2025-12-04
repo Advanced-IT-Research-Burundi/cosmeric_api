@@ -13,6 +13,29 @@ use Illuminate\Http\Response;
 class CotisationController extends Controller
 {
 
+    public function dashboard()
+    {
+        $totalCotisationsBif = Cotisation::where('devise', 'BIF')->count();
+        $totalCotisationsUSD = Cotisation::where('devise', 'USD')->count();
+        // $totalMembres = Cotisation::distinct('membre_id')->count('membre_id');
+        $totalMembres = Cotisation::where('statut', 'paye')->count();
+        $totalMontantCotisations = Cotisation::sum('montant');
+        $cotisationsParPeriode = Cotisation::selectRaw('periode_id, COUNT(*) as total, SUM(montant) as total_montant')
+            ->groupBy('periode_id')
+            ->with('periode')
+            ->get();
+
+        $data = [
+            'total_cotisations_bif' => $totalCotisationsBif,
+            'total_cotisations_usd' => $totalCotisationsUSD,
+            'total_membres' => $totalMembres,
+            'total_montant_cotisations' => $totalMontantCotisations,
+            'cotisations_par_periode' => $cotisationsParPeriode,
+        ];
+
+        return sendResponse($data, 'Données du tableau de bord des cotisations récupérées avec succès.');
+    }
+
     public function mesCotisations()
     {
         // get Member

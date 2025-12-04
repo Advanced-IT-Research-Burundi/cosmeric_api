@@ -45,11 +45,12 @@ Route::middleware('auth:sanctum')->group(function () {
     // Gestion des tokens
     Route::get('/tokens', [UserController::class, 'tokens']);
     Route::delete('/tokens', [UserController::class, 'revokeToken']);
-    
+
     Route::apiResource('categorie-membres', CategorieMembreController::class);
     Route::apiResource('membres', MembreController::class);
     Route::apiResource('periodes', PeriodeController::class);
     Route::apiResource('cotisations', CotisationController::class);
+    Route::apiResource('configurations', ConfigurationController::class);
     Route::apiResource('credits', CreditController::class);
     Route::get('mescredits', [CreditController::class, 'mesCredits']);
     Route::get('mescotisations', [CotisationController::class, 'mesCotisations']);
@@ -62,12 +63,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::apiResource('users', UserController::class);
     Route::get('/dashboard', [DashboardController::class, 'index']);
     Route::get('/dashboard-member', [DashboardController::class, 'dashboardMember']);
-    Route::post("importation", [ImportationController::class , 'cotisation']);
+    Route::get('/dashboard-assistance', [AssistanceController::class, 'dashboard']);
+    Route::get('/dashboard-cotisation', [CotisationController::class, 'dashboard']);
+    Route::post("importation", [ImportationController::class, 'cotisation']);
     Route::apiResource('cotisation-mensuelles', CotisationMensuelleController::class);
-
-
 });
-
-
-
-

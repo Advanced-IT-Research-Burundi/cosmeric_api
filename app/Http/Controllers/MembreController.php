@@ -6,6 +6,7 @@ use App\Http\Requests\MembreStoreRequest;
 use App\Http\Requests\MembreUpdateRequest;
 
 use App\Http\Resources\MembreCollection;
+use App\Http\Resources\MembreResource;
 use App\Models\Membre;
 use Illuminate\Http\Request;
 
@@ -21,9 +22,9 @@ class MembreController extends Controller
 
             $query->where(function ($q) use ($searchTerm) {
                 $q->where('matricule', 'LIKE', "%{$searchTerm}%")
-                ->orWhere('nom', 'LIKE', "%{$searchTerm}%")
-                ->orWhere('prenom', 'LIKE', "%{$searchTerm}%")
-                ->orWhere('email', 'LIKE', "%{$searchTerm}%");
+                    ->orWhere('nom', 'LIKE', "%{$searchTerm}%")
+                    ->orWhere('prenom', 'LIKE', "%{$searchTerm}%")
+                    ->orWhere('email', 'LIKE', "%{$searchTerm}%");
             });
         }
 
@@ -67,7 +68,17 @@ class MembreController extends Controller
 
     public function show(Request $request, Membre $membre)
     {
-        return sendResponse($membre, 'Membre récupéré avec succès');
+
+
+        $membre->load('user');
+        $membre->load('categorie');
+        $membre->load('cotisations');
+        $membre->load('credits');
+        $membre->load('assistances');
+
+        $data = $membre;
+
+        return sendResponse(new MembreResource($data), 'Membre récupéré avec succès');
     }
 
     public function update(MembreUpdateRequest $request, Membre $membre)

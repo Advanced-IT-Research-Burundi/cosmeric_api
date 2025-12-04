@@ -6,7 +6,9 @@ use App\Http\Requests\AssistanceStoreRequest;
 use App\Http\Requests\AssistanceUpdateRequest;
 use App\Http\Resources\AssistanceCollection;
 use App\Http\Resources\AssistanceResource;
+use App\Http\Resources\TypeAssistanceResource;
 use App\Models\Assistance;
+use App\Models\TypeAssistance;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 
@@ -42,7 +44,7 @@ class AssistanceController extends Controller
         // Sorting
         if ($request->has('sort_field') && $request->sort_field) {
             $query->orderBy(
-                $request->sort_field, 
+                $request->sort_field,
                 $request->sort_order ?? 'asc'
             );
         }
@@ -64,6 +66,23 @@ class AssistanceController extends Controller
             $assistance,
             Response::HTTP_CREATED,
         );
+    }
+
+    public function dashboard(Request $request)
+    {
+        $totalAssistances = Assistance::count();
+        $totalMontantAssiste = Assistance::sum('montant');
+        $typesAssistance = TypeAssistance::get();
+        $detailsAssistances = Assistance::latest()->take(5)->get()->where('statut', 'approuve');
+
+        $data = [
+            'total_assistances' => $totalAssistances,
+            'total_montant_assiste' => $totalMontantAssiste,
+            'types_assistance' => TypeAssistanceResource::collection($typesAssistance),
+            'details_assistances' => AssistanceResource::collection($detailsAssistances),
+        ];
+
+        return sendResponse($data, 'Données du tableau de bord des assistances récupérées avec succès.');
     }
 
     public function show(Request $request, Assistance $assistance)

@@ -7,38 +7,58 @@ use App\Http\Requests\RapportUpdateRequest;
 use App\Http\Resources\RapportCollection;
 use App\Http\Resources\RapportResource;
 use App\Models\Rapport;
+use App\Models\Cotisation;
+use App\Models\Membre;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 
 class RapportController extends Controller
 {
-    public function index(Request $request): Response
+    public function index(Request $request)
     {
-        $rapports = Rapport::all();
+        $totalCotisationsBif = Cotisation::where('devise', 'BIF')->count();
+        $totalCotisationsUSD = Cotisation::where('devise', 'USD')->count();
+        // $totalMembres = Cotisation::distinct('membre_id')->count('membre_id');
+        $totalMembres = Membre::where('statut', 'actif')->count();
+        $taux = 3;
+        $cotisationsParPeriode = Cotisation::selectRaw('periode_id, COUNT(*) as total, SUM(montant) as total_montant')
+            ->groupBy('periode_id')
+            ->with('periode')
+            ->get();
 
-        return new RapportCollection($rapports);
+        $data = [
+            'total_cotisations_bif' => $totalCotisationsBif,
+            'total_cotisations_usd' => $totalCotisationsUSD,
+            'total_membres' => $totalMembres,
+            'taux' => $taux,
+            'cotisations_par_periode' => $cotisationsParPeriode,
+        ];
+
+        return sendResponse($data, 'Données du tableau de bord des cotisations récupérées avec succès.');
     }
 
-    public function store(RapportStoreRequest $request): Response
+
+
+    public function store(RapportStoreRequest $request)
     {
         $rapport = Rapport::create($request->validated());
 
         return new RapportResource($rapport);
     }
 
-    public function show(Request $request, Rapport $rapport): Response
+    public function show(Request $request, Rapport $rapport)
     {
         return new RapportResource($rapport);
     }
 
-    public function update(RapportUpdateRequest $request, Rapport $rapport): Response
+    public function update(RapportUpdateRequest $request, Rapport $rapport)
     {
         $rapport->update($request->validated());
 
         return new RapportResource($rapport);
     }
 
-    public function destroy(Request $request, Rapport $rapport): Response
+    public function destroy(Request $request, Rapport $rapport)
     {
         $rapport->delete();
 

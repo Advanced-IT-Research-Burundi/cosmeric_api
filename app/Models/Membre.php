@@ -72,6 +72,21 @@ class Membre extends Model
         return $this->belongsTo(CategorieMembre::class);
     }
 
+    public function cotisations()
+    {
+        return $this->hasMany(Cotisation::class);
+    }
+
+    public function credits()
+    {
+        return $this->hasMany(Credit::class);
+    }
+
+    public function assistances()
+    {
+        return $this->hasMany(Assistance::class);
+    }
+
     public function getFullNameAttribute(): string
     {
         return "{$this->nom} {$this->prenom}";
