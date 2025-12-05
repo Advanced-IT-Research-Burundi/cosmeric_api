@@ -11,6 +11,32 @@ use Illuminate\Http\Request;
 
 class CreditController extends Controller
 {
+    public function demandeCredit(Request $request){
+        $request->validate([
+            'montant_demande' => 'required|numeric',
+            'taux_interet' => 'required|numeric',
+            'duree_mois' => 'required|numeric',
+            'montant_total_rembourser' => 'required|numeric',
+            'montant_mensualite' => 'required|numeric',
+        ]);
+
+        $credit = Credit::create([
+            'montant_demande' => $request->montant_demande,
+            'taux_interet' => $request->taux_interet,
+            'duree_mois' => $request->duree_mois,
+            'montant_total_rembourser' => $request->montant_total_rembourser,
+            'montant_mensualite' => $request->montant_mensualite,
+            'membre_id' => $request->user()->id,
+            'user_id' => $request->user()->id,
+            'statut' => 'en_attente',
+            'date_demande' => now(),
+            'motif' => $request->motif,
+            'montant_accorde' => 0,
+        ]);
+
+        return sendResponse($credit, 'Credit created successfully.');
+        
+    }
     public function mesCredits(){
         $credits = Credit::where('membre_id', auth()->user()->id)->latest()->paginate();
         return sendResponse($credits, 'Credits retrieved successfully.');
