@@ -53,7 +53,7 @@ class User extends Authenticatable
     // Relations
     public function membre()
     {
-        return $this->hasOne(Membre::class);
+        return $this->belongsTo(Membre::class);
     }
 
     public function tokens()

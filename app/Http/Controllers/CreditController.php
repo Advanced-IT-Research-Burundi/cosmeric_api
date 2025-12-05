@@ -6,12 +6,17 @@ use App\Http\Requests\CreditStoreRequest;
 use App\Http\Requests\CreditUpdateRequest;
 use App\Http\Resources\CreditCollection;
 use App\Http\Resources\CreditResource;
+use App\Mail\DemandeCredit;
 use App\Models\Credit;
+use App\Models\Membre;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Mail;
 
 class CreditController extends Controller
 {
     public function demandeCredit(Request $request){
+
+       
         $request->validate([
             'montant_demande' => 'required|numeric',
             'taux_interet' => 'required|numeric',
@@ -20,25 +25,41 @@ class CreditController extends Controller
             'montant_mensualite' => 'required|numeric',
         ]);
 
+        try{
+            $membre = Membre::where('user_id', auth()->user()->id)->first();
+        }catch(\Exception $e){
+            return sendError($e->getMessage());
+        }
+
+      
+
         $credit = Credit::create([
             'montant_demande' => $request->montant_demande,
             'taux_interet' => $request->taux_interet,
             'duree_mois' => $request->duree_mois,
             'montant_total_rembourser' => $request->montant_total_rembourser,
             'montant_mensualite' => $request->montant_mensualite,
-            'membre_id' => $request->user()->id,
+            'membre_id' => $membre->id,
             'user_id' => $request->user()->id,
             'statut' => 'en_attente',
             'date_demande' => now(),
             'motif' => $request->motif,
             'montant_accorde' => 0,
         ]);
+        // Envoie de l'email a l'admin
+        Mail::to('admin@cosmeric.com')
+        ->cc(auth()->user()->email) 
+        ->send(new DemandeCredit($credit->load('membre')));
 
         return sendResponse($credit, 'Credit created successfully.');
-        
     }
     public function mesCredits(){
-        $credits = Credit::where('membre_id', auth()->user()->id)->latest()->paginate();
+        try{
+            $membre = Membre::where('user_id', auth()->user()->id)->first();
+            $credits = Credit::where('membre_id',$membre->id)->latest()->paginate();
+        }catch(\Exception $e){
+            return sendError($e->getMessage());
+        }
         return sendResponse($credits, 'Credits retrieved successfully.');
     }
     public function index(Request $request)
