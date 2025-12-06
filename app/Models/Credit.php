@@ -29,6 +29,7 @@ class Credit extends Model
         'date_approbation',
         'statut',
         'motif',
+        'user_id'
     ];
 
     /**

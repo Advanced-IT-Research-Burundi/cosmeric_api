@@ -16,7 +16,8 @@ class CreditController extends Controller
 {
     public function demandeCredit(Request $request){
 
-       
+
+
         $request->validate([
             'montant_demande' => 'required|numeric',
             'taux_interet' => 'required|numeric',
@@ -25,13 +26,14 @@ class CreditController extends Controller
             'montant_mensualite' => 'required|numeric',
         ]);
 
+
         try{
             $membre = Membre::where('user_id', auth()->user()->id)->first();
         }catch(\Exception $e){
             return sendError($e->getMessage());
         }
 
-      
+
 
         $credit = Credit::create([
             'montant_demande' => $request->montant_demande,
@@ -40,17 +42,22 @@ class CreditController extends Controller
             'montant_total_rembourser' => $request->montant_total_rembourser,
             'montant_mensualite' => $request->montant_mensualite,
             'membre_id' => $membre->id,
-            'user_id' => $request->user()->id,
+            'user_id' => auth()->user()->id,
             'statut' => 'en_attente',
             'date_demande' => now(),
             'motif' => $request->motif,
             'montant_accorde' => 0,
         ]);
-        // Envoie de l'email a l'admin
-        Mail::to('admin@cosmeric.com')
-        ->cc(auth()->user()->email) 
-        ->send(new DemandeCredit($credit->load('membre')));
 
+        try{
+            // Envoie de l'email a l'admin
+            Mail::to('nijeanlionel@gmail.com')
+            ->cc(auth()->user()->email)
+            ->send(new DemandeCredit($credit->load('membre')));
+
+        }catch(\Exception $e){
+            return sendError($e->getMessage());
+        }
         return sendResponse($credit, 'Credit created successfully.');
     }
     public function mesCredits(){
@@ -62,43 +69,6 @@ class CreditController extends Controller
         }
         return sendResponse($credits, 'Credits retrieved successfully.');
     }
-    public function index(Request $request)
-    {
-        $query = Credit::query();
-
-        // Search
-        if ($request->has('search') && $request->search) {
-            $searchTerm = $request->search;
-            $query->where(function ($q) use ($searchTerm) {
-                $q->whereAny(['montant_demande', 'montant_accorde', 'taux_interet', 'duree_mois', 'montant_total_rembourser', 'montant_mensualite'], 'LIKE', "%{$searchTerm}%");
-            })
-            ->orWhereHas('membre', function ($q) use ($searchTerm) {
-                $q->whereAny(['nom', 'prenom', 'matricule'], 'LIKE', "%{$searchTerm}%");
-            });
-        }
-
-        // Filters
-        if ($request->has('filter')) {
-            foreach ($request->filter as $field => $value) {
-                if ($value) {
-                    $query->where($field, 'LIKE', "%{$value}%");
-                }
-            }
-        }
-
-        // Sorting
-        if ($request->has('sort_field') && $request->sort_field) {
-            $query->orderBy(
-                $request->sort_field, 
-                $request->sort_order ?? 'asc'
-            );
-        }
-
-        // Pagination
-        $perPage = $request->per_page ?? 10;
-        $credits = $query->paginate($perPage);
-        return sendResponse($credits, 'Credits retrieved successfully.');
-    }
 
     public function store(CreditStoreRequest $request)    {
         $credit = Credit::create(array_merge($request->validated(), [
@@ -107,6 +77,62 @@ class CreditController extends Controller
 
         return new CreditResource($credit);
     }
+
+    public function index(Request $request)
+    {
+        $params = $request->all();
+        $params = $params['params'];
+        $query = Credit::query();
+
+
+        // 🔎 Recherche : par nom ou prénom du membre, motif, ID
+        if ($params['search']) {
+            $search = $params['search'];
+
+            $query->where(function ($q) use ($search) {
+                $q->whereHas('membre', function ($m) use ($search) {
+                    $m->where('nom', 'like', "%$search%")
+                    ->orWhere('prenom', 'like', "%$search%");
+                })
+                ->orWhere('motif', 'like', "%$search%")
+                ->orWhere('id', $search);
+            });
+        }
+
+        // 📌 Filtre statut
+        if ($params['statut']) {
+            $query->where('statut', $params['statut']);
+        }
+
+        // 📅 Filtre date_demande (start / end)
+        if ($params['date_demande_start']) {
+            $query->whereDate('date_demande', '>=', $params['date_demande_start']);
+        }
+
+        if ($params['date_demande_end']) {
+            $query->whereDate('date_demande', '<=', $params['date_demande_end']);
+        }
+
+        // 📅 Filtre date_fin précise
+        if ($params['date_fin']) {
+            $query->whereDate('date_fin', $params['date_fin']);
+        }
+
+        // 🔽 Tri dynamique
+        $sortField = $params['sort_field'] ?? 'created_at';
+        $sortOrder = $params['sort_order'] ?? 'desc';
+
+        $query->orderBy($sortField, $sortOrder);
+
+        // 📄 Pagination dynamique
+        $perPage = $params['per_page'] ?? 15;
+        $credits = $query->paginate($perPage);
+
+        return sendResponse($credits , 'Credits retrieved successfully.');
+    }
+
+
+
 
     public function show(Request $request, Credit $credit)
     {
