@@ -14,18 +14,7 @@ class User extends Authenticatable
 {
     use HasApiTokens, HasFactory, Notifiable;
 
-    protected $fillable = [
-        'name',
-        'nom',
-        'prenom',
-        'email',
-        'telephone',
-        'password',
-        'role',
-        'email_verified_at',
-        'is_active',
-        'last_login_at',
-    ];
+    protected $guarded = [];
 
     protected $hidden = [
         'password',
@@ -53,7 +42,7 @@ class User extends Authenticatable
     // Relations
     public function membre()
     {
-        return $this->belongsTo(Membre::class);
+        return $this->belongsTo(Membre::class  , 'id', 'user_id');
     }
 
     public function tokens()

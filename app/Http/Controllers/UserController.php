@@ -22,7 +22,15 @@ class UserController extends Controller
     public function __construct()
     {
         // Middleware pour protéger les routes sauf pour l'inscription et la connexion
-       
+
+    }
+
+    public function profiles(){
+
+        $user = User::with("membre")->where('id', Auth::user()->id)->get();
+
+        return sendResponse($user, 'Utilisateur récupéré avec succès.');
+
     }
 
     public function index()

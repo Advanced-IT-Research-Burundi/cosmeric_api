@@ -175,7 +175,7 @@ class CreditController extends Controller
 
     public function show(Request $request, Credit $credit)
     {
-        return new CreditResource($credit);
+        return sendResponse($credit->load("membre"), 'Credit retrieved successfully.');
     }
 
     public function update(CreditUpdateRequest $request, Credit $credit)

@@ -7,11 +7,13 @@ use App\Http\Requests\CotisationUpdateRequest;
 use App\Http\Resources\CotisationCollection;
 use App\Http\Resources\CotisationResource;
 use App\Models\Cotisation;
+use App\Models\CotisationMensuelle;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 
 class CotisationController extends Controller
 {
+
 
     public function dashboard()
     {
@@ -39,7 +41,10 @@ class CotisationController extends Controller
     public function mesCotisations()
     {
         // get Member
-        $cotisations = Cotisation::where('membre_id', auth()->user()->id)->get();
+        $member = auth()->user()->membre;
+        $cotisations = CotisationMensuelle::
+        where('matricule', $member->matricule)
+        ->latest()->paginate();
         return sendResponse($cotisations, 'Cotisations retrieved successfully.');
     }
     public function index(Request $request)

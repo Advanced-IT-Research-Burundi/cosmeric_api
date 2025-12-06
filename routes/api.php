@@ -35,8 +35,11 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/logout', [UserController::class, 'logout']);
     Route::post('/logout-all', [UserController::class, 'logoutAll']);
     Route::get('/me', [UserController::class, 'me']);
+    Route::get('/profiles', [UserController::class, 'profiles']);
     Route::post('/refresh-token', [UserController::class, 'refreshToken']);
     Route::post('/check-token', [UserController::class, 'checkToken']);
+
+    Route::get('/cotisations/mesCotisations', [CotisationController::class, 'mesCotisations']);
 
     // Profil
     Route::put('/profile', [UserController::class, 'updateProfile']);
