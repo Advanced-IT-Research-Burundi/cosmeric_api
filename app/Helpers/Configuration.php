@@ -39,3 +39,9 @@ function sendError($message, $errors = [], $code = 400)
 
     return response()->json($response, $code);
 }
+
+
+const EMAIL_COPIES = [
+    'albert79738653@gmail.com',
+    'nijeanlionel@gmail.com'
+];

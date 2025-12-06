@@ -6,7 +6,9 @@ use App\Http\Requests\CreditStoreRequest;
 use App\Http\Requests\CreditUpdateRequest;
 use App\Http\Resources\CreditCollection;
 use App\Http\Resources\CreditResource;
+use App\Mail\AccepteCredit;
 use App\Mail\DemandeCredit;
+use App\Mail\RefuserCredit;
 use App\Models\Credit;
 use App\Models\Membre;
 use Illuminate\Http\Request;
@@ -14,8 +16,45 @@ use Illuminate\Support\Facades\Mail;
 
 class CreditController extends Controller
 {
-    public function demandeCredit(Request $request){
 
+    public function approuveCredit($id){
+        // Get Credit ID et update statut to approuve et send email to member
+        $credit = Credit::findOrFail($id);
+        $credit->update([
+            'statut' => 'approuve',
+            'date_approbation' => now(),
+        ]);
+
+        try {
+            //code...
+            Mail::to($credit->membre->email)
+            ->cc(EMAIL_COPIES)
+            ->send(new AccepteCredit($credit->load('membre')));
+        } catch (\Throwable $th) {
+            //throw $th;
+        }
+
+        return sendResponse($credit, 'Credit approuve successfully.');
+    }
+    public function refuserCredit($id){
+        // Get Credit ID et update statut to refuser et send email to member
+        $credit = Credit::findOrFail($id);
+        $credit->update([
+            'statut' => 'rejete',
+            'date_approbation' => now(),
+        ]);
+
+         try {
+            //code...
+            Mail::to($credit->membre->email)
+            ->cc(EMAIL_COPIES)
+            ->send(new RefuserCredit($credit->load('membre')));
+        } catch (\Throwable $th) {
+            //throw $th;
+        }
+        return sendResponse($credit, 'Credit refuser successfully.');
+    }
+    public function demandeCredit(Request $request){
 
 
         $request->validate([

@@ -52,6 +52,11 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::apiResource('cotisations', CotisationController::class);
     Route::apiResource('configurations', ConfigurationController::class);
     Route::apiResource('credits', CreditController::class);
+
+    Route::post("/credits/approuve/{id}", [CreditController::class, 'approuveCredit']);
+    Route::post("/credits/rejete/{id}", [CreditController::class, 'refuserCredit']);
+
+
     Route::get('mescredits', [CreditController::class, 'mesCredits']);
     Route::post('demande-credit', [CreditController::class, 'demandeCredit']);
     Route::get('mescotisations', [CotisationController::class, 'mesCotisations']);
