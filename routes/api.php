@@ -50,6 +50,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::delete('/tokens', [UserController::class, 'revokeToken']);
 
     Route::apiResource('categorie-membres', CategorieMembreController::class);
+    Route::apiResource('categories', CategorieMembreController::class);
     Route::apiResource('membres', MembreController::class);
     Route::apiResource('periodes', PeriodeController::class);
     Route::apiResource('cotisations', CotisationController::class);

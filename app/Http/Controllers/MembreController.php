@@ -55,7 +55,7 @@ class MembreController extends Controller
         $membres = $query->paginate($perPage);
 
         // Format response
-        return sendResponse(new MembreCollection($membres), 'Membres récupérés avec succès');
+        return sendResponse($membres, 'Membres récupérés avec succès');
     }
 
     public function store(MembreStoreRequest $request)
