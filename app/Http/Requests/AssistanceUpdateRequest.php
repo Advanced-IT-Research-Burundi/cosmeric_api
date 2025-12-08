@@ -22,7 +22,7 @@ class AssistanceUpdateRequest extends FormRequest
         return [
             // 'membre_id' => ['required', 'integer', 'exists:membres,id'],
             'type_assistance_id' => ['required', 'integer', 'exists:type_assistances,id'],
-            //'montant' => ['required', 'numeric', 'between:-99999999.99,99999999.99'],
+            'montant' => ['required', 'numeric', 'between:-99999999.99,99999999.99'],
             'date_demande' => ['required', 'date'],
             'date_approbation' => ['required', 'date'],
             'date_versement' => ['required', 'date'],
