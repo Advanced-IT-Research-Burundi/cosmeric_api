@@ -14,10 +14,13 @@ use App\Models\Membre;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
 
+use function PHPSTORM_META\type;
+
 class CreditController extends Controller
 {
 
-    public function approuveCredit($id){
+    public function approuveCredit($id)
+    {
         // Get Credit ID et update statut to approuve et send email to member
         $credit = Credit::findOrFail($id);
         $credit->update([
@@ -28,15 +31,16 @@ class CreditController extends Controller
         try {
             //code...
             Mail::to($credit->membre->email)
-            ->cc(EMAIL_COPIES)
-            ->send(new AccepteCredit($credit->load('membre')));
+                ->cc(EMAIL_COPIES)
+                ->send(new AccepteCredit($credit->load('membre')));
         } catch (\Throwable $th) {
             //throw $th;
         }
 
         return sendResponse($credit, 'Credit approuve successfully.');
     }
-    public function refuserCredit($id){
+    public function refuserCredit($id)
+    {
         // Get Credit ID et update statut to refuser et send email to member
         $credit = Credit::findOrFail($id);
         $credit->update([
@@ -44,17 +48,18 @@ class CreditController extends Controller
             'date_approbation' => now(),
         ]);
 
-         try {
+        try {
             //code...
             Mail::to($credit->membre->email)
-            ->cc(EMAIL_COPIES)
-            ->send(new RefuserCredit($credit->load('membre')));
+                ->cc(EMAIL_COPIES)
+                ->send(new RefuserCredit($credit->load('membre')));
         } catch (\Throwable $th) {
             //throw $th;
         }
         return sendResponse($credit, 'Credit refuser successfully.');
     }
-    public function demandeCredit(Request $request){
+    public function demandeCredit(Request $request)
+    {
 
 
         $request->validate([
@@ -66,9 +71,9 @@ class CreditController extends Controller
         ]);
 
 
-        try{
+        try {
             $membre = Membre::where('user_id', auth()->user()->id)->first();
-        }catch(\Exception $e){
+        } catch (\Exception $e) {
             return sendError($e->getMessage());
         }
 
@@ -88,28 +93,30 @@ class CreditController extends Controller
             'montant_accorde' => 0,
         ]);
 
-        try{
+        try {
             // Envoie de l'email a l'admin
             Mail::to('nijeanlionel@gmail.com')
-            ->cc(auth()->user()->email)
-            ->send(new DemandeCredit($credit->load('membre')));
-
-        }catch(\Exception $e){
+                ->cc(auth()->user()->email)
+                ->send(new DemandeCredit($credit->load('membre')));
+        } catch (\Exception $e) {
             return sendError($e->getMessage());
         }
         return sendResponse($credit, 'Credit created successfully.');
     }
-    public function mesCredits(){
-        try{
-            $membre = Membre::where('user_id', auth()->user()->id)->first();
-            $credits = Credit::where('membre_id',$membre->id)->latest()->paginate();
-        }catch(\Exception $e){
+    public function mesCredits()
+    {
+        try {
+            $membre = Membre::where('user_id', auth()->user()->id)->first()->id;
+            $credits = Credit::where('membre_id', $membre)->latest()->paginate();
+        } catch (\Exception $e) {
             return sendError($e->getMessage());
         }
         return sendResponse($credits, 'Credits retrieved successfully.');
     }
 
-    public function store(CreditStoreRequest $request)    {
+
+    public function store(CreditStoreRequest $request)
+    {
         $credit = Credit::create(array_merge($request->validated(), [
             'user_id' => $request->user()->id ?? 1,
         ]));
@@ -131,10 +138,10 @@ class CreditController extends Controller
             $query->where(function ($q) use ($search) {
                 $q->whereHas('membre', function ($m) use ($search) {
                     $m->where('nom', 'like', "%$search%")
-                    ->orWhere('prenom', 'like', "%$search%");
+                        ->orWhere('prenom', 'like', "%$search%");
                 })
-                ->orWhere('motif', 'like', "%$search%")
-                ->orWhere('id', $search);
+                    ->orWhere('motif', 'like', "%$search%")
+                    ->orWhere('id', $search);
             });
         }
 
@@ -167,7 +174,7 @@ class CreditController extends Controller
         $perPage = $params['per_page'] ?? 15;
         $credits = $query->paginate($perPage);
 
-        return sendResponse($credits , 'Credits retrieved successfully.');
+        return sendResponse($credits, 'Credits retrieved successfully.');
     }
 
 

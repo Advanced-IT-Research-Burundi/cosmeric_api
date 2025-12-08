@@ -5,6 +5,7 @@ namespace Database\Factories;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Str;
 use App\Models\CotisationMensuelle;
+use App\Models\Membre;
 
 class CotisationMensuelleFactory extends Factory
 {
@@ -22,7 +23,7 @@ class CotisationMensuelleFactory extends Factory
     {
         return [
             'name' => fake()->name(),
-            'matricule' => fake()->word(),
+            'matricule' => Membre::factory(),
             'nomero_dossier' => fake()->word(),
             'global' => fake()->word(),
             'regle' => fake()->word(),

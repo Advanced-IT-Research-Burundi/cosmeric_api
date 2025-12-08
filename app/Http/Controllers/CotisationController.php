@@ -42,9 +42,8 @@ class CotisationController extends Controller
     {
         // get Member
         $member = auth()->user()->membre;
-        $cotisations = CotisationMensuelle::
-        where('matricule', $member->matricule)
-        ->latest()->paginate();
+        $cotisations = CotisationMensuelle::where('matricule', $member->user_id)
+            ->latest()->paginate();
         return sendResponse($cotisations, 'Cotisations retrieved successfully.');
     }
     public function index(Request $request)
