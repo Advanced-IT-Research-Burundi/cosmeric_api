@@ -28,30 +28,18 @@ class conf extends Command
     {
         Configuration::insert([
             [
-                'cle' => 'taux_change_usd_bif',
-                'valeur' => '3',
-                'description' => 'Taux de change entre USD et BIF',
+                'valeur' => '300000',
+                'description' => 'Mariage',
             ],
             [
-                'cle' => 'duree_minimale_en_mois',
-                'valeur' => '3',
-                'description' => 'Durée minimale',
-            ],
-            [
-                'cle' => 'duree_maximale_en_mois',
-                'valeur' => '24',
-                'description' => 'Durée maximale',
-            ],
-            [
-                'cle' => 'montant_minimal_cotisation',
                 'valeur' => '500000',
-                'description' => 'Montant minimum en FBU',
+                'description' => 'Retraite',
             ],
             [
-                'cle' => 'montant_maximal_cotisation',
-                'valeur' => '10000000',
-                'description' => 'Montant maximum en FBU',
-            ],
+
+                'valeur' => '700000',
+                'description' => 'Deces',
+            ]
         ]);
 
         $this->info('Configurations créées avec succès.');
