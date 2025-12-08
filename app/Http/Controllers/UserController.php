@@ -25,17 +25,29 @@ class UserController extends Controller
 
     }
 
-    public function profiles(){
+    public function profiles()
+    {
 
         $user = User::with("membre")->where('id', Auth::user()->id)->get();
 
         return sendResponse($user, 'Utilisateur récupéré avec succès.');
-
     }
 
-    public function index()
+    public function index(Request $request)
     {
-        $users = User::latest()->paginate();
+        $search = $request->input('search');
+
+        if ($search) {
+            $users = User::where(function ($q) use ($search) {
+                $q->where('nom', 'like', "%{$search}%")
+                    ->orWhere('name', 'like', "%{$search}%")
+                    ->orWhere('prenom', 'like', "%{$search}%")
+                    ->orWhere('role', 'like', "%{$search}%")
+                    ->orWhere('email', 'like', "%{$search}%");
+            })->latest()->paginate();
+        } else {
+            $users = User::latest()->paginate();
+        }
         return sendResponse($users, 'Users retrieved successfully.');
     }
     // ===== INSCRIPTION =====
@@ -254,7 +266,6 @@ class UserController extends Controller
                 'token_type' => 'Bearer',
                 'expires_at' => $token->accessToken->expires_at,
             ]);
-
         } catch (\Exception $e) {
             return response()->json([
                 'message' => 'Erreur lors de la connexion',
@@ -273,7 +284,6 @@ class UserController extends Controller
             return response()->json([
                 'message' => 'Déconnexion réussie'
             ]);
-
         } catch (\Exception $e) {
             return response()->json([
                 'message' => 'Erreur lors de la déconnexion',
@@ -294,7 +304,6 @@ class UserController extends Controller
                 'message' => 'Déconnexion de tous les appareils réussie',
                 'tokens_deleted' => $tokensDeleted
             ]);
-
         } catch (\Exception $e) {
             return response()->json([
                 'message' => 'Erreur lors de la déconnexion',
@@ -321,7 +330,6 @@ class UserController extends Controller
                 ],
                 'active_tokens' => $user->tokens()->count(),
             ]);
-
         } catch (\Exception $e) {
             return response()->json([
                 'message' => 'Erreur lors de la récupération du profil',
@@ -353,7 +361,6 @@ class UserController extends Controller
                 'token_type' => 'Bearer',
                 'expires_at' => $newToken->accessToken->expires_at,
             ]);
-
         } catch (\Exception $e) {
             return response()->json([
                 'message' => 'Erreur lors du rafraîchissement du token',
@@ -407,7 +414,6 @@ class UserController extends Controller
             return response()->json([
                 'message' => 'Mot de passe modifié avec succès'
             ]);
-
         } catch (\Exception $e) {
             return response()->json([
                 'message' => 'Erreur lors de la modification du mot de passe',
@@ -448,7 +454,6 @@ class UserController extends Controller
                 'message' => 'Profil mis à jour avec succès',
                 'user' => $this->formatUserResponse($user->fresh())
             ]);
-
         } catch (\Exception $e) {
             return response()->json([
                 'message' => 'Erreur lors de la mise à jour du profil',
@@ -478,7 +483,6 @@ class UserController extends Controller
                 'tokens' => $tokens,
                 'total' => $tokens->count()
             ]);
-
         } catch (\Exception $e) {
             return response()->json([
                 'message' => 'Erreur lors de la récupération des tokens',
@@ -517,7 +521,6 @@ class UserController extends Controller
             return response()->json([
                 'message' => 'Token "' . $tokenName . '" révoqué avec succès'
             ]);
-
         } catch (\Exception $e) {
             return response()->json([
                 'message' => 'Erreur lors de la révocation du token',
@@ -544,7 +547,6 @@ class UserController extends Controller
                     'is_expired' => $token->expires_at ? $token->expires_at->isPast() : false,
                 ]
             ]);
-
         } catch (\Exception $e) {
             return response()->json([
                 'valid' => false,
@@ -607,5 +609,3 @@ class UserController extends Controller
         };
     }
 }
-
-

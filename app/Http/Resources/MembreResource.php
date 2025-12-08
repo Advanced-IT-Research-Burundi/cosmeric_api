@@ -33,7 +33,7 @@ class MembreResource extends JsonResource
             "cotisations" => CotisationResource::collection($this->cotisations),
             "credits" => CreditResource::collection($this->credits),
             "remboursements_pending" => Credit::where("membre_id", $this->id)->where("statut", "en_cours")->sum('montant_total_rembourser'),
-            "remboursements" => RemboursementResource::where("credit_id", $this->id),
+            // "remboursements" => RemboursementResource::where("credit_id", $this->id),
             "assistances" => AssistanceResource::collection($this->assistances),
         ];
     }

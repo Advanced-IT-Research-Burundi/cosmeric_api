@@ -22,13 +22,19 @@ class AssistanceController extends Controller
      */
     public function index(Request $request)
     {
+
         $query = Assistance::query();
 
         // Search
         if ($request->has('search') && $request->search) {
             $searchTerm = $request->search;
             $query->where(function ($q) use ($searchTerm) {
-                $q->whereAny(['membre_id', 'type_assistance_id', 'montant', 'date_demande', 'date_approbation', 'date_versement', 'statut', 'justificatif'], 'LIKE', "%{$searchTerm}%");
+                $q->whereAny(['membre_id', 'type_assistance_id', 'montant', 'date_demande', 'date_approbation', 'date_versement', 'statut', 'justificatif'], 'LIKE', "%{$searchTerm}%")
+                    ->orWhereHas('membre', function ($query) use ($searchTerm) {
+                        $query->where('matricule', 'like', "%{$searchTerm}%")
+                            ->orWhere('nom', 'like', "%{$searchTerm}%")
+                            ->orWhere('prenom', 'like', "%{$searchTerm}%");
+                    });
             });
         }
 
