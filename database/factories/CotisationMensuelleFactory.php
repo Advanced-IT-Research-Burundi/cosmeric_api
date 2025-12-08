@@ -23,14 +23,14 @@ class CotisationMensuelleFactory extends Factory
     {
         return [
             'name' => fake()->name(),
-            'matricule' => Membre::factory(),
+            'matricule' => Membre::factory()->unique()->create()->matricule,
             'nomero_dossier' => fake()->word(),
             'global' => fake()->word(),
             'regle' => fake()->word(),
             'restant' => fake()->word(),
             'retenu' => fake()->word(),
             'date_cotisation' => fake()->word(),
-            'user_id' => fake()->numberBetween(-10000, 10000),
+            'user_id' => Membre::factory()->create()->user_id,
         ];
     }
 }

@@ -76,5 +76,5 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/dashboard-assistance', [AssistanceController::class, 'dashboard']);
     Route::get('/dashboard-cotisation', [CotisationController::class, 'dashboard']);
     Route::post("importation", [ImportationController::class, 'cotisation']);
-    Route::apiResource('cotisation-mensuelles', CotisationMensuelleController::class);
+    Route::apiResource("cotisation-mensuelles", CotisationMensuelleController::class);
 });
