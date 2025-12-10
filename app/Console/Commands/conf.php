@@ -5,6 +5,7 @@ namespace App\Console\Commands;
 use App\Models\Configuration;
 use App\Models\Cotisation;
 use App\Models\CotisationMensuelle;
+use App\Models\TypeAssistance;
 use Illuminate\Console\Command;
 
 class conf extends Command
@@ -28,24 +29,24 @@ class conf extends Command
      */
     public function handle()
     {
-        // Configuration::insert([
-        //     [
-        //         'valeur' => '300000',
-        //         'description' => 'Mariage',
-        //     ],
-        //     [
-        //         'valeur' => '500000',
-        //         'description' => 'Retraite',
-        //     ],
-        //     [
+        TypeAssistance::insert([
+            [
+                'nom' => 'Mariage',
+                'montant_standard' => '300000',
+            ],
+            [
+                'nom' => 'Retraite',
+                'montant_standard' => '500000',
+            ],
+            [
 
-        //         'valeur' => '700000',
-        //         'description' => 'Deces',
-        //     ]
-        // ]);
+                'nom' => 'Decés',
+                'montant_standard' => '700000',
+            ]
+        ]);
 
         // CotisationMensuelle::factory()->count(5)->create();
-        Cotisation::factory()->count(5)->create();
+        // Cotisation::factory()->count(5)->create();
 
         $this->info('Configurations créées avec succès.');
     }

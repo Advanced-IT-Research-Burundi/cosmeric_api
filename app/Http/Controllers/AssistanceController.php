@@ -57,7 +57,7 @@ class AssistanceController extends Controller
 
         // Pagination
         $perPage = $request->per_page ?? 10;
-        $assistances = $query->paginate($perPage);
+        $assistances = $query->with("typeAssistance")->latest()->paginate($perPage);
 
         return sendResponse(
             $assistances,
