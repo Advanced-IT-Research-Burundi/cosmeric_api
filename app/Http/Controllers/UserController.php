@@ -3,12 +3,15 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
+use App\Mail\WelcomEmail;
 use App\Models\Membre;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rules\Password;
@@ -35,19 +38,7 @@ class UserController extends Controller
 
     public function index(Request $request)
     {
-        $search = $request->input('search');
-
-        if ($search) {
-            $users = User::where(function ($q) use ($search) {
-                $q->where('nom', 'like', "%{$search}%")
-                    ->orWhere('name', 'like', "%{$search}%")
-                    ->orWhere('prenom', 'like', "%{$search}%")
-                    ->orWhere('role', 'like', "%{$search}%")
-                    ->orWhere('email', 'like', "%{$search}%");
-            })->latest()->paginate();
-        } else {
-            $users = User::latest()->paginate();
-        }
+        $users = User::latest()->paginate();
         return sendResponse($users, 'Users retrieved successfully.');
     }
     // ===== INSCRIPTION =====
@@ -75,28 +66,43 @@ class UserController extends Controller
             'password.confirmed' => 'La confirmation du mot de passe ne correspond pas.',
         ]);
 
-        $user = User::create([
-            'name' => $request->nom . ' ' . $request->prenom,
-            'nom' => $request->nom,
-            'prenom' => $request->prenom,
-            'email' => $request->email,
-            'telephone' => $request->telephone,
-            'password' => Hash::make($request->password),
-            'role' => 'membre',
-            'is_active' => true,
-        ]);
+        // Transaction
 
-        $membre = Membre::create([
-            'matricule' => $request->matricule,
-            'categorie_id' => $request->categorie_id,
-            'nom' => $request->nom,
-            'prenom' => $request->prenom,
-            'email' => $request->email,
-            'telephone' => $request->telephone,
-            'statut' => 'inactif',
-            'date_adhesion' => now(),
-            'user_id' => $user->id,
-        ]);
+        try {
+            //code...
+
+            DB::beginTransaction();
+            $user = User::create([
+                'name' => $request->nom . ' ' . $request->prenom,
+                'nom' => $request->nom,
+                'prenom' => $request->prenom,
+                'email' => $request->email,
+                'telephone' => $request->telephone,
+                'password' => Hash::make($request->password),
+                'role' => 'membre',
+                'is_active' => true,
+            ]);
+
+            $membre = Membre::create([
+                'matricule' => $request->matricule,
+                'categorie_id' => $request->categorie_id,
+                'nom' => $request->nom,
+                'prenom' => $request->prenom,
+                'email' => $request->email,
+                'telephone' => $request->telephone,
+                'statut' => 'inactif',
+                'date_adhesion' => now(),
+                'user_id' => $user->id,
+            ]);
+
+            Mail::to($user->email)->send(new WelcomEmail($user));
+            DB::commit();
+        } catch (\Throwable $th) {
+            DB::rollBack();
+            throw $th;
+        }
+
+
 
         return sendResponse($user, 'Membre créé avec succès.');
     }
@@ -183,9 +189,9 @@ class UserController extends Controller
 
     // ===== CONNEXION =====
     /**
-     * @param Request $request
-     * @return JsonResponse
-     */
+    * @param Request $request
+    * @return JsonResponse
+    */
     public function login(Request $request): JsonResponse
     {
         try {
@@ -230,35 +236,32 @@ class UserController extends Controller
                     'message' => 'Les identifiants fournis sont incorrects.',
                     'errors' => [
                         'email' => ['Les identifiants fournis sont incorrects.']
-                    ]
-                ], 401);
-            }
+                        ]
+                    ], 401);
+                }
 
-            // Vérification du statut du compte
-            if (!$user->is_active) {
-                return response()->json([
-                    'message' => 'Votre compte est désactivé. Contactez l\'administrateur.',
-                ], 403);
-            }
+                // Vérification du statut du compte
+                if (!$user->is_active) {
+                    return response()->json([
+                        'message' => 'Votre compte est désactivé. Contactez l\'administrateur.',
+                    ], 403);
+                }
 
-            // Révoquer tous les tokens existants si demandé
-            if ($request->revoke_other_tokens) {
-                $user->tokens()->delete();
-            }
+                // Révoquer tous les tokens existants si demandé
+                if ($request->revoke_other_tokens) {
+                    $user->tokens()->delete();
+                }
 
-            // Créer un nouveau token
-            $tokenName = $request->device_name ?? 'login_token';
-            $abilities = $this->getTokenAbilities($user->role);
-            $expiresAt = $request->remember ? now()->addDays(30) : now()->addHours(24);
+                // Créer un nouveau token
+                $tokenName = $request->device_name ?? 'login_token';
+                $abilities = $this->getTokenAbilities($user->role);
+                $expiresAt = $request->remember ? now()->addDays(30) : now()->addHours(24);
 
-            $token = $user->createToken($tokenName, $abilities, $expiresAt);
-
-            // Mettre à jour la dernière connexion
-            $user->updateLastLogin();
-
-            // Effacer le rate limiting en cas de succès
-            RateLimiter::clear($key);
-
+                $token = $user->createToken($tokenName, $abilities, $expiresAt);
+                // Mettre à jour la dernière connexion
+                $user->updateLastLogin();
+                // Effacer le rate limiting en cas de succès
+                RateLimiter::clear($key);
             return response()->json([
                 'message' => 'Connexion réussie',
                 'user' => $this->formatUserResponse($user),
@@ -266,6 +269,7 @@ class UserController extends Controller
                 'token_type' => 'Bearer',
                 'expires_at' => $token->accessToken->expires_at,
             ]);
+
         } catch (\Exception $e) {
             return response()->json([
                 'message' => 'Erreur lors de la connexion',
@@ -274,16 +278,17 @@ class UserController extends Controller
         }
     }
 
-    // ===== DÉCONNEXION =====
-    public function logout(Request $request): JsonResponse
-    {
-        try {
-            // Supprimer le token actuel
-            $request->user()->currentAccessToken()->delete();
+        // ===== DÉCONNEXION =====
+        public function logout(Request $request): JsonResponse
+        {
+            try {
+                // Supprimer le token actuel
+                $request->user()->currentAccessToken()->delete();
 
             return response()->json([
                 'message' => 'Déconnexion réussie'
             ]);
+
         } catch (\Exception $e) {
             return response()->json([
                 'message' => 'Erreur lors de la déconnexion',
@@ -292,18 +297,19 @@ class UserController extends Controller
         }
     }
 
-    // ===== DÉCONNEXION DE TOUS LES APPAREILS =====
-    public function logoutAll(Request $request): JsonResponse
-    {
-        try {
-            // Supprimer tous les tokens de l'utilisateur
-            $tokensDeleted = $request->user()->tokens()->count();
-            $request->user()->tokens()->delete();
+        // ===== DÉCONNEXION DE TOUS LES APPAREILS =====
+        public function logoutAll(Request $request): JsonResponse
+        {
+            try {
+                // Supprimer tous les tokens de l'utilisateur
+                $tokensDeleted = $request->user()->tokens()->count();
+                $request->user()->tokens()->delete();
 
             return response()->json([
                 'message' => 'Déconnexion de tous les appareils réussie',
                 'tokens_deleted' => $tokensDeleted
             ]);
+
         } catch (\Exception $e) {
             return response()->json([
                 'message' => 'Erreur lors de la déconnexion',
@@ -312,12 +318,12 @@ class UserController extends Controller
         }
     }
 
-    // ===== PROFIL UTILISATEUR =====
-    public function me(Request $request): JsonResponse
-    {
-        try {
-            $user = $request->user();
-            $currentToken = $user->currentAccessToken();
+        // ===== PROFIL UTILISATEUR =====
+        public function me(Request $request): JsonResponse
+        {
+            try {
+                $user = $request->user();
+                $currentToken = $user->currentAccessToken();
 
             return response()->json([
                 'user' => $this->formatUserResponse($user),
@@ -330,6 +336,7 @@ class UserController extends Controller
                 ],
                 'active_tokens' => $user->tokens()->count(),
             ]);
+
         } catch (\Exception $e) {
             return response()->json([
                 'message' => 'Erreur lors de la récupération du profil',
@@ -338,22 +345,22 @@ class UserController extends Controller
         }
     }
 
-    // ===== RAFRAÎCHIR LE TOKEN =====
-    public function refreshToken(Request $request): JsonResponse
-    {
-        try {
-            $user = $request->user();
-            $currentToken = $user->currentAccessToken();
+        // ===== RAFRAÎCHIR LE TOKEN =====
+        public function refreshToken(Request $request): JsonResponse
+        {
+            try {
+                $user = $request->user();
+                $currentToken = $user->currentAccessToken();
 
-            // Créer un nouveau token avec les mêmes capacités
-            $newToken = $user->createToken(
-                $currentToken->name,
-                $currentToken->abilities,
-                now()->addHours(24)
-            );
+                // Créer un nouveau token avec les mêmes capacités
+                $newToken = $user->createToken(
+                    $currentToken->name,
+                    $currentToken->abilities,
+                    now()->addHours(24)
+                );
 
-            // Supprimer l'ancien token
-            $currentToken->delete();
+                // Supprimer l'ancien token
+                $currentToken->delete();
 
             return response()->json([
                 'message' => 'Token rafraîchi avec succès',
@@ -361,6 +368,7 @@ class UserController extends Controller
                 'token_type' => 'Bearer',
                 'expires_at' => $newToken->accessToken->expires_at,
             ]);
+
         } catch (\Exception $e) {
             return response()->json([
                 'message' => 'Erreur lors du rafraîchissement du token',
@@ -369,51 +377,52 @@ class UserController extends Controller
         }
     }
 
-    // ===== CHANGER LE MOT DE PASSE =====
-    public function changePassword(Request $request): JsonResponse
-    {
-        try {
-            $validator = Validator::make($request->all(), [
-                'current_password' => ['required', 'string'],
-                'password' => ['required', 'confirmed', Password::defaults()],
-            ], [
-                'current_password.required' => 'Le mot de passe actuel est obligatoire.',
-                'password.required' => 'Le nouveau mot de passe est obligatoire.',
-                'password.confirmed' => 'La confirmation du nouveau mot de passe ne correspond pas.',
-            ]);
+        // ===== CHANGER LE MOT DE PASSE =====
+        public function changePassword(Request $request): JsonResponse
+        {
+            try {
+                $validator = Validator::make($request->all(), [
+                    'current_password' => ['required', 'string'],
+                    'password' => ['required', 'confirmed', Password::defaults()],
+                ], [
+                    'current_password.required' => 'Le mot de passe actuel est obligatoire.',
+                    'password.required' => 'Le nouveau mot de passe est obligatoire.',
+                    'password.confirmed' => 'La confirmation du nouveau mot de passe ne correspond pas.',
+                ]);
 
-            if ($validator->fails()) {
-                return response()->json([
-                    'message' => 'Erreur de validation',
-                    'errors' => $validator->errors()
-                ], 422);
-            }
+                if ($validator->fails()) {
+                    return response()->json([
+                        'message' => 'Erreur de validation',
+                        'errors' => $validator->errors()
+                    ], 422);
+                }
 
-            $user = $request->user();
+                $user = $request->user();
 
-            // Vérifier l'ancien mot de passe
-            if (!Hash::check($request->current_password, $user->password)) {
-                return response()->json([
-                    'message' => 'Le mot de passe actuel est incorrect.',
-                    'errors' => [
-                        'current_password' => ['Le mot de passe actuel est incorrect.']
-                    ]
-                ], 422);
-            }
+                // Vérifier l'ancien mot de passe
+                if (!Hash::check($request->current_password, $user->password)) {
+                    return response()->json([
+                        'message' => 'Le mot de passe actuel est incorrect.',
+                        'errors' => [
+                            'current_password' => ['Le mot de passe actuel est incorrect.']
+                            ]
+                        ], 422);
+                    }
 
-            // Mettre à jour le mot de passe
-            $user->update([
-                'password' => Hash::make($request->password),
-            ]);
+                    // Mettre à jour le mot de passe
+                    $user->update([
+                        'password' => Hash::make($request->password),
+                    ]);
 
-            // Révoquer tous les autres tokens (optionnel)
-            if ($request->revoke_other_tokens) {
-                $user->tokens()->where('id', '!=', $user->currentAccessToken()->id)->delete();
-            }
+                    // Révoquer tous les autres tokens (optionnel)
+                    if ($request->revoke_other_tokens) {
+                        $user->tokens()->where('id', '!=', $user->currentAccessToken()->id)->delete();
+                    }
 
             return response()->json([
                 'message' => 'Mot de passe modifié avec succès'
             ]);
+
         } catch (\Exception $e) {
             return response()->json([
                 'message' => 'Erreur lors de la modification du mot de passe',
@@ -422,38 +431,39 @@ class UserController extends Controller
         }
     }
 
-    // ===== METTRE À JOUR LE PROFIL =====
-    public function updateProfile(Request $request): JsonResponse
-    {
-        try {
-            $user = $request->user();
+            // ===== METTRE À JOUR LE PROFIL =====
+            public function updateProfile(Request $request): JsonResponse
+            {
+                try {
+                    $user = $request->user();
 
-            $validator = Validator::make($request->all(), [
-                'nom' => ['sometimes', 'required', 'string', 'max:100'],
-                'prenom' => ['sometimes', 'required', 'string', 'max:100'],
-                'email' => ['sometimes', 'required', 'email', 'unique:users,email,' . $user->id],
-                'telephone' => ['nullable', 'string', 'max:20'],
-            ], [
-                'nom.required' => 'Le nom est obligatoire.',
-                'prenom.required' => 'Le prénom est obligatoire.',
-                'email.required' => 'L\'adresse email est obligatoire.',
-                'email.unique' => 'Cette adresse email est déjà utilisée.',
-                'email.email' => 'L\'adresse email doit être valide.',
-            ]);
+                    $validator = Validator::make($request->all(), [
+                        'nom' => ['sometimes', 'required', 'string', 'max:100'],
+                        'prenom' => ['sometimes', 'required', 'string', 'max:100'],
+                        'email' => ['sometimes', 'required', 'email', 'unique:users,email,' . $user->id],
+                        'telephone' => ['nullable', 'string', 'max:20'],
+                    ], [
+                        'nom.required' => 'Le nom est obligatoire.',
+                        'prenom.required' => 'Le prénom est obligatoire.',
+                        'email.required' => 'L\'adresse email est obligatoire.',
+                        'email.unique' => 'Cette adresse email est déjà utilisée.',
+                        'email.email' => 'L\'adresse email doit être valide.',
+                    ]);
 
-            if ($validator->fails()) {
-                return response()->json([
-                    'message' => 'Erreur de validation',
-                    'errors' => $validator->errors()
-                ], 422);
-            }
+                    if ($validator->fails()) {
+                        return response()->json([
+                            'message' => 'Erreur de validation',
+                            'errors' => $validator->errors()
+                        ], 422);
+                    }
 
-            $user->update($request->only(['nom', 'prenom', 'email', 'telephone']));
+                    $user->update($request->only(['nom', 'prenom', 'email', 'telephone']));
 
             return response()->json([
                 'message' => 'Profil mis à jour avec succès',
                 'user' => $this->formatUserResponse($user->fresh())
             ]);
+
         } catch (\Exception $e) {
             return response()->json([
                 'message' => 'Erreur lors de la mise à jour du profil',
@@ -462,27 +472,28 @@ class UserController extends Controller
         }
     }
 
-    // ===== LISTER LES TOKENS ACTIFS =====
-    public function tokens(Request $request): JsonResponse
-    {
-        try {
-            $user = $request->user();
-            $tokens = $user->tokens()->get()->map(function ($token) {
-                return [
-                    'id' => $token->id,
-                    'name' => $token->name,
-                    'abilities' => $token->abilities,
-                    'created_at' => $token->created_at,
-                    'last_used_at' => $token->last_used_at,
-                    'expires_at' => $token->expires_at,
-                    'is_current' => $token->id === $user->currentAccessToken()->id,
-                ];
-            });
+            // ===== LISTER LES TOKENS ACTIFS =====
+            public function tokens(Request $request): JsonResponse
+            {
+                try {
+                    $user = $request->user();
+                    $tokens = $user->tokens()->get()->map(function ($token) {
+                        return [
+                            'id' => $token->id,
+                            'name' => $token->name,
+                            'abilities' => $token->abilities,
+                            'created_at' => $token->created_at,
+                            'last_used_at' => $token->last_used_at,
+                            'expires_at' => $token->expires_at,
+                            'is_current' => $token->id === $user->currentAccessToken()->id,
+                        ];
+                    });
 
             return response()->json([
                 'tokens' => $tokens,
                 'total' => $tokens->count()
             ]);
+
         } catch (\Exception $e) {
             return response()->json([
                 'message' => 'Erreur lors de la récupération des tokens',
@@ -491,36 +502,37 @@ class UserController extends Controller
         }
     }
 
-    // ===== RÉVOQUER UN TOKEN SPÉCIFIQUE =====
-    public function revokeToken(Request $request): JsonResponse
-    {
-        try {
-            $validator = Validator::make($request->all(), [
-                'token_id' => ['required', 'integer'],
-            ]);
+            // ===== RÉVOQUER UN TOKEN SPÉCIFIQUE =====
+            public function revokeToken(Request $request): JsonResponse
+            {
+                try {
+                    $validator = Validator::make($request->all(), [
+                        'token_id' => ['required', 'integer'],
+                    ]);
 
-            if ($validator->fails()) {
-                return response()->json([
-                    'message' => 'Erreur de validation',
-                    'errors' => $validator->errors()
-                ], 422);
-            }
+                    if ($validator->fails()) {
+                        return response()->json([
+                            'message' => 'Erreur de validation',
+                            'errors' => $validator->errors()
+                        ], 422);
+                    }
 
-            $user = $request->user();
-            $token = $user->tokens()->find($request->token_id);
+                    $user = $request->user();
+                    $token = $user->tokens()->find($request->token_id);
 
-            if (!$token) {
-                return response()->json([
-                    'message' => 'Token introuvable'
-                ], 404);
-            }
+                    if (!$token) {
+                        return response()->json([
+                            'message' => 'Token introuvable'
+                        ], 404);
+                    }
 
-            $tokenName = $token->name;
-            $token->delete();
+                    $tokenName = $token->name;
+                    $token->delete();
 
             return response()->json([
                 'message' => 'Token "' . $tokenName . '" révoqué avec succès'
             ]);
+
         } catch (\Exception $e) {
             return response()->json([
                 'message' => 'Erreur lors de la révocation du token',
@@ -529,12 +541,12 @@ class UserController extends Controller
         }
     }
 
-    // ===== VÉRIFIER L'ÉTAT DU TOKEN =====
-    public function checkToken(Request $request): JsonResponse
-    {
-        try {
-            $user = $request->user();
-            $token = $user->currentAccessToken();
+            // ===== VÉRIFIER L'ÉTAT DU TOKEN =====
+            public function checkToken(Request $request): JsonResponse
+            {
+                try {
+                    $user = $request->user();
+                    $token = $user->currentAccessToken();
 
             return response()->json([
                 'valid' => true,
@@ -547,6 +559,7 @@ class UserController extends Controller
                     'is_expired' => $token->expires_at ? $token->expires_at->isPast() : false,
                 ]
             ]);
+
         } catch (\Exception $e) {
             return response()->json([
                 'valid' => false,
@@ -555,27 +568,27 @@ class UserController extends Controller
         }
     }
 
-    // ===== MÉTHODES PRIVÉES =====
+                // ===== MÉTHODES PRIVÉES =====
 
-    /**
-     * Formater la réponse utilisateur
-     */
-    private function formatUserResponse(User $user): array
-    {
-        return [
-            'id' => $user->id,
-            'nom' => $user->nom,
-            'prenom' => $user->prenom,
-            'email' => $user->email,
-            'telephone' => $user->telephone,
-            'role' => $user->role,
-            'full_name' => $user->prenom . ' ' . $user->nom,
-            'is_active' => $user->is_active,
-            'last_login_at' => $user->last_login_at,
-            'email_verified_at' => $user->email_verified_at,
-            'created_at' => $user->created_at,
-        ];
-    }
+                /**
+                * Formater la réponse utilisateur
+                */
+                private function formatUserResponse(User $user): array
+                {
+                    return [
+                        'id' => $user->id,
+                        'nom' => $user->nom,
+                        'prenom' => $user->prenom,
+                        'email' => $user->email,
+                        'telephone' => $user->telephone,
+                        'role' => $user->role,
+                        'full_name' => $user->prenom . ' ' . $user->nom,
+                        'is_active' => $user->is_active,
+                        'last_login_at' => $user->last_login_at,
+                        'email_verified_at' => $user->email_verified_at,
+                        'created_at' => $user->created_at,
+                    ];
+                }
 
     /**
      * Obtenir les capacités du token selon le rôle
@@ -609,3 +622,5 @@ class UserController extends Controller
         };
     }
 }
+
+

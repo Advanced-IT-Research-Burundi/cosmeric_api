@@ -146,7 +146,7 @@ class DashboardController extends Controller
             ],
         ];
 
-        return response()->json($response);
+        return sendResponse($response, 'Dashboard data retrieved successfully.');
     }
 
     function dashboardMember(Request $request)
@@ -282,6 +282,6 @@ class DashboardController extends Controller
             ],
         ];
 
-        return response()->json($response);
+        return sendResponse($response,"");
     }
 }
