@@ -61,6 +61,8 @@ class MembreResource extends JsonResource
             // Assistances
             'montant_recues_en_assistances' => $assistancesSum,
             'assistances'        => AssistanceResource::collection($this->assistances),
+
+            'retard' => Cotisation::where('statut', 'en_retard')->count()   
         ];
     }
 }
