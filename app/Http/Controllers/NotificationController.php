@@ -13,7 +13,7 @@ class NotificationController extends Controller
     public function index(Request $request)
     {
 
-        $notifications = Notification::latest()->get();
+        $notifications = Notification::where('read', false)->latest()->get();
         return sendResponse($notifications, 'Notifications récupérées avec succès.');
     }
 
@@ -72,7 +72,6 @@ class NotificationController extends Controller
     // POST /notifications/{notification}/mark-read
     public function markAsRead(Notification $notification)
     {
-        $this->authorizeOwner($notification);
         if (!$notification->read) {
             $notification->forceFill(['read' => true])->save();
         }

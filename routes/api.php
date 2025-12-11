@@ -82,7 +82,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::apiResource("cotisation-mensuelles", CotisationMensuelleController::class);
 
     Route::apiResource('notifications', NotificationController::class);
-    Route::post('notifications/{notification}/mark-read', [NotificationController::class, 'markAsRead']);
+    Route::put('notifications/{notification}/mark-read', [NotificationController::class, 'markAsRead']);
     Route::post('notifications/mark-all-read', [NotificationController::class, 'markAllAsRead']);
     Route::get('notifications-unread-count', [NotificationController::class, 'unreadCount']);
 });
