@@ -1,18 +1,9 @@
 models:
-  CotisationMensuelle:
-    name: string 255 nullable            
-    matricule: string 255 nullable
-    nomero_dossier: string 255 nullable
-    global: string 255 nullable
-    regle: string 255 nullable
-    restant: string 255 nullable
-    retenu: string 255 nullable
-    date_cotisation: string 255 nullable
+  Notification:
+    type: string 255 nullable
+    title: string 255 nullable
+    message: text nullable
+    time: timestamp nullable
+    read: boolean nullable
     user_id: integer nullable
 
-
-controllers:
-  CotisationMensuelle:
-    resource: api
-
- 
