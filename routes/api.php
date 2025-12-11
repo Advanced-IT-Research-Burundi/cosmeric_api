@@ -16,7 +16,10 @@ use App\Http\Controllers\TypeAssistanceController;
 use App\Http\Controllers\CotisationMensuelleController;
 use App\Http\Controllers\UserController;
 use Illuminate\Http\Request;
+use App\Http\Controllers\NotificationController;
 use Illuminate\Support\Facades\Route;
+
+
 
 Route::get('/user', function (Request $request) {
     return $request->user();
@@ -77,4 +80,9 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/dashboard-cotisation', [CotisationController::class, 'dashboard']);
     Route::post("importation", [ImportationController::class, 'cotisation']);
     Route::apiResource("cotisation-mensuelles", CotisationMensuelleController::class);
+
+    Route::apiResource('notifications', NotificationController::class);
+    Route::put('notifications/{notification}/mark-read', [NotificationController::class, 'markAsRead']);
+    Route::post('notifications/mark-all-read', [NotificationController::class, 'markAllAsRead']);
+    Route::get('notifications-unread-count', [NotificationController::class, 'unreadCount']);
 });

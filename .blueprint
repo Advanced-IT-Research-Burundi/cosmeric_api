@@ -1,15 +1,7 @@
 created:
-    - app/Http/Controllers/CotisationMensuelleController.php
-    - database/factories/CotisationMensuelleFactory.php
-    - database/migrations/2025_11_11_050707_create_cotisation_mensuelles_table.php
-    - app/Models/CotisationMensuelle.php
-    - tests/Feature/Http/Controllers/CotisationMensuelleControllerTest.php
-    - app/Http/Requests/CotisationMensuelleStoreRequest.php
-    - app/Http/Requests/CotisationMensuelleUpdateRequest.php
-    - app/Http/Resources/CotisationMensuelleCollection.php
-    - app/Http/Resources/CotisationMensuelleResource.php
-updated:
-    - routes/api.php
+    - database/factories/NotificationFactory.php
+    - database/migrations/2025_12_11_083831_create_notifications_table.php
+    - app/Models/Notification.php
 models:
     User: { name: string, email: string, email_verified_at: 'datetime nullable', password: string, remember_token: 'string nullable' }
     CategorieMembre: { nom: 'string:100', montant_cotisation: 'decimal:10,2', devise: 'enum:FBU,USD', frequence_paiement: 'enum:mensuel,semestriel', description: text, timestamps: timestamps }
@@ -24,3 +16,4 @@ models:
     Rapport: { titre: 'string:200', type_rapport: 'enum:mensuel,semestriel,annuel,personnalise', periode_debut: date, periode_fin: date, genere_par: 'id foreign', fichier_path: 'string:255', statut: 'enum:genere,envoye,archive', created_at: timestamp }
     Configuration: { cle: 'string:100 unique', valeur: text, description: text, timestamps: timestamps }
     CotisationMensuelle: { name: 'string 255 nullable', matricule: 'string 255 nullable', nomero_dossier: 'string 255 nullable', global: 'string 255 nullable', regle: 'string 255 nullable', restant: 'string 255 nullable', retenu: 'string 255 nullable', date_cotisation: 'string 255 nullable', user_id: 'integer nullable' }
+    Notification: { type: 'string 255 nullable', title: 'string 255 nullable', message: 'text nullable', time: 'timestamp nullable', read: 'boolean nullable', user_id: 'integer nullable' }

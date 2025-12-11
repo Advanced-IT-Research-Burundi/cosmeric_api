@@ -12,11 +12,11 @@ use App\Mail\RefuserCredit;
 use App\Models\Cotisation;
 use App\Models\Credit;
 use App\Models\Membre;
+use App\Models\Notification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Http\Response;
-
-
+use Illuminate\Support\Facades\DB;
 use function PHPSTORM_META\type;
 
 class CreditController extends Controller
@@ -64,7 +64,6 @@ class CreditController extends Controller
     public function demandeCredit(Request $request)
     {
 
-
         $request->validate([
             'montant_demande' => 'required|numeric',
             'taux_interet' => 'required|numeric',
@@ -72,6 +71,7 @@ class CreditController extends Controller
             'montant_total_rembourser' => 'required|numeric',
             'montant_mensualite' => 'required|numeric',
         ]);
+
 
 
         try {
@@ -95,8 +95,10 @@ class CreditController extends Controller
             );
         }
 
-
-        $credit = Credit::create([
+        try {
+            DB::beginTransaction();
+            //code...
+            $credit = Credit::create([
             'montant_demande' => $request->montant_demande,
             'taux_interet' => $request->taux_interet,
             'duree_mois' => $request->duree_mois,
@@ -110,9 +112,22 @@ class CreditController extends Controller
             'montant_accorde' => 0,
         ]);
 
+        Notification::create([
+             'type' => 'credit',
+             'title' => 'Nouvelle demande de credit',
+             'message' => 'Une nouvelle demande de credit a ete effectuee par '.$membre->nom.' '.$membre->prenom . ' pour un montant de ' . $request->montant_demande . ' BIF',
+             'time' => now(),
+             'read' => false,
+             'user_id' => auth()->user()->id,
+        ]);
+        DB::commit();
+        } catch (\Throwable $th) {
+            DB::rollBack();
+            return sendError($th->getMessage());
+        }
         try {
             // Envoie de l'email a l'admin
-            Mail::to('nijeanlionel@gmail.com')
+            Mail::to(EMAIL_COPIES)
                 ->cc(auth()->user()->email)
                 ->send(new DemandeCredit($credit->load('membre')));
         } catch (\Exception $e) {
@@ -211,9 +226,6 @@ class CreditController extends Controller
 
         return sendResponse($credits, 'Credits retrieved successfully.');
     }
-
-
-
 
     public function show(Request $request, Credit $credit)
     {
