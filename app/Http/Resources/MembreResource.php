@@ -10,33 +10,57 @@ use Illuminate\Http\Resources\Json\JsonResource;
 
 class MembreResource extends JsonResource
 {
-    /**
-     * Transform the resource into an array.
-     */
     public function toArray(Request $request): array
     {
+        // Get credit data
+        $creditsEnCours = Credit::where("membre_id", $this->id)
+            ->where("statut", "en_cours")
+            ->get();
+
+        $creditTotal = $creditsEnCours->sum("montant_total_rembourser");
+        $creditReste = $creditsEnCours->sum("montant_restant");
+
+        // Get assistances count
+        $assistancesSum = Assistance::where("membre_id", $this->id)->sum("montant");
+
         return [
             'id' => $this->id,
-            'user_id' => $this->user?->id,
-            "nom" => $this->user?->nom,
-            "prenom" => $this->user?->prenom,
+
+            // User info
+            'user_id'   => $this->user?->id,
+            'nom'       => $this->user?->nom,
+            'prenom'    => $this->user?->prenom,
+
+            // Contact
             'matricule' => $this->matricule,
-            'email' => $this->email,
+            'email'     => $this->email,
             'telephone' => $this->telephone,
-            'categorie_id' => $this->categorie_id,
-            'statut' => $this->statut,
+
+            // Category
+            'categorie_id'           => $this->categorie_id,
+            'categorie_nom'          => $this->categorie?->nom,
+            'categorie_cotisation'   => $this->categorie?->montant_cotisation,
+            'categorie_devise'       => $this->categorie?->devise,
+
+            // Use the member's category currency as default extraction currency
+            'devise' => $this->categorie?->devise ?? "FBU",
+
+            // Status
+            'statut'        => $this->statut,
             'date_adhesion' => $this->date_adhesion,
-            "categorie_nom" => $this->categorie?->nom,
-            "categorie_cotisation" => $this->categorie?->montant_cotisation,
-            "categorie_devise" => $this->categorie?->devise,
-            // "cotisations_paid" => Cotisation::where("membre_id", $this->id)->sum('montant'),
-            "cotisations_paid" => 10000,
-            // "cotisations" => CotisationResource::collection($this->cotisations),
-            // "cotisations" => CotisationResource::collection($this->cotisations),
-            "credits" => CreditResource::collection($this->credits),
-            "credits_en_cours" => Credit::where("membre_id", $this->id)->where("statut", "en_cours")->sum('montant_total_rembourser'),
-            // "remboursements" => RemboursementResource::where("credit_id", $this->id),
-            "assistances" => AssistanceResource::collection($this->assistances),
+
+            // Cotisations
+            'cotisations_paid'       => Cotisation::where("membre_id", $this->id)->where("statut", "paye")->sum('montant'),
+            'cotisations_manquantes' => $this->cotisations_manquantes ?? 0,  // optional field
+
+            // Credits
+            'credit_encours' => $creditTotal,
+            'credit_restant' => $creditReste,
+            'credits'        => CreditResource::collection($this->credits),
+
+            // Assistances
+            'montant_recues_en_assistances' => $assistancesSum,
+            'assistances'        => AssistanceResource::collection($this->assistances),
         ];
     }
 }

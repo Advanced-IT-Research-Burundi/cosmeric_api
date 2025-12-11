@@ -8,6 +8,8 @@ use App\Http\Resources\AssistanceCollection;
 use App\Http\Resources\AssistanceResource;
 use App\Http\Resources\TypeAssistanceResource;
 use App\Models\Assistance;
+use App\Models\Cotisation;
+use App\Models\Credit;
 use App\Models\TypeAssistance;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -67,12 +69,34 @@ class AssistanceController extends Controller
 
     public function store(AssistanceStoreRequest $request)
     {
-        $assistance = Assistance::create($request->validated());
-        return sendResponse(
-            $assistance,
-            Response::HTTP_CREATED,
+        // Check irregular cotisations
+        $hasIrregularCotisations = Cotisation::where('membre_id', $request->membre_id)
+            ->whereIn('statut', ['en_attente', 'en_retard'])
+            ->exists();
+
+        // Check unpaid credits
+        $hasUnpaidCredits = Credit::where('membre_id', $request->membre_id)
+            ->where('montant_restant', '!=', 0)
+            ->exists();
+
+        // If NO irregular cotisations AND NO unpaid credits
+        if (!$hasIrregularCotisations && !$hasUnpaidCredits) {
+
+            $assistance = Assistance::create($request->validated());
+
+            return sendResponse(
+                $assistance,
+                Response::HTTP_CREATED
+            );
+        }
+
+        // Otherwise: reject
+        return sendError(
+            "Vous avez des crédits ou des cotisations irrégulières. Merci de les régulariser.",
+            Response::HTTP_FORBIDDEN
         );
     }
+
 
     public function dashboard(Request $request)
     {

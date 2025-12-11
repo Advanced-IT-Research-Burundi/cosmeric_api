@@ -103,7 +103,7 @@ class CotisationController extends Controller
             $query->whereDate('date_paiement', '<=', $request->get('date_fin'));
         }
 
-        $cotisations = $query->paginate(10);
+        $cotisations = $query->latest()->paginate(10);
 
         return sendResponse($cotisations, 'Cotisations retrieved successfully.');
     }
