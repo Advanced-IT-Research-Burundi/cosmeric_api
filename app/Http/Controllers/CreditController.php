@@ -159,13 +159,16 @@ class CreditController extends Controller
     public function index(Request $request)
     {
         $params = $request->all();
-        $params = $params['params'];
+
+        $inputSearch = $params['search'] ?? null;
+
+
         $query = Credit::query();
 
 
         // 🔎 Recherche : par nom ou prénom du membre, motif, ID
-        if ($params['search']) {
-            $search = $params['search'];
+        if ($inputSearch) {
+            $search = $inputSearch;
 
             $query->where(function ($q) use ($search) {
                 $q->whereHas('membre', function ($m) use ($search) {
@@ -178,21 +181,21 @@ class CreditController extends Controller
         }
 
         // 📌 Filtre statut
-        if ($params['statut']) {
+        if (!empty($params['statut'])) {
             $query->where('statut', $params['statut']);
         }
 
         // 📅 Filtre date_demande (start / end)
-        if ($params['date_demande_start']) {
+        if (!empty($params['date_demande_start'])) {
             $query->whereDate('date_demande', '>=', $params['date_demande_start']);
         }
 
-        if ($params['date_demande_end']) {
+        if (!empty($params['date_demande_end'])) {
             $query->whereDate('date_demande', '<=', $params['date_demande_end']);
         }
 
         // 📅 Filtre date_fin précise
-        if ($params['date_fin']) {
+        if (!empty($params['date_fin'])) {
             $query->whereDate('date_fin', $params['date_fin']);
         }
 

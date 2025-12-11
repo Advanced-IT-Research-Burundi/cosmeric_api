@@ -6,6 +6,7 @@ use App\Http\Requests\RemboursementStoreRequest;
 use App\Http\Requests\RemboursementUpdateRequest;
 use App\Http\Resources\RemboursementCollection;
 use App\Http\Resources\RemboursementResource;
+use App\Models\Credit;
 use App\Models\Remboursement;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -21,16 +22,16 @@ class RemboursementController extends Controller
             $searchTerm = $request->search;
             $query->where(function ($q) use ($searchTerm) {
                 $q->where('montant_prevu', 'LIKE', "%{$searchTerm}%")
-                ->orWhere('montant_paye', 'LIKE', "%{$searchTerm}%")
-                ->orWhere('numero_echeance', 'LIKE', "%{$searchTerm}%")
-                ->orWhere('statut', 'LIKE', "%{$searchTerm}%")
-                ->orWhere('penalite', 'LIKE', "%{$searchTerm}%");
+                    ->orWhere('montant_paye', 'LIKE', "%{$searchTerm}%")
+                    ->orWhere('numero_echeance', 'LIKE', "%{$searchTerm}%")
+                    ->orWhere('statut', 'LIKE', "%{$searchTerm}%")
+                    ->orWhere('penalite', 'LIKE', "%{$searchTerm}%");
             })
-            ->orWhereHas('credit.membre', function ($q) use ($searchTerm) {
-                $q->where('nom', 'LIKE', "%{$searchTerm}%")
-                ->orWhere('prenom', 'LIKE', "%{$searchTerm}%")
-                ->orWhere('matricule', 'LIKE', "%{$searchTerm}%");
-            });
+                ->orWhereHas('credit.membre', function ($q) use ($searchTerm) {
+                    $q->where('nom', 'LIKE', "%{$searchTerm}%")
+                        ->orWhere('prenom', 'LIKE', "%{$searchTerm}%")
+                        ->orWhere('matricule', 'LIKE', "%{$searchTerm}%");
+                });
         }
 
         // Filters
@@ -59,6 +60,13 @@ class RemboursementController extends Controller
 
     public function store(RemboursementStoreRequest $request)
     {
+
+        $IdCredit = $request->membre_id;
+
+        dd($IdCredit);
+
+        $request = Credit::all();
+
         $remboursement = Remboursement::create($request->validated());
 
         return sendResponse($remboursement, 'Remboursement créé avec succès', 201);
