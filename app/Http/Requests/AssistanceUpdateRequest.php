@@ -20,7 +20,7 @@ class AssistanceUpdateRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'membre_id' => ['required', 'integer', 'exists:membres,id'],
+            // 'membre_id' => ['required', 'integer', 'exists:membres,id'],
             'type_assistance_id' => ['required', 'integer', 'exists:type_assistances,id'],
             'montant' => ['required', 'numeric', 'between:-99999999.99,99999999.99'],
             'date_demande' => ['required', 'date'],
@@ -28,7 +28,7 @@ class AssistanceUpdateRequest extends FormRequest
             'date_versement' => ['required', 'date'],
             'statut' => ['required', 'in:en_attente,approuve,rejete,verse'],
             'justificatif' => ['required', 'string', 'max:255'],
-            'motif_rejet' => ['required', 'string'],
+            'motif_rejet' => ['string'],
         ];
     }
 }

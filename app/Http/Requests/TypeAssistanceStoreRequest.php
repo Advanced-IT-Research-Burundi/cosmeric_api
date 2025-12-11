@@ -22,8 +22,8 @@ class TypeAssistanceStoreRequest extends FormRequest
         return [
             'nom' => ['required', 'string', 'max:100'],
             'montant_standard' => ['required', 'numeric', 'between:-99999999.99,99999999.99'],
-            'conditions' => ['required', 'string'],
-            'documents_requis' => ['required', 'string'],
+            'conditions' => ['string'],
+            'documents_requis' => ['string'],
         ];
     }
 }

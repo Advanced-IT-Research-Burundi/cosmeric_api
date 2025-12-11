@@ -16,7 +16,7 @@ class ConfigurationController extends Controller
     {
         $configurations = Configuration::all();
 
-        return new ConfigurationCollection($configurations);
+        return sendResponse(new ConfigurationCollection($configurations), " Configurations retrieved successfully.   ", 200);
     }
 
     public function store(ConfigurationStoreRequest $request)

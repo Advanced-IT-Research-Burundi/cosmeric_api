@@ -15,19 +15,22 @@ return new class extends Migration
 
         Schema::create('credits', function (Blueprint $table) {
             $table->id();
-        $table->foreignId('membre_id')->constrained();
+            $table->foreignId('membre_id')->constrained();
             $table->double('montant_demande', 64, 2);
             $table->double('montant_restant', 64, 2)->default(0);
             $table->double('montant_accorde', 64, 2)->default(0);
-            $table->double('taux_interet', 6
-            , 2)->default(3.00);
+            $table->double(
+                'taux_interet',
+                6,
+                2
+            )->default(3.00);
             $table->integer('duree_mois')->default(12);
             $table->double('montant_total_rembourser', 64, 2);
             $table->double('montant_mensualite', 64, 2);
             $table->date('date_demande')->default(now());
             $table->date('date_approbation')->nullable();
             $table->date('date_fin')->nullable();
-            $table->enum('statut', ["en_attente","approuve","rejete","en_cours","termine"])->default("en_attente");
+            $table->enum('statut', ["en_attente", "approuve", "rejete", "en_cours", "termine"])->default("en_attente");
             $table->text('motif');
             $table->foreignId('user_id');
             $table->timestamps();

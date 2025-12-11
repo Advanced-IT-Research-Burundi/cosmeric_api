@@ -16,17 +16,19 @@ class PeriodeController extends Controller
     {
         $query = Periode::query();
 
+
+
         // Search
         if ($request->has('search') && $request->search) {
             $searchTerm = $request->search;
             $query->where(function ($q) use ($searchTerm) {
                 $q->where('type', 'LIKE', "%{$searchTerm}%")
-                ->orWhere('mois', 'LIKE', "%{$searchTerm}%")
-                ->orWhere('semestre', 'LIKE', "%{$searchTerm}%")
-                ->orWhere('annee', 'LIKE', "%{$searchTerm}%")
-                ->orWhere('statut', 'LIKE', "%{$searchTerm}%")
-                ->orWhere('date_debut', 'LIKE', "%{$searchTerm}%")
-                ->orWhere('date_fin', 'LIKE', "%{$searchTerm}%");
+                    ->orWhere('mois', 'LIKE', "%{$searchTerm}%")
+                    ->orWhere('semestre', 'LIKE', "%{$searchTerm}%")
+                    ->orWhere('annee', 'LIKE', "%{$searchTerm}%")
+                    ->orWhere('statut', 'LIKE', "%{$searchTerm}%")
+                    ->orWhere('date_debut', 'LIKE', "%{$searchTerm}%")
+                    ->orWhere('date_fin', 'LIKE', "%{$searchTerm}%");
             });
         }
 
@@ -45,9 +47,20 @@ class PeriodeController extends Controller
                 $request->sort_field,
                 $request->sort_order ?? 'asc'
             );
-        } else{
+        } else {
             $query->latest();
         }
+
+        if ($request->has('type_membre')) {
+
+            $typePeriode = $request->input('type_membre', 'semestriel');
+
+            $query->where('type', 'LIKE', "%{$typePeriode}%");
+        } else {
+            $query->latest();
+        }
+
+
 
         // Pagination
         $perPage = $request->per_page ?? 10;

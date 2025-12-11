@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use App\Models\Assistance;
 use App\Models\CategorieMembre;
+use App\Models\Configuration;
 use App\Models\Cotisation;
 use App\Models\Credit;
 use App\Models\Membre;
@@ -34,7 +35,6 @@ class DatabaseSeeder extends Seeder
         $typesassistances = ['mariage', 'retraite', 'deces'];
 
         foreach ($typesassistances as $key => $value) {
-
         }
 
         $categorieMembres = [
@@ -94,8 +94,27 @@ class DatabaseSeeder extends Seeder
             // ]);
         }
 
-        Assistance::factory()->count(10)->create();
-        Cotisation::factory()->count(10)->create();
-        Credit::factory()->count(10)->create();
+        // Assistance::factory()->count(10)->create();
+        // Cotisation::factory()->count(10)->create();
+        // Credit::factory()->count(10)->create();
+
+        Configuration::factory()->insert([
+
+            [
+                'cle' => 'Mariage',
+                'valeur' => '300000',
+                'description' => 'Mariage',
+            ],
+            [
+                'cle' => 'Retraite',
+                'valeur' => '500000',
+                'description' => 'Retraite',
+            ],
+            [
+                'cle' => 'Deces',
+                'valeur' => '700000',
+                'description' => 'Deces',
+            ]
+        ]);
     }
 }

@@ -4,6 +4,7 @@ namespace App\Console\Commands;
 
 use App\Models\Assistance;
 use App\Models\Cotisation;
+use App\Models\CotisationMensuelle;
 use App\Models\Credit;
 use App\Models\Periode;
 use App\Models\Transaction;
@@ -35,7 +36,7 @@ class SeedDatabaseTest extends Command
         $this->info('Seeding database for testing purposes...');
         // $this->populate();
 
-        Periode::factory(10)->create();
+        CotisationMensuelle::factory(10)->create();
         $this->info("finish");
     }
 

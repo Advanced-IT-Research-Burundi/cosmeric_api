@@ -8,6 +8,8 @@ use App\Http\Resources\AssistanceCollection;
 use App\Http\Resources\AssistanceResource;
 use App\Http\Resources\TypeAssistanceResource;
 use App\Models\Assistance;
+use App\Models\Cotisation;
+use App\Models\Credit;
 use App\Models\TypeAssistance;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -22,13 +24,19 @@ class AssistanceController extends Controller
      */
     public function index(Request $request)
     {
+
         $query = Assistance::query();
 
         // Search
         if ($request->has('search') && $request->search) {
             $searchTerm = $request->search;
             $query->where(function ($q) use ($searchTerm) {
-                $q->whereAny(['membre_id', 'type_assistance_id', 'montant', 'date_demande', 'date_approbation', 'date_versement', 'statut', 'justificatif'], 'LIKE', "%{$searchTerm}%");
+                $q->whereAny(['membre_id', 'type_assistance_id', 'montant', 'date_demande', 'date_approbation', 'date_versement', 'statut', 'justificatif'], 'LIKE', "%{$searchTerm}%")
+                    ->orWhereHas('membre', function ($query) use ($searchTerm) {
+                        $query->where('matricule', 'like', "%{$searchTerm}%")
+                            ->orWhere('nom', 'like', "%{$searchTerm}%")
+                            ->orWhere('prenom', 'like', "%{$searchTerm}%");
+                    });
             });
         }
 
@@ -51,7 +59,7 @@ class AssistanceController extends Controller
 
         // Pagination
         $perPage = $request->per_page ?? 10;
-        $assistances = $query->paginate($perPage);
+        $assistances = $query->with("typeAssistance")->latest()->paginate($perPage);
 
         return sendResponse(
             $assistances,
@@ -61,12 +69,34 @@ class AssistanceController extends Controller
 
     public function store(AssistanceStoreRequest $request)
     {
-        $assistance = Assistance::create($request->validated());
-        return sendResponse(
-            $assistance,
-            Response::HTTP_CREATED,
+        // Check irregular cotisations
+        $hasIrregularCotisations = Cotisation::where('membre_id', $request->membre_id)
+            ->whereIn('statut', ['en_attente', 'en_retard'])
+            ->exists();
+
+        // Check unpaid credits
+        $hasUnpaidCredits = Credit::where('membre_id', $request->membre_id)
+            ->where('montant_restant', '!=', 0)
+            ->exists();
+
+        // If NO irregular cotisations AND NO unpaid credits
+        if (!$hasIrregularCotisations && !$hasUnpaidCredits) {
+
+            $assistance = Assistance::create($request->validated());
+
+            return sendResponse(
+                $assistance,
+                Response::HTTP_CREATED
+            );
+        }
+
+        // Otherwise: reject
+        return sendError(
+            "Vous avez des crédits ou des cotisations irrégulières. Merci de les régulariser.",
+            Response::HTTP_FORBIDDEN
         );
     }
+
 
     public function dashboard(Request $request)
     {

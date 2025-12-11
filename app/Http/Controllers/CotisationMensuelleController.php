@@ -14,9 +14,38 @@ class CotisationMensuelleController extends Controller
 {
     public function index(Request $request)
     {
-        $cotisationMensuelles = CotisationMensuelle::latest()->paginate();
 
-        return sendResponse(    $cotisationMensuelles, 'Cotisation mensuelles retrieved successfully.');
+        $query = CotisationMensuelle::query();
+
+        // prefer explicit inputs instead of overriding $params
+        $search = $request->input('name') ?? $request->input('search');
+        $statut = $request->input('statut');
+        $dateCotisation = $request->input('date_cotisation');
+
+        // 🔎 Recherche : par nom ou prénom du membre, motif, ID
+        if ($search) {
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                    ->orWhere('matricule', 'like', "%{$search}%")
+                    ->orWhere('id', $search);
+            });
+        }
+
+        // 📌 Filtre statut
+        if ($statut) {
+            $query->where('statut', $statut);
+        }
+
+        // 📅 Filtre date_cotisation (exact date)
+        if ($dateCotisation) {
+            $query->whereDate('date_cotisation', $dateCotisation);
+        }
+
+        // 📄 Pagination dynamique
+        $perPage = (int) $request->input('per_page', 15);
+        $cotisationMensuelles = $query->paginate($perPage);
+
+        return sendResponse($cotisationMensuelles, 'Cotisation mensuelles retrieved successfully.');
     }
 
     public function store(CotisationMensuelleStoreRequest $request)

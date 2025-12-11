@@ -18,12 +18,12 @@ return new class extends Migration
             $table->foreignId('membre_id')->constrained();
             $table->foreignId('type_assistance_id')->constrained();
             $table->decimal('montant', 10, 2);
-            $table->date('date_demande');
-            $table->date('date_approbation');
-            $table->date('date_versement');
-            $table->enum('statut', ["en_attente","approuve","rejete","verse"]);
+            $table->date('date_demande')->default(now());;
+            $table->date('date_approbation')->nullable();
+            $table->date('date_versement')->nullable();
+            $table->enum('statut', ["en_attente", "approuve", "rejete", "verse"]);
             $table->string('justificatif', 255);
-            $table->text('motif_rejet');
+            $table->text('motif_rejet')->nullable();
             $table->timestamps();
             $table->softDeletes();
         });

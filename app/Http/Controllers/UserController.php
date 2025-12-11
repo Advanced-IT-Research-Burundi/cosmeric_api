@@ -28,39 +28,17 @@ class UserController extends Controller
 
     }
 
-    public function profiles(){
+    public function profiles()
+    {
 
         $user = User::with("membre")->where('id', Auth::user()->id)->get();
 
         return sendResponse($user, 'Utilisateur récupéré avec succès.');
-
     }
 
     public function index(Request $request)
     {
-        $query = User::query();
-
-        // Recherche plein-texte sur plusieurs colonnes
-        if ($request->filled('search')) {
-            $s = $request->search;
-            $query->where(function ($q) use ($s) {
-                $q->where('name', 'LIKE', "%{$s}%")
-                ->orWhere('nom', 'LIKE', "%{$s}%")
-                ->orWhere('prenom', 'LIKE', "%{$s}%")
-                ->orWhere('email', 'LIKE', "%{$s}%")
-                ->orWhere('telephone', 'LIKE', "%{$s}%")
-                ->orWhere('role', 'LIKE', "%{$s}%")
-                ->orWhere('adresse', 'LIKE', "%{$s}%")
-                ->orWhere('ville', 'LIKE', "%{$s}%")
-                ->orWhere('pays', 'LIKE', "%{$s}%")
-                ->orWhere('code_postal', 'LIKE', "%{$s}%")
-                ->orWhere('sexe', 'LIKE', "%{$s}%")
-                ->orWhere('statut', 'LIKE', "%{$s}%");
-            });
-        }
-        $perPage = (int)($request->per_page ?? 10);
-        $users = $query->paginate($perPage);
-
+        $users = User::latest()->paginate();
         return sendResponse($users, 'Users retrieved successfully.');
     }
     // ===== INSCRIPTION =====
@@ -280,28 +258,25 @@ class UserController extends Controller
                 $expiresAt = $request->remember ? now()->addDays(30) : now()->addHours(24);
 
                 $token = $user->createToken($tokenName, $abilities, $expiresAt);
-
                 // Mettre à jour la dernière connexion
                 $user->updateLastLogin();
-
                 // Effacer le rate limiting en cas de succès
                 RateLimiter::clear($key);
+            return response()->json([
+                'message' => 'Connexion réussie',
+                'user' => $this->formatUserResponse($user),
+                'access_token' => $token->plainTextToken,
+                'token_type' => 'Bearer',
+                'expires_at' => $token->accessToken->expires_at,
+            ]);
 
-                return response()->json([
-                    'message' => 'Connexion réussie',
-                    'user' => $this->formatUserResponse($user),
-                    'access_token' => $token->plainTextToken,
-                    'token_type' => 'Bearer',
-                    'expires_at' => $token->accessToken->expires_at,
-                ]);
-
-            } catch (\Exception $e) {
-                return response()->json([
-                    'message' => 'Erreur lors de la connexion',
-                    'error' => config('app.debug') ? $e->getMessage() : 'Erreur interne du serveur'
-                ], 500);
-            }
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Erreur lors de la connexion',
+                'error' => config('app.debug') ? $e->getMessage() : 'Erreur interne du serveur'
+            ], 500);
         }
+    }
 
         // ===== DÉCONNEXION =====
         public function logout(Request $request): JsonResponse
@@ -310,17 +285,17 @@ class UserController extends Controller
                 // Supprimer le token actuel
                 $request->user()->currentAccessToken()->delete();
 
-                return response()->json([
-                    'message' => 'Déconnexion réussie'
-                ]);
+            return response()->json([
+                'message' => 'Déconnexion réussie'
+            ]);
 
-            } catch (\Exception $e) {
-                return response()->json([
-                    'message' => 'Erreur lors de la déconnexion',
-                    'error' => config('app.debug') ? $e->getMessage() : 'Erreur interne du serveur'
-                ], 500);
-            }
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Erreur lors de la déconnexion',
+                'error' => config('app.debug') ? $e->getMessage() : 'Erreur interne du serveur'
+            ], 500);
         }
+    }
 
         // ===== DÉCONNEXION DE TOUS LES APPAREILS =====
         public function logoutAll(Request $request): JsonResponse
@@ -330,18 +305,18 @@ class UserController extends Controller
                 $tokensDeleted = $request->user()->tokens()->count();
                 $request->user()->tokens()->delete();
 
-                return response()->json([
-                    'message' => 'Déconnexion de tous les appareils réussie',
-                    'tokens_deleted' => $tokensDeleted
-                ]);
+            return response()->json([
+                'message' => 'Déconnexion de tous les appareils réussie',
+                'tokens_deleted' => $tokensDeleted
+            ]);
 
-            } catch (\Exception $e) {
-                return response()->json([
-                    'message' => 'Erreur lors de la déconnexion',
-                    'error' => config('app.debug') ? $e->getMessage() : 'Erreur interne du serveur'
-                ], 500);
-            }
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Erreur lors de la déconnexion',
+                'error' => config('app.debug') ? $e->getMessage() : 'Erreur interne du serveur'
+            ], 500);
         }
+    }
 
         // ===== PROFIL UTILISATEUR =====
         public function me(Request $request): JsonResponse
@@ -350,25 +325,25 @@ class UserController extends Controller
                 $user = $request->user();
                 $currentToken = $user->currentAccessToken();
 
-                return response()->json([
-                    'user' => $this->formatUserResponse($user),
-                    'token_info' => [
-                        'name' => $currentToken->name,
-                        'abilities' => $currentToken->abilities,
-                        'expires_at' => $currentToken->expires_at,
-                        'created_at' => $currentToken->created_at,
-                        'last_used_at' => $currentToken->last_used_at,
-                    ],
-                    'active_tokens' => $user->tokens()->count(),
-                ]);
+            return response()->json([
+                'user' => $this->formatUserResponse($user),
+                'token_info' => [
+                    'name' => $currentToken->name,
+                    'abilities' => $currentToken->abilities,
+                    'expires_at' => $currentToken->expires_at,
+                    'created_at' => $currentToken->created_at,
+                    'last_used_at' => $currentToken->last_used_at,
+                ],
+                'active_tokens' => $user->tokens()->count(),
+            ]);
 
-            } catch (\Exception $e) {
-                return response()->json([
-                    'message' => 'Erreur lors de la récupération du profil',
-                    'error' => config('app.debug') ? $e->getMessage() : 'Erreur interne du serveur'
-                ], 500);
-            }
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Erreur lors de la récupération du profil',
+                'error' => config('app.debug') ? $e->getMessage() : 'Erreur interne du serveur'
+            ], 500);
         }
+    }
 
         // ===== RAFRAÎCHIR LE TOKEN =====
         public function refreshToken(Request $request): JsonResponse
@@ -387,20 +362,20 @@ class UserController extends Controller
                 // Supprimer l'ancien token
                 $currentToken->delete();
 
-                return response()->json([
-                    'message' => 'Token rafraîchi avec succès',
-                    'access_token' => $newToken->plainTextToken,
-                    'token_type' => 'Bearer',
-                    'expires_at' => $newToken->accessToken->expires_at,
-                ]);
+            return response()->json([
+                'message' => 'Token rafraîchi avec succès',
+                'access_token' => $newToken->plainTextToken,
+                'token_type' => 'Bearer',
+                'expires_at' => $newToken->accessToken->expires_at,
+            ]);
 
-            } catch (\Exception $e) {
-                return response()->json([
-                    'message' => 'Erreur lors du rafraîchissement du token',
-                    'error' => config('app.debug') ? $e->getMessage() : 'Erreur interne du serveur'
-                ], 500);
-            }
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Erreur lors du rafraîchissement du token',
+                'error' => config('app.debug') ? $e->getMessage() : 'Erreur interne du serveur'
+            ], 500);
         }
+    }
 
         // ===== CHANGER LE MOT DE PASSE =====
         public function changePassword(Request $request): JsonResponse
@@ -444,17 +419,17 @@ class UserController extends Controller
                         $user->tokens()->where('id', '!=', $user->currentAccessToken()->id)->delete();
                     }
 
-                    return response()->json([
-                        'message' => 'Mot de passe modifié avec succès'
-                    ]);
+            return response()->json([
+                'message' => 'Mot de passe modifié avec succès'
+            ]);
 
-                } catch (\Exception $e) {
-                    return response()->json([
-                        'message' => 'Erreur lors de la modification du mot de passe',
-                        'error' => config('app.debug') ? $e->getMessage() : 'Erreur interne du serveur'
-                    ], 500);
-                }
-            }
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Erreur lors de la modification du mot de passe',
+                'error' => config('app.debug') ? $e->getMessage() : 'Erreur interne du serveur'
+            ], 500);
+        }
+    }
 
             // ===== METTRE À JOUR LE PROFIL =====
             public function updateProfile(Request $request): JsonResponse
@@ -484,18 +459,18 @@ class UserController extends Controller
 
                     $user->update($request->only(['nom', 'prenom', 'email', 'telephone']));
 
-                    return response()->json([
-                        'message' => 'Profil mis à jour avec succès',
-                        'user' => $this->formatUserResponse($user->fresh())
-                    ]);
+            return response()->json([
+                'message' => 'Profil mis à jour avec succès',
+                'user' => $this->formatUserResponse($user->fresh())
+            ]);
 
-                } catch (\Exception $e) {
-                    return response()->json([
-                        'message' => 'Erreur lors de la mise à jour du profil',
-                        'error' => config('app.debug') ? $e->getMessage() : 'Erreur interne du serveur'
-                    ], 500);
-                }
-            }
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Erreur lors de la mise à jour du profil',
+                'error' => config('app.debug') ? $e->getMessage() : 'Erreur interne du serveur'
+            ], 500);
+        }
+    }
 
             // ===== LISTER LES TOKENS ACTIFS =====
             public function tokens(Request $request): JsonResponse
@@ -514,18 +489,18 @@ class UserController extends Controller
                         ];
                     });
 
-                    return response()->json([
-                        'tokens' => $tokens,
-                        'total' => $tokens->count()
-                    ]);
+            return response()->json([
+                'tokens' => $tokens,
+                'total' => $tokens->count()
+            ]);
 
-                } catch (\Exception $e) {
-                    return response()->json([
-                        'message' => 'Erreur lors de la récupération des tokens',
-                        'error' => config('app.debug') ? $e->getMessage() : 'Erreur interne du serveur'
-                    ], 500);
-                }
-            }
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Erreur lors de la récupération des tokens',
+                'error' => config('app.debug') ? $e->getMessage() : 'Erreur interne du serveur'
+            ], 500);
+        }
+    }
 
             // ===== RÉVOQUER UN TOKEN SPÉCIFIQUE =====
             public function revokeToken(Request $request): JsonResponse
@@ -554,17 +529,17 @@ class UserController extends Controller
                     $tokenName = $token->name;
                     $token->delete();
 
-                    return response()->json([
-                        'message' => 'Token "' . $tokenName . '" révoqué avec succès'
-                    ]);
+            return response()->json([
+                'message' => 'Token "' . $tokenName . '" révoqué avec succès'
+            ]);
 
-                } catch (\Exception $e) {
-                    return response()->json([
-                        'message' => 'Erreur lors de la révocation du token',
-                        'error' => config('app.debug') ? $e->getMessage() : 'Erreur interne du serveur'
-                    ], 500);
-                }
-            }
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Erreur lors de la révocation du token',
+                'error' => config('app.debug') ? $e->getMessage() : 'Erreur interne du serveur'
+            ], 500);
+        }
+    }
 
             // ===== VÉRIFIER L'ÉTAT DU TOKEN =====
             public function checkToken(Request $request): JsonResponse
@@ -573,25 +548,25 @@ class UserController extends Controller
                     $user = $request->user();
                     $token = $user->currentAccessToken();
 
-                    return response()->json([
-                        'valid' => true,
-                        'user' => $this->formatUserResponse($user),
-                        'token' => [
-                            'name' => $token->name,
-                            'abilities' => $token->abilities,
-                            'expires_at' => $token->expires_at,
-                            'expires_in_hours' => $token->expires_at ? $token->expires_at->diffInHours(now()) : null,
-                            'is_expired' => $token->expires_at ? $token->expires_at->isPast() : false,
-                            ]
-                        ]);
+            return response()->json([
+                'valid' => true,
+                'user' => $this->formatUserResponse($user),
+                'token' => [
+                    'name' => $token->name,
+                    'abilities' => $token->abilities,
+                    'expires_at' => $token->expires_at,
+                    'expires_in_hours' => $token->expires_at ? $token->expires_at->diffInHours(now()) : null,
+                    'is_expired' => $token->expires_at ? $token->expires_at->isPast() : false,
+                ]
+            ]);
 
-                    } catch (\Exception $e) {
-                        return response()->json([
-                            'valid' => false,
-                            'message' => 'Token invalide ou expiré'
-                        ], 401);
-                    }
-                }
+        } catch (\Exception $e) {
+            return response()->json([
+                'valid' => false,
+                'message' => 'Token invalide ou expiré'
+            ], 401);
+        }
+    }
 
                 // ===== MÉTHODES PRIVÉES =====
 
@@ -615,37 +590,37 @@ class UserController extends Controller
                     ];
                 }
 
-                /**
-                * Obtenir les capacités du token selon le rôle
-                */
-                private function getTokenAbilities(string $role): array
-                {
-                    return match ($role) {
-                        'admin' => ['*'],
-                        'gestionnaire' => [
-                            'membres:read',
-                            'membres:write',
-                            'cotisations:read',
-                            'cotisations:write',
-                            'credits:read',
-                            'credits:write',
-                            'assistances:read',
-                            'assistances:write',
-                            'rapports:read',
-                            'rapports:write',
-                        ],
-                        'membre' => [
-                            'profile:read',
-                            'profile:write',
-                            'cotisations:read',
-                            'credits:read',
-                            'credits:request',
-                            'assistances:read',
-                            'assistances:request',
-                        ],
-                        default => ['profile:read'],
-                    };
-                }
-            }
+    /**
+     * Obtenir les capacités du token selon le rôle
+     */
+    private function getTokenAbilities(string $role): array
+    {
+        return match ($role) {
+            'admin' => ['*'],
+            'gestionnaire' => [
+                'membres:read',
+                'membres:write',
+                'cotisations:read',
+                'cotisations:write',
+                'credits:read',
+                'credits:write',
+                'assistances:read',
+                'assistances:write',
+                'rapports:read',
+                'rapports:write',
+            ],
+            'membre' => [
+                'profile:read',
+                'profile:write',
+                'cotisations:read',
+                'credits:read',
+                'credits:request',
+                'assistances:read',
+                'assistances:request',
+            ],
+            default => ['profile:read'],
+        };
+    }
+}
 
 

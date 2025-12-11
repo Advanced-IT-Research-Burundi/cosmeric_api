@@ -42,21 +42,27 @@ class CotisationController extends Controller
     {
         // get Member
         $member = auth()->user()->membre;
-        $cotisations = CotisationMensuelle::
-        where('matricule', $member->matricule)
-        ->latest()->paginate();
+        $cotisations = CotisationMensuelle::where('matricule', $member->user_id)
+            ->latest()->paginate();
         return sendResponse($cotisations, 'Cotisations retrieved successfully.');
     }
     public function index(Request $request)
     {
-        $query = Cotisation::with('periode');
+        $query = Cotisation::with(['membre', 'periode']);
 
         // Recherche textuelle
         if ($request->has('search')) {
             $search = $request->get('search');
             $query->where(function ($q) use ($search) {
                 $q->where('reference_paiement', 'like', "%{$search}%")
-                    ->orWhere('membre_id', 'like', "%{$search}%");
+                    ->orWhere('membre_id', 'like', "%{$search}%")
+                    ->orWhereHas('membre', function ($query) use ($search) {
+                        $query->where('matricule', 'like', "%{$search}%")
+                            ->orWhere('nom', 'like', "%{$search}%")
+                            ->orWhere('prenom', 'like', "%{$search}%")
+                        ;
+                    })
+                ;
             });
         }
 
@@ -97,7 +103,7 @@ class CotisationController extends Controller
             $query->whereDate('date_paiement', '<=', $request->get('date_fin'));
         }
 
-        $cotisations = $query->paginate(10);
+        $cotisations = $query->latest()->paginate(10);
 
         return sendResponse($cotisations, 'Cotisations retrieved successfully.');
     }

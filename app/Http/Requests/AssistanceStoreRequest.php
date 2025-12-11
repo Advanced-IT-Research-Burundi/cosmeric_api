@@ -28,7 +28,7 @@ class AssistanceStoreRequest extends FormRequest
             'date_versement' => ['required', 'date'],
             'statut' => ['required', 'in:en_attente,approuve,rejete,verse'],
             'justificatif' => ['required', 'string', 'max:255'],
-            'motif_rejet' => ['required', 'string'],
+            'motif_rejet' => ['string'],
         ];
     }
 }

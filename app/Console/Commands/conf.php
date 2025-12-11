@@ -3,6 +3,9 @@
 namespace App\Console\Commands;
 
 use App\Models\Configuration;
+use App\Models\Cotisation;
+use App\Models\CotisationMensuelle;
+use App\Models\TypeAssistance;
 use Illuminate\Console\Command;
 
 class conf extends Command
@@ -26,33 +29,24 @@ class conf extends Command
      */
     public function handle()
     {
-        Configuration::insert([
+        TypeAssistance::insert([
             [
-                'cle' => 'taux_change_usd_bif',
-                'valeur' => '3',
-                'description' => 'Taux de change entre USD et BIF',
+                'nom' => 'Mariage',
+                'montant_standard' => '300000',
             ],
             [
-                'cle' => 'duree_minimale_en_mois',
-                'valeur' => '3',
-                'description' => 'Durée minimale',
+                'nom' => 'Retraite',
+                'montant_standard' => '500000',
             ],
             [
-                'cle' => 'duree_maximale_en_mois',
-                'valeur' => '24',
-                'description' => 'Durée maximale',
-            ],
-            [
-                'cle' => 'montant_minimal_cotisation',
-                'valeur' => '500000',
-                'description' => 'Montant minimum en FBU',
-            ],
-            [
-                'cle' => 'montant_maximal_cotisation',
-                'valeur' => '10000000',
-                'description' => 'Montant maximum en FBU',
-            ],
+
+                'nom' => 'Decés',
+                'montant_standard' => '700000',
+            ]
         ]);
+
+        // CotisationMensuelle::factory()->count(5)->create();
+        // Cotisation::factory()->count(5)->create();
 
         $this->info('Configurations créées avec succès.');
     }
