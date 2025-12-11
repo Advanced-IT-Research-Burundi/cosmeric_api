@@ -9,10 +9,13 @@ use App\Http\Resources\CreditResource;
 use App\Mail\AccepteCredit;
 use App\Mail\DemandeCredit;
 use App\Mail\RefuserCredit;
+use App\Models\Cotisation;
 use App\Models\Credit;
 use App\Models\Membre;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Http\Response;
+
 
 use function PHPSTORM_META\type;
 
@@ -76,7 +79,21 @@ class CreditController extends Controller
         } catch (\Exception $e) {
             return sendError($e->getMessage());
         }
+        // ✅ Check business rules before creating credit
+        $hasIrregularCotisations = Cotisation::where('membre_id', $membre->id)
+            ->whereIn('statut', ['en_attente', 'en_retard'])
+            ->exists();
 
+        $hasUnpaidCredits = Credit::where('membre_id', $membre->id)
+            ->where('montant_restant', '!=', 0)
+            ->exists();
+
+        if ($hasIrregularCotisations || $hasUnpaidCredits) {
+            return sendError(
+                'Vous ne pouvez pas demander un crédit tant que vous avez des cotisations irrégulières ou des crédits impayés.',
+                Response::HTTP_FORBIDDEN
+            );
+        }
 
 
         $credit = Credit::create([
@@ -117,6 +134,21 @@ class CreditController extends Controller
 
     public function store(CreditStoreRequest $request)
     {
+        // ✅ Check business rules before creating credit
+        $hasIrregularCotisations = Cotisation::where('membre_id', $request->membre_id)
+            ->whereIn('statut', ['en_attente', 'en_retard'])
+            ->exists();
+
+        $hasUnpaidCredits = Credit::where('membre_id', $request->membre_id)
+            ->where('montant_restant', '!=', 0)
+            ->exists();
+
+        if ($hasIrregularCotisations || $hasUnpaidCredits) {
+            return sendError(
+                'Vous ne pouvez pas demander un crédit tant que vous avez des cotisations irrégulières ou des crédits impayés.',
+                Response::HTTP_FORBIDDEN
+            );
+        }
         $credit = Credit::create(array_merge($request->validated(), [
             'user_id' => $request->user()->id ?? 1,
         ]));
