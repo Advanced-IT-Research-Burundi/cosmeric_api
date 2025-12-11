@@ -12,23 +12,9 @@ class NotificationController extends Controller
     // GET /notifications
     public function index(Request $request)
     {
-        $perPage = (int) ($request->integer('per_page') ?: 15);
 
-        $query = Notification::query()
-            ->where('user_id', Auth::id())
-            ->when($request->filled('read'), fn($q) => $q->where('read', filter_var($request->get('read'), FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE)))
-            ->when($request->filled('type'), fn($q) => $q->where('type', $request->string('type')))
-            ->when($request->filled('search'), function ($q) use ($request) {
-                $s = $request->string('search');
-                $q->where(function ($q2) use ($s) {
-                    $q2->where('title', 'like', "%{$s}%")
-                       ->orWhere('message', 'like', "%{$s}%");
-                });
-            })
-            ->orderByDesc('time')
-            ->orderByDesc('id');
-
-        return sendResponse($query->paginate($perPage), 'Notifications récupérées avec succès.');
+        $notifications = Notification::latest()->get();
+        return sendResponse($notifications, 'Notifications récupérées avec succès.');
     }
 
     // POST /notifications

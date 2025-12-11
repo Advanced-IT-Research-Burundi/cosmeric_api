@@ -16,8 +16,7 @@ use App\Models\Notification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Http\Response;
-
-
+use Illuminate\Support\Facades\DB;
 use function PHPSTORM_META\type;
 
 class CreditController extends Controller
@@ -126,9 +125,6 @@ class CreditController extends Controller
             DB::rollBack();
             return sendError($th->getMessage());
         }
-
-
-
         try {
             // Envoie de l'email a l'admin
             Mail::to(EMAIL_COPIES)
