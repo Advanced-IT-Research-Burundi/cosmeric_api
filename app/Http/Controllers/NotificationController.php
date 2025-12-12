@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Membre;
 use App\Models\Notification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -12,8 +13,19 @@ class NotificationController extends Controller
     // GET /notifications
     public function index(Request $request)
     {
+        $user = Auth::user();
 
-        $notifications = Notification::where('read', false)->latest()->get();
+        $query = Notification::query();
+
+        if($request->has("memberId")){
+            $query->where("user_id", $request->memberId);
+        }
+
+        if($request->has("read")){
+            $query->where("read", $request->read);
+        }
+
+        $notifications = $query->latest()->get();
         return sendResponse($notifications, 'Notifications récupérées avec succès.');
     }
 
