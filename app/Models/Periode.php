@@ -14,13 +14,7 @@ class Periode extends Model
      *
      * @var array
      */
-    protected $fillable = [
-        'mois',
-        'annee',
-        'statut',
-        'date_debut',
-        'date_fin',
-    ];
+    protected $guarded = [];
 
     /**
      * Get the attributes that should be cast.
