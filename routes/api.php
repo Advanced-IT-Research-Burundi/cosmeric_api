@@ -67,6 +67,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('mescredits', [CreditController::class, 'mesCredits']);
     Route::post('demande-credit', [CreditController::class, 'demandeCredit']);
     Route::get('mescotisations', [CotisationController::class, 'mesCotisations']);
+    Route::get('mes-assistances', [AssistanceController::class, 'mesAssistances']);
+    Route::post('demande-assistance', [AssistanceController::class, 'demandeAssistance']);
     Route::apiResource('remboursements', RemboursementController::class);
     Route::apiResource('type-assistances', TypeAssistanceController::class);
     Route::apiResource('assistances', AssistanceController::class);

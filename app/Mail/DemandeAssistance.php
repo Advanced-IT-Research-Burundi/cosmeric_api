@@ -9,17 +9,18 @@ use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
 
-class DemandeCredit extends Mailable
+class DemandeAssistance extends Mailable
 {
     use Queueable, SerializesModels;
 
     /**
      * Create a new message instance.
      */
-    public $credit;
-    public function __construct($credit)
+
+    public $assistance;
+    public function __construct($assistance)
     {
-        $this->credit = $credit;
+        $this->assistance = $assistance;
     }
 
     /**
@@ -28,7 +29,7 @@ class DemandeCredit extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Demande Credit',
+            subject: 'Demande Assistance',
         );
     }
 
@@ -38,9 +39,9 @@ class DemandeCredit extends Mailable
     public function content(): Content
     {
         return new Content(
-            view: 'emails.credit.demande_credit',
+            view: 'emails.assistance.demande_assitance',
             with: [
-                'credit' => $this->credit,
+                'assistance' => $this->assistance,
             ],
         );
     }
