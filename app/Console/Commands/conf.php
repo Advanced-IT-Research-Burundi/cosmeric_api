@@ -6,6 +6,7 @@ use App\Models\Configuration;
 use App\Models\Cotisation;
 use App\Models\CotisationMensuelle;
 use App\Models\Notification;
+use App\Models\Remboursement;
 use App\Models\TypeAssistance;
 use Illuminate\Console\Command;
 
@@ -45,7 +46,7 @@ class conf extends Command
         //         'montant_standard' => '700000',
         //     ]
         // ]);
-        Notification::factory()->count(10)->create();
+        Remboursement::factory()->count(10)->create();
 
 
         // CotisationMensuelle::factory()->count(5)->create();

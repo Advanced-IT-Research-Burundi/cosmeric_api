@@ -38,7 +38,7 @@ class RefuserCredit extends Mailable
     public function content(): Content
     {
         return new Content(
-            view: 'emails.refuser_credit',
+            view: 'emails.credit.refuser_credit',
             with: [
                 'credit' => $this->credit
                 ]

@@ -17,6 +17,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\DB;
+use Symfony\Component\Mime\Email;
+
 use function PHPSTORM_META\type;
 
 class CreditController extends Controller
@@ -34,7 +36,7 @@ class CreditController extends Controller
         try {
             //code...
             Mail::to($credit->membre->email)
-                ->cc(EMAIL_COPIES)
+                ->cc(EMAIL_USER)
                 ->send(new AccepteCredit($credit->load('membre')));
         } catch (\Throwable $th) {
             //throw $th;
@@ -127,7 +129,7 @@ class CreditController extends Controller
         }
         try {
             // Envoie de l'email a l'admin
-            Mail::to(EMAIL_COPIES)
+            Mail::to(EMAIL_ADMIN)
                 ->cc(auth()->user()->email)
                 ->send(new DemandeCredit($credit->load('membre')));
         } catch (\Exception $e) {

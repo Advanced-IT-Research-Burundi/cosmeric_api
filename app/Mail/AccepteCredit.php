@@ -38,7 +38,7 @@ class AccepteCredit extends Mailable
     public function content(): Content
     {
         return new Content(
-            view: 'emails.accepte_credit',
+            view: 'emails.credit.accepte_credit',
             with: [
                 'credit' => $this->credit
                 ]
