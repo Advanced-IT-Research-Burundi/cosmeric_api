@@ -13,6 +13,7 @@ use App\Models\Cotisation;
 use App\Models\Credit;
 use App\Models\Membre;
 use App\Models\Notification;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Http\Response;
@@ -23,6 +24,8 @@ use function PHPSTORM_META\type;
 
 class CreditController extends Controller
 {
+
+
 
     public function approuveCredit($id)
     {
@@ -65,6 +68,8 @@ class CreditController extends Controller
     }
     public function demandeCredit(Request $request)
     {
+
+        $Email_admin = User::where('role', 'admin')->orWhere('role', 'gestionnaire')->pluck('email')->toArray();
 
         $request->validate([
             'montant_demande' => 'required|numeric',
@@ -129,7 +134,7 @@ class CreditController extends Controller
         }
         try {
             // Envoie de l'email a l'admin
-            Mail::to(EMAIL_ADMIN)
+            Mail::to($Email_admin)
                 ->cc(auth()->user()->email)
                 ->send(new DemandeCredit($credit->load('membre')));
         } catch (\Exception $e) {

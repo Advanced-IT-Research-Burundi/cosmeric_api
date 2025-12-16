@@ -46,15 +46,3 @@ const EMAIL_COPIES = [
     'nijeanlionel@gmail.com'
 ];
 
-const EMAIL_ADMIN = [
-    'mnikezwe@gmail.com',
-];
-
-const EMAIL_Manager = [
-    'irumvabr@gmail.com'
-];
-
-const EMAIL_USER = [
-    'irumvabr@gmail.com'
-
-];
