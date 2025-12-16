@@ -19,6 +19,17 @@ class PeriodeStoreRequest extends FormRequest
      */
     public function rules(): array
     {
+
+        if($this->type == 'mensuel'){
+            return [
+                'type' => ['required', 'in:mensuel,semestriel'],
+                'mois' => ['nullable', 'integer'],
+                'annee' => ['required', 'integer'],
+                'statut' => ['required', 'in:ouvert,ferme'],
+                'date_debut' => ['date','before_or_equal:date_fin'],
+                'date_fin' => ['date','after_or_equal:date_debut'],
+            ];
+        }
         return [
             'type' => ['required', 'in:mensuel,semestriel'],
             'mois' => ['nullable', 'integer'],

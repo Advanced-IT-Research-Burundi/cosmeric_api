@@ -19,9 +19,18 @@ class PeriodeUpdateRequest extends FormRequest
      */
     public function rules(): array
     {
+        if($this->type == 'mensuel'){
+            return [
+                'mois' => ['required', 'integer'],
+                'annee' => ['required', 'integer'],
+                'statut' => ['required', 'in:ouvert,ferme'],
+                'date_debut' => ['required', 'date'],
+                'date_fin' => ['required', 'date'],
+            ];
+        }
         return [
-            'mois' => ['required', 'integer'],
-            'annee' => ['required', 'integer'],
+            'mois' => ['nullable', 'integer'],
+            'annee' => ['nullable', 'integer'],
             'statut' => ['required', 'in:ouvert,ferme'],
             'date_debut' => ['required', 'date'],
             'date_fin' => ['required', 'date'],

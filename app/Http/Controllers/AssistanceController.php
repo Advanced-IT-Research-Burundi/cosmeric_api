@@ -129,7 +129,6 @@ class AssistanceController extends Controller
 
         try {
             DB::beginTransaction();
-            //code...
             $assistance = Assistance::create([
             'montant' => $request->montant,
             'date_demande' => $request->date_demande,

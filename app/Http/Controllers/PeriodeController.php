@@ -71,6 +71,7 @@ class PeriodeController extends Controller
 
     public function store(PeriodeStoreRequest $request)
     {
+
         $periode = Periode::create($request->validated());
 
         return sendResponse($periode, 'Periode créée avec succès.');

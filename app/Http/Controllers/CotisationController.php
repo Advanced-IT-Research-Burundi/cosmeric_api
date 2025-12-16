@@ -8,6 +8,7 @@ use App\Http\Resources\CotisationCollection;
 use App\Http\Resources\CotisationResource;
 use App\Models\Cotisation;
 use App\Models\CotisationMensuelle;
+use App\Models\Membre;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 
@@ -37,6 +38,57 @@ class CotisationController extends Controller
 
         return sendResponse($data, 'Données du tableau de bord des cotisations récupérées avec succès.');
     }
+
+    public function cotisationAutomatic(Request $request){
+
+//         $request->validate([
+//             'membre_id' => 'required|exists:membres,id',
+//             'periode_id' => 'required|exists:periodes,id',
+//             'montant' => 'required|numeric',
+//             'devise' => 'required|in:BIF,USD',
+//             'mode_paiement' => 'required|in:espece,virement',
+//             'reference_paiement' => 'required|string|max:255',
+//             'date_paiement' => 'required|date',
+//         ]);
+
+// $cotisation = Cotisation::where('membre_id', $request->membre_id)->where('periode_id', $request->periode_id)->first();
+//         if($cotisation){
+//             return sendError('Cotisation deja existante');
+//         }
+
+//         $cotisation = Cotisation::create([
+//             'membre_id' => $request->membre_id,
+//             'periode_id' => $request->periode_id,
+//             'montant' => $request->montant,
+//             'statut' => 'paye',
+//             'devise' => $request->devise,
+//             'mode_paiement' => $request->mode_paiement,
+//             'reference_paiement' => $request->reference_paiement,
+//             'date_paiement' => $request->date_paiement,
+//         ]);
+
+$cotisation = Cotisation::where('periode_id', $request->periode_id)->first();
+
+if($cotisation){
+    return sendError('Cotisation deja existante');
+}
+
+$membres = Membre::whereAny('statut', 'actif')->get();
+
+for ($i=0; $i < count($membres); $i++) {
+    $cotisation->create([
+    'statut'=> 'en_attente',
+    'membre_id' => $membres[$i]->id,
+    'periode_id' => $request->periode_id,
+    'montant' => $request->montant,
+    'devise' => $membres[$i]->devise,
+    'mode_paiement' => 'espece',
+    'reference_paiement' => null,
+    'date_paiement' => null,
+]);
+
+        return sendResponse($cotisation, 'Cotisation mise a jour avec succes');
+    }}
 
     public function mesCotisations()
     {
