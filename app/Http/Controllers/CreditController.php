@@ -30,6 +30,8 @@ class CreditController extends Controller
     public function approuveCredit($id)
     {
         // Get Credit ID et update statut to approuve et send email to member
+        $Email_admin = User::where('role', 'admin')->orWhere('role', 'gestionnaire')->pluck('email')->toArray();
+
         $credit = Credit::findOrFail($id);
         $credit->update([
             'statut' => 'approuve',
@@ -37,12 +39,11 @@ class CreditController extends Controller
         ]);
 
         try {
-            //code...
             Mail::to($credit->membre->email)
-                ->cc(EMAIL_USER)
-                ->send(new AccepteCredit($credit->load('membre')));
+                ->cc($Email_admin)
+                ->queue(new AccepteCredit($credit->load('membre')));
         } catch (\Throwable $th) {
-            //throw $th;
+            throw $th;
         }
 
         return sendResponse($credit, 'Credit approuve successfully.');
@@ -60,7 +61,7 @@ class CreditController extends Controller
             //code...
             Mail::to($credit->membre->email)
                 ->cc(EMAIL_COPIES)
-                ->send(new RefuserCredit($credit->load('membre')));
+                ->queue(new RefuserCredit($credit->load('membre')));
         } catch (\Throwable $th) {
             //throw $th;
         }
@@ -106,28 +107,28 @@ class CreditController extends Controller
             DB::beginTransaction();
             //code...
             $credit = Credit::create([
-            'montant_demande' => $request->montant_demande,
-            'taux_interet' => $request->taux_interet,
-            'duree_mois' => $request->duree_mois,
-            'montant_total_rembourser' => $request->montant_total_rembourser,
-            'montant_mensualite' => $request->montant_mensualite,
-            'membre_id' => $membre->id,
-            'user_id' => auth()->user()->id,
-            'statut' => 'en_attente',
-            'date_demande' => now(),
-            'motif' => $request->motif,
-            'montant_accorde' => 0,
-        ]);
+                'montant_demande' => $request->montant_demande,
+                'taux_interet' => $request->taux_interet,
+                'duree_mois' => $request->duree_mois,
+                'montant_total_rembourser' => $request->montant_total_rembourser,
+                'montant_mensualite' => $request->montant_mensualite,
+                'membre_id' => $membre->id,
+                'user_id' => auth()->user()->id,
+                'statut' => 'en_attente',
+                'date_demande' => now(),
+                'motif' => $request->motif,
+                'montant_accorde' => 0,
+            ]);
 
-        Notification::create([
-             'type' => 'credit',
-             'title' => 'Nouvelle demande de credit',
-             'message' => 'Une nouvelle demande de credit a ete effectuee par '.$membre->nom.' '.$membre->prenom . ' pour un montant de ' . $request->montant_demande . ' BIF',
-             'time' => now(),
-             'read' => false,
-             'user_id' => auth()->user()->id,
-        ]);
-        DB::commit();
+            Notification::create([
+                'type' => 'credit',
+                'title' => 'Nouvelle demande de credit',
+                'message' => 'Une nouvelle demande de credit a ete effectuee par ' . $membre->nom . ' ' . $membre->prenom . ' pour un montant de ' . $request->montant_demande . ' BIF',
+                'time' => now(),
+                'read' => false,
+                'user_id' => auth()->user()->id,
+            ]);
+            DB::commit();
         } catch (\Throwable $th) {
             DB::rollBack();
             return sendError($th->getMessage());
@@ -136,7 +137,7 @@ class CreditController extends Controller
             // Envoie de l'email a l'admin
             Mail::to($Email_admin)
                 ->cc(auth()->user()->email)
-                ->send(new DemandeCredit($credit->load('membre')));
+                ->queue(new DemandeCredit($credit->load('membre')));
         } catch (\Exception $e) {
             return sendError($e->getMessage());
         }

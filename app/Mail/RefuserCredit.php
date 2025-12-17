@@ -9,7 +9,7 @@ use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
 
-class RefuserCredit extends Mailable
+class RefuserCredit extends Mailable implements ShouldQueue
 {
     use Queueable, SerializesModels;
     public $credit;
@@ -28,7 +28,7 @@ class RefuserCredit extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-        subject: '[COSMERIC] Votre demande de crédit a été refusée',
+            subject: 'Votre demande de crédit a été refusée',
         );
     }
 
@@ -41,7 +41,7 @@ class RefuserCredit extends Mailable
             view: 'emails.credit.refuser_credit',
             with: [
                 'credit' => $this->credit
-                ]
+            ]
         );
     }
 

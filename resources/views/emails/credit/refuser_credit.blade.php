@@ -11,7 +11,7 @@
                 <table width="600" cellpadding="0" cellspacing="0" role="presentation" style="background:#ffffff;border-radius:8px;overflow:hidden;border:1px solid #e6e6ee;">
                     <tr>
                         <td style="background:#0f172a;color:#ffffff;padding:18px 24px;font-size:18px;font-weight:bold;">
-                            COSMERIC
+                            CASOMIREC
                         </td>
                     </tr>
 
@@ -62,7 +62,7 @@
 
                             <p style="margin:16px 0 0 0;">
                                 Cordialement,<br/>
-                                <strong>Équipe COSMERIC</strong>
+                                <strong>Équipe CASOMIREC</strong>
                             </p>
                         </td>
                     </tr>
@@ -75,7 +75,7 @@
                 </table>
 
                 <p style="color:#64748b;font-size:12px;margin:12px 0 0 0;">
-                    © {{ date('Y') }} COSMERIC. Tous droits réservés.
+                    © {{ date('Y') }} CASOMIREC. Tous droits réservés.
                 </p>
             </td>
         </tr>

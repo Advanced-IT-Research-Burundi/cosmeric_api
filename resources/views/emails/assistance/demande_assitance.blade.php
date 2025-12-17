@@ -11,7 +11,7 @@
     <p>Bonjour,</p>
 
     <p>
-        Nous vous informons qu’un membre du groupement <strong>COSMERIC</strong> 
+        Nous vous informons qu’un membre du groupement <strong>CASOMIREC</strong> 
         a soumis une nouvelle demande d'assistance.
     </p>
 

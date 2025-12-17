@@ -9,7 +9,7 @@ use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
 
-class WelcomEmail extends Mailable
+class WelcomEmail extends Mailable implements ShouldQueue
 {
     use Queueable, SerializesModels;
     public $user;
@@ -29,7 +29,7 @@ class WelcomEmail extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Welcom  to Cosmeric',
+            subject: 'Welcom  to CASOMIREC',
         );
     }
 

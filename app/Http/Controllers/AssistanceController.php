@@ -90,7 +90,7 @@ class AssistanceController extends Controller
     }
 
 
-     public function demandeAssistance(Request $request)
+    public function demandeAssistance(Request $request)
     {
 
         $request->validate([
@@ -130,26 +130,26 @@ class AssistanceController extends Controller
         try {
             DB::beginTransaction();
             $assistance = Assistance::create([
-            'montant' => $request->montant,
-            'date_demande' => $request->date_demande,
-            'date_approbation' => $request->date_approbation,
-            'date_versement' => $request->date_versement,
-            'statut' => $request->statut,
-            'justificatif' => $request->justificatif,
-            'motif_rejet' => $request->motif_rejet,
-            'type_assistance_id' => $request->type_assistance_id,
-            'membre_id' => $membre->id,
-        ]);
+                'montant' => $request->montant,
+                'date_demande' => $request->date_demande,
+                'date_approbation' => $request->date_approbation,
+                'date_versement' => $request->date_versement,
+                'statut' => $request->statut,
+                'justificatif' => $request->justificatif,
+                'motif_rejet' => $request->motif_rejet,
+                'type_assistance_id' => $request->type_assistance_id,
+                'membre_id' => $membre->id,
+            ]);
 
-        Notification::create([
-             'type' => 'assistance',
-             'title' => 'Nouvelle demande d\'assistance',
-             'message' => 'Une nouvelle demande d\'assistance a ete effectuee par '.$membre->nom.' '.$membre->prenom . ' pour un montant de ' . $request->montant_demande . ' BIF',
-             'time' => now(),
-             'read' => false,
-             'user_id' => auth()->user()->id,
-        ]);
-        DB::commit();
+            Notification::create([
+                'type' => 'assistance',
+                'title' => 'Nouvelle demande d\'assistance',
+                'message' => 'Une nouvelle demande d\'assistance a ete effectuee par ' . $membre->nom . ' ' . $membre->prenom . ' pour un montant de ' . $request->montant_demande . ' BIF',
+                'time' => now(),
+                'read' => false,
+                'user_id' => auth()->user()->id,
+            ]);
+            DB::commit();
         } catch (\Throwable $th) {
             DB::rollBack();
             return sendError($th->getMessage());
@@ -158,7 +158,7 @@ class AssistanceController extends Controller
             // Envoie de l'email a l'admin
             Mail::to(EMAIL_COPIES)
                 ->cc(auth()->user()->email)
-                ->send(new DemandeAssistance($assistance->load('membre')));
+                ->queue(new DemandeAssistance($assistance->load('membre')));
         } catch (\Exception $e) {
             return sendError($e->getMessage());
         }

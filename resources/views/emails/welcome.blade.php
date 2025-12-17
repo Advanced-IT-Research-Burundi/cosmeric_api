@@ -21,12 +21,12 @@
     <div class="wrapper">
         <div class="container">
             <div class="header">
-                {{ config('app.name', 'Cosmeric') }}
+                {{ config('app.name', 'CASOMIREC') }}
             </div>
             <div class="content">
                 <p>Hi {{ $user->prenom ?? $user->name ?? 'there' }},</p>
 
-                <p>Welcome to {{ config('app.name', 'Cosmeric') }}! We’re excited to have you on board.</p>
+                <p>Welcome to {{ config('app.name', 'CASOMIREC') }}! We’re excited to have you on board.</p>
 
                 <p>Here’s a quick summary of your account:</p>
                 <ul>
@@ -52,10 +52,10 @@
                 <p>If you didn’t create this account, please ignore this email or contact support.</p>
 
                 <p>Cheers,<br>
-                The {{ config('app.name', 'Cosmeric') }} Team</p>
+                The {{ config('app.name', 'CASOMIREC') }} Team</p>
             </div>
             <div class="footer">
-                © {{ now()->year }} {{ config('app.name', 'Cosmeric') }}. All rights reserved.
+                © {{ now()->year }} {{ config('app.name', 'CASOMIREC') }}. All rights reserved.
             </div>
         </div>
     </div>
