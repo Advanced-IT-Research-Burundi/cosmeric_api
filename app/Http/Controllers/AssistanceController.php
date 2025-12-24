@@ -92,13 +92,16 @@ class AssistanceController extends Controller
 
     public function demandeAssistance(Request $request)
     {
+        $image = $request->file('justificatif');
+        //put in storage public
+        $image->store('justificatif');
 
         $request->validate([
             'type_assistance_id' => 'required|exists:type_assistances,id',
             'montant' => 'required|numeric',
             'date_demande' => 'required|date',
-            'date_approbation' => 'required|date',
-            'date_versement' => 'required|date',
+            'date_approbation' => 'date',
+            'date_versement' => 'date',
             'statut' => 'required|in:en_attente,approuve,rejete,verse',
             'justificatif' => 'required|string|max:255',
             'motif_rejet' => 'string',
@@ -175,35 +178,42 @@ class AssistanceController extends Controller
         return sendResponse($assistances, 'Assistances retrieved successfully.');
     }
 
-    public function store(AssistanceStoreRequest $request)
-    {
-        // Check irregular cotisations
+   public function store(AssistanceStoreRequest $request)
+{
+    try {
+        if ($request->hasFile('justificatif') && $request->file('justificatif')->isValid()) {           
+            $image = $request->file('justificatif');
+            $path = $image->store('justificatif', 'public');
+        } else {
+            return sendError("Aucun fichier ou fichier invalide.", Response::HTTP_BAD_REQUEST);
+        }
+
         $hasIrregularCotisations = Cotisation::where('membre_id', $request->membre_id)
             ->whereIn('statut', ['en_attente', 'en_retard'])
             ->exists();
-
-        // Check unpaid credits
         $hasUnpaidCredits = Credit::where('membre_id', $request->membre_id)
             ->where('montant_restant', '!=', 0)
             ->exists();
 
-        // If NO irregular cotisations AND NO unpaid credits
         if (!$hasIrregularCotisations && !$hasUnpaidCredits) {
 
             $assistance = Assistance::create($request->validated());
 
             return sendResponse(
                 $assistance,
-                Response::HTTP_CREATED
+                Response::HTTP_CREATED,
             );
         }
-
-        // Otherwise: reject
-        return sendError(
-            "Vous avez des crédits ou des cotisations irrégulières. Merci de les régulariser.",
-            Response::HTTP_FORBIDDEN
-        );
+    } catch (\Exception $e) {
+        return sendError($e->getMessage());
     }
+
+    return sendError(
+        "Vous avez des crédits ou des cotisations irrégulières. Merci de les régulariser.",
+        Response::HTTP_FORBIDDEN
+    );
+}
+
 
 
     public function dashboardAdmin(Request $request)

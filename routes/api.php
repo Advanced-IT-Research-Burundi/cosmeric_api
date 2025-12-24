@@ -17,9 +17,10 @@ use App\Http\Controllers\CotisationMensuelleController;
 use App\Http\Controllers\UserController;
 use Illuminate\Http\Request;
 use App\Http\Controllers\NotificationController;
+use Illuminate\Support\Facades\Broadcast;
 use Illuminate\Support\Facades\Route;
 
-
+Broadcast::routes(['middleware' => ['auth:sanctum']]);
 
 Route::get('/user', function (Request $request) {
     return $request->user();

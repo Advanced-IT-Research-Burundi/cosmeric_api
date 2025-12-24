@@ -27,6 +27,7 @@ class Credit extends Model
         'montant_mensualite',
         'date_demande',
         'date_approbation',
+        'date_fin',
         'statut',
         'motif',
         'user_id'

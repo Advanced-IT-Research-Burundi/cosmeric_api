@@ -14,11 +14,13 @@ use App\Models\Credit;
 use App\Models\Membre;
 use App\Models\Notification;
 use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\DB;
 use Symfony\Component\Mime\Email;
+use App\Events\NotificationSent;
 
 use function PHPSTORM_META\type;
 
@@ -26,28 +28,67 @@ class CreditController extends Controller
 {
 
 
+public function approuveCredit($id)
+{
+    $Email_admin = User::where('role', 'admin')
+        ->orWhere('role', 'gestionnaire')
+        ->pluck('email')
+        ->toArray();
 
-    public function approuveCredit($id)
-    {
-        // Get Credit ID et update statut to approuve et send email to member
-        $Email_admin = User::where('role', 'admin')->orWhere('role', 'gestionnaire')->pluck('email')->toArray();
+    $Email_id = User::where('role', 'admin')
+        ->orWhere('role', 'gestionnaire')
+        ->pluck('id')
+        ->toArray();
 
-        $credit = Credit::findOrFail($id);
-        $credit->update([
-            'statut' => 'approuve',
-            'date_approbation' => now(),
+    $credit = Credit::findOrFail($id);
+
+    $credit->update([
+        'statut' => 'approuve',
+        'date_approbation' => now(),
+        'date_fin' => now()->addMonths(12),
+    ]);
+
+    try {
+        // Send email
+        Mail::to($credit->membre->email)
+            ->cc($Email_admin)
+            ->queue(new AccepteCredit($credit->load('membre')));
+
+
+
+        Mail::to($Email_admin)
+            ->cc($Email_admin)
+            ->queue(new AccepteCredit($credit->load('membre')));
+
+        // Create notification in DB
+        $notification = Notification::create([
+            'type' => 'credit',
+            'title' => 'Crédit approuvé',
+            'message' => 'Le crédit a été approuvé pour '
+                . $credit->membre->nom . ' '
+                . $credit->membre->prenom
+                . ' (Montant : ' . $credit->montant_demande . ' BIF)',
+            'time' => now(),
+            'read' => false,
+            'user_id' => auth()->id(),
         ]);
 
-        try {
-            Mail::to($credit->membre->email)
-                ->cc($Email_admin)
-                ->queue(new AccepteCredit($credit->load('membre')));
-        } catch (\Throwable $th) {
-            throw $th;
+        event(new NotificationSent($notification->toArray(), auth()->id()));
+
+       foreach ($Email_id as $admin) {
+        event(new NotificationSent(
+            $notification->toArray(),
+            $admin
+        ));
         }
 
-        return sendResponse($credit, 'Credit approuve successfully.');
+    } catch (\Throwable $th) {
+        throw $th;
     }
+
+    return sendResponse($credit, 'Crédit approuvé avec succès.');
+}
+
     public function refuserCredit($id)
     {
         // Get Credit ID et update statut to refuser et send email to member
@@ -62,6 +103,14 @@ class CreditController extends Controller
             Mail::to($credit->membre->email)
                 ->cc(EMAIL_COPIES)
                 ->queue(new RefuserCredit($credit->load('membre')));
+            Notification::create([
+                'type' => 'credit',
+                'title' => 'Credit rejeté',
+                'message' => 'Le credit a ete rejeté par ' . $credit->membre->nom . ' ' . $credit->membre->prenom . ' pour un montant de ' . $credit->montant_demande . ' BIF',
+                'time' => now(),
+                'read' => false,
+                'user_id' => auth()->user()->id,
+            ]);
         } catch (\Throwable $th) {
             //throw $th;
         }
@@ -157,7 +206,9 @@ class CreditController extends Controller
 
     public function store(CreditStoreRequest $request)
     {
-        // ✅ Check business rules before creating credit
+
+        $date_fin = now()->addMonths(12);
+        //$date_fin = $request->has('date_fin') ? $request->date_approbation->now()->addMonths(12) : null;
         $hasIrregularCotisations = Cotisation::where('membre_id', $request->membre_id)
             ->whereIn('statut', ['en_attente', 'en_retard'])
             ->exists();
@@ -174,6 +225,7 @@ class CreditController extends Controller
         }
         $credit = Credit::create(array_merge($request->validated(), [
             'user_id' => $request->user()->id ?? 1,
+            'date_fin' => $date_fin,
         ]));
 
         return new CreditResource($credit);
