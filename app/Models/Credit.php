@@ -31,7 +31,9 @@ class Credit extends Model
         'statut',
         'motif',
         'commentaire',
-        'user_id'
+        'created_by',
+        'approved_by',
+        'rejected_by'
     ];
 
     /**

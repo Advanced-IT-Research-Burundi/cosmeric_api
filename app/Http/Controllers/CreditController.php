@@ -21,6 +21,7 @@ use Illuminate\Http\Response;
 use Illuminate\Support\Facades\DB;
 use Symfony\Component\Mime\Email;
 use App\Events\NotificationSent;
+use Illuminate\Support\Facades\Auth;
 
 use function PHPSTORM_META\type;
 
@@ -46,6 +47,7 @@ public function approuveCredit($id)
         'statut' => 'approuve',
         'date_approbation' => now(),
         'date_fin' => now()->addMonths(12),
+        'approved_by' => auth()->id(),
     ]);
 
     try {
@@ -95,7 +97,7 @@ public function approuveCredit($id)
         $credit = Credit::findOrFail($id);
         $credit->update([
             'statut' => 'rejete',
-            'date_approbation' => now(),
+            'rejected_by' => auth()->id(),
         ]);
 
         try {
@@ -162,7 +164,7 @@ public function approuveCredit($id)
                 'montant_total_rembourser' => $request->montant_total_rembourser,
                 'montant_mensualite' => $request->montant_mensualite,
                 'membre_id' => $membre->id,
-                'user_id' => auth()->user()->id,
+                'created_by' => auth()->user()->id,
                 'statut' => 'en_attente',
                 'date_demande' => now(),
                 'motif' => $request->motif,
@@ -224,7 +226,7 @@ public function approuveCredit($id)
             );
         }
         $credit = Credit::create(array_merge($request->validated(), [
-            'user_id' => $request->user()->id ?? 1,
+            'created_by' => auth()->id(),
             'date_fin' => $date_fin,
         ]));
 
@@ -284,7 +286,7 @@ public function approuveCredit($id)
         $perPage = $params['per_page'] ?? 15;
         $credits = $query->paginate($perPage);
 
-        return sendResponse($credits, 'Credits retrieved successfully.');
+        return sendResponse(new CreditCollection($credits), 'Credits retrieved successfully.');
     }
 
     public function show(Request $request, Credit $credit)

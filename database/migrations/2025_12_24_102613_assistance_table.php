@@ -24,6 +24,7 @@ return new class extends Migration
             $table->enum('statut', ["en_attente", "approuve", "rejete", "verse"]);
             $table->string('justificatif', 255);
             $table->text('motif_rejet')->nullable();
+            $table->text('motif')->nullable();
             $table->timestamps();
             $table->softDeletes();
         });

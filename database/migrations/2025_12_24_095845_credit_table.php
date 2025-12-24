@@ -33,11 +33,13 @@ return new class extends Migration
             $table->enum('statut', ["en_attente", "approuve", "rejete", "en_cours", "termine"])->default("en_attente");
             $table->text('motif')->nullable();
             $table->text('commentaire')->nullable();
-            $table->foreignId('user_id');
+            $table->foreignId('created_by')->constrained('users','id');
+            $table->foreignId('approved_by')->nullable()->constrained('users','id');
+            $table->foreignId('rejected_by')->nullable()->constrained('users','id');
             $table->timestamps();
             $table->softDeletes();
         });
-
+        
         Schema::enableForeignKeyConstraints();
     }
 
