@@ -31,7 +31,8 @@ return new class extends Migration
             $table->date('date_approbation')->nullable();
             $table->date('date_fin')->nullable();
             $table->enum('statut', ["en_attente", "approuve", "rejete", "en_cours", "termine"])->default("en_attente");
-            $table->text('motif');
+            $table->text('motif')->nullable();
+            $table->text('commentaire')->nullable();
             $table->foreignId('user_id');
             $table->timestamps();
             $table->softDeletes();

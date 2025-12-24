@@ -32,6 +32,7 @@ class CreditUpdateRequest extends FormRequest
             'date_fin' => ['nullable', 'date'],
             'statut' => ['required', 'in:en_attente,approuve,rejete,en_cours,termine'],
             'motif' => ['required', 'string'],
+            'commentaire' => ['nullable', 'string'],
         ];
     }
 }

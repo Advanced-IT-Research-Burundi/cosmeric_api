@@ -30,6 +30,7 @@ class Credit extends Model
         'date_fin',
         'statut',
         'motif',
+        'commentaire',
         'user_id'
     ];
 
