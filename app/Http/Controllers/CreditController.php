@@ -14,6 +14,7 @@ use App\Models\Credit;
 use App\Models\Membre;
 use App\Models\Notification;
 use App\Models\User;
+use App\Models\Remboursement;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
@@ -46,9 +47,15 @@ public function approuveCredit($id)
     $credit->update([
         'statut' => 'approuve',
         'date_approbation' => now(),
-        'date_fin' => now()->addMonths(12),
+        'date_fin' => now()->addMonths($credit->duree_mois ?? 12),
         'approved_by' => auth()->id(),
+        // Au moment de l'approbation, on considère que le montant accordé est celui demandé si non défini
+        'montant_accorde' => $credit->montant_accorde > 0 ? $credit->montant_accorde : $credit->montant_demande,
+        'montant_restant' => $credit->montant_total_rembourser,
     ]);
+
+    // Générer / régénérer les échéances à l'approbation
+    $this->generateEcheances($credit);
 
     try {
         // Send email
@@ -209,7 +216,7 @@ public function approuveCredit($id)
     public function store(CreditStoreRequest $request)
     {
 
-        $date_fin = now()->addMonths(12);
+        $date_fin = now()->addMonths($request->duree_mois ?? 12);
         //$date_fin = $request->has('date_fin') ? $request->date_approbation->now()->addMonths(12) : null;
         $hasIrregularCotisations = Cotisation::where('membre_id', $request->membre_id)
             ->whereIn('statut', ['en_attente', 'en_retard'])
@@ -230,7 +237,10 @@ public function approuveCredit($id)
             'date_fin' => $date_fin,
         ]));
 
-        return new CreditResource($credit);
+        // Générer automatiquement les échéances pour ce crédit
+        $this->generateEcheances($credit);
+
+        return new CreditResource($credit->load('remboursements'));
     }
 
     public function index(Request $request)
@@ -291,7 +301,24 @@ public function approuveCredit($id)
 
     public function show(Request $request, Credit $credit)
     {
-        return sendResponse($credit->load("membre"), 'Credit retrieved successfully.');
+        $credit->load(['membre', 'remboursements']);
+
+        $totalPaye = $credit->remboursements->sum('montant_paye');
+        $totalPenalites = $credit->remboursements->sum('penalite');
+        $echeancesRestantes = $credit->remboursements
+            ->whereIn('statut', ['prevu', 'en_retard'])
+            ->count();
+        $echeancesEnRetard = $credit->remboursements
+            ->where('statut', 'en_retard')
+            ->count();
+
+        $credit->montant_total_endette = $credit->montant_total_rembourser;
+        $credit->montant_deja_paye = $totalPaye;
+        $credit->echeances_restantes = $echeancesRestantes;
+        $credit->echeances_en_retard = $echeancesEnRetard;
+        $credit->total_penalites = $totalPenalites;
+
+        return sendResponse($credit, 'Credit retrieved successfully.');
     }
 
     public function update(CreditUpdateRequest $request, Credit $credit)
@@ -305,5 +332,35 @@ public function approuveCredit($id)
     {
         $credit->delete();
         return response()->noContent();
+    }
+
+    /**
+     * Génère les échéances (remboursements prévus) pour un crédit donné.
+     */
+    protected function generateEcheances(Credit $credit): void
+    {
+        // On supprime d'abord d'éventuelles anciennes échéances pour éviter les doublons
+        $credit->remboursements()->delete();
+
+        $duree = $credit->duree_mois ?? 12;
+        $montantMensualite = $credit->montant_mensualite;
+        $dateDepart = $credit->date_approbation ?? $credit->date_demande ?? now();
+
+        for ($i = 1; $i <= $duree; $i++) {
+            Remboursement::create([
+                'credit_id' => $credit->id,
+                'numero_echeance' => $i,
+                'montant_prevu' => $montantMensualite,
+                'montant_paye' => 0,
+                'date_echeance' => $dateDepart->copy()->addMonths($i),
+                'date_paiement' => null,
+                'statut' => 'prevu',
+                'penalite' => 0,
+            ]);
+        }
+
+        // Mettre à jour le montant restant sur le crédit
+        $credit->montant_restant = $credit->montant_total_rembourser - $credit->remboursements()->sum('montant_paye');
+        $credit->save();
     }
 }

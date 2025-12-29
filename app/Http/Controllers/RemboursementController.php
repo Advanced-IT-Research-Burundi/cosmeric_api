@@ -60,13 +60,6 @@ class RemboursementController extends Controller
 
     public function store(RemboursementStoreRequest $request)
     {
-
-        $IdCredit = $request->membre_id;
-
-        dd($IdCredit);
-
-        $request = Credit::all();
-
         $remboursement = Remboursement::create($request->validated());
 
         return sendResponse($remboursement, 'Remboursement créé avec succès', 201);
@@ -89,5 +82,45 @@ class RemboursementController extends Controller
         $remboursement->delete();
 
         return response()->noContent();
+    }
+
+    /**
+     * Permet à un administrateur de marquer une échéance comme payée.
+     */
+    public function approve(Request $request, Remboursement $remboursement)
+    {
+        $request->validate([
+            'montant_paye' => 'nullable|numeric|min:0',
+            'date_paiement' => 'nullable|date',
+        ]);
+
+        $montantPaye = $request->input('montant_paye', $remboursement->montant_prevu);
+        $datePaiement = $request->input('date_paiement', now());
+
+        // Mettre à jour le statut (en retard si paiement après la date d'échéance)
+        $statut = 'paye';
+        $penalite = $remboursement->penalite ?? 0;
+
+        if ($datePaiement->greaterThan($remboursement->date_echeance)) {
+            $statut = 'paye';
+            // Ici vous pouvez appliquer une logique de calcul de pénalité si nécessaire
+        }
+
+        $remboursement->update([
+            'montant_paye' => $montantPaye,
+            'date_paiement' => $datePaiement,
+            'statut' => $statut,
+            'penalite' => $penalite,
+        ]);
+
+        // Mettre à jour le crédit lié
+        $credit = $remboursement->credit()->with('remboursements')->first();
+
+        $totalPaye = $credit->remboursements->sum('montant_paye');
+        $credit->montant_restant = max(0, $credit->montant_total_rembourser - $totalPaye);
+        $credit->statut = $credit->montant_restant <= 0 ? 'termine' : 'en_cours';
+        $credit->save();
+
+        return sendResponse($remboursement->fresh(), 'Échéance approuvée (payée) avec succès');
     }
 }
