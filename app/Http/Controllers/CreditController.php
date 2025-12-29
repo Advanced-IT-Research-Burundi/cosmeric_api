@@ -48,7 +48,7 @@ public function approuveCredit($id)
         'statut' => 'approuve',
         'date_approbation' => now(),
         'date_fin' => now()->addMonths($credit->duree_mois ?? 12),
-        'approved_by' => auth()->id(),
+        'approved_by' => auth()->user()->id,
         // Au moment de l'approbation, on considère que le montant accordé est celui demandé si non défini
         'montant_accorde' => $credit->montant_accorde > 0 ? $credit->montant_accorde : $credit->montant_demande,
         'montant_restant' => $credit->montant_total_rembourser,
@@ -62,8 +62,6 @@ public function approuveCredit($id)
         Mail::to($credit->membre->email)
             ->cc($Email_admin)
             ->queue(new AccepteCredit($credit->load('membre')));
-
-
 
         Mail::to($Email_admin)
             ->cc($Email_admin)
@@ -79,10 +77,10 @@ public function approuveCredit($id)
                 . ' (Montant : ' . $credit->montant_demande . ' BIF)',
             'time' => now(),
             'read' => false,
-            'user_id' => auth()->id(),
+            'user_id' => auth()->user()->id,
         ]);
 
-        event(new NotificationSent($notification->toArray(), auth()->id()));
+        event(new NotificationSent($notification->toArray(), auth()->user()->id));
 
        foreach ($Email_id as $admin) {
         event(new NotificationSent(
@@ -104,7 +102,7 @@ public function approuveCredit($id)
         $credit = Credit::findOrFail($id);
         $credit->update([
             'statut' => 'rejete',
-            'rejected_by' => auth()->id(),
+            'rejected_by' => auth()->user()->id,
         ]);
 
         try {
@@ -233,7 +231,7 @@ public function approuveCredit($id)
             );
         }
         $credit = Credit::create(array_merge($request->validated(), [
-            'created_by' => auth()->id(),
+            'created_by' => auth()->user()->id,
             'date_fin' => $date_fin,
         ]));
 
@@ -296,7 +294,7 @@ public function approuveCredit($id)
         $perPage = $params['per_page'] ?? 15;
         $credits = $query->paginate($perPage);
 
-        return sendResponse(new CreditCollection($credits), 'Credits retrieved successfully.');
+        return sendResponse($credits, 'Credits retrieved successfully.');
     }
 
     public function show(Request $request, Credit $credit)

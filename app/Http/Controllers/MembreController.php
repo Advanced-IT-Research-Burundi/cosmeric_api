@@ -61,6 +61,7 @@ class MembreController extends Controller
     public function search(Request $request)
 {
     $search = $request->get('q');
+    dd($search);
 
     // Search for members based on provided query
     $membres = Membre::with('categorie')
