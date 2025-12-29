@@ -238,7 +238,7 @@ public function approuveCredit($id)
         // Générer automatiquement les échéances pour ce crédit
         $this->generateEcheances($credit);
 
-        return new CreditResource($credit->load('remboursements'));
+        return sendResponse($credit->load('remboursements'), 'Credit created successfully.');
     }
 
     public function index(Request $request)
