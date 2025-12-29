@@ -16,7 +16,6 @@ class MembreController extends Controller
     {
         $query = Membre::with('categorie');
 
-        // Search
         if ($request->filled('search')) {
             $searchTerm = $request->search;
 
@@ -29,7 +28,6 @@ class MembreController extends Controller
         }
 
 
-        // Filters
         if ($request->has('filter')) {
             foreach ($request->filter as $field => $value) {
                 if ($value) {
@@ -38,7 +36,6 @@ class MembreController extends Controller
             }
         }
 
-        // Sorting
         if ($request->has('sort_field') && $request->sort_field) {
             if ($request->sort_field === 'full_name') {
                 $query->orderByRaw("CONCAT(nom, ' ', prenom) " . ($request->sort_order ?? 'asc'));
@@ -50,36 +47,30 @@ class MembreController extends Controller
             }
         }
 
-        // Pagination
         $perPage = $request->per_page ?? 10;
         $membres = $query->paginate($perPage);
 
-        // Format response
         return sendResponse($membres, 'Membres récupérés avec succès');
     }
 
     public function search(Request $request)
-{
-    $search = $request->get('q');
-    dd($search);
+    {
+    $search = $request->get('q'); 
 
-    // Search for members based on provided query
-    $membres = Membre::with('categorie')
-        ->when($search, function ($query) use ($search) {
+    $membres = Membre::when($search, function ($query) use ($search) {
             $query->where('matricule', 'like', "%{$search}%")
                   ->orWhere('nom', 'like', "%{$search}%")
                   ->orWhere('prenom', 'like', "%{$search}%")
                   ->orWhere('telephone', 'like', "%{$search}%");
         })
-        ->limit(10) // Limit for autocomplete
+        ->limit(10)
         ->get();
 
-    // Check if results exist
     if ($membres->isEmpty()) {
-        return response()->json(['message' => 'No members found'], 404);
+        return sendError('No members found', 404);
     }
 
-    return response()->json($membres);
+    return sendResponse($membres, 'Membres récupérés avec succès');
 }
 
     public function store(MembreStoreRequest $request)
@@ -92,8 +83,6 @@ class MembreController extends Controller
 
     public function show(Request $request, Membre $membre)
     {
-
-
         $membre->load('user');
         $membre->load('categorie');
         $membre->load('cotisations');

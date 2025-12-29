@@ -36,7 +36,7 @@ class SeedDatabaseTest extends Command
         $this->info('Seeding database for testing purposes...');
         // $this->populate();
 
-        CotisationMensuelle::factory(10)->create();
+        Assistance::factory(10)->create();
         $this->info("finish");
     }
 

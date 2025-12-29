@@ -70,7 +70,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('mescotisations', [CotisationController::class, 'mesCotisations']);
     Route::get('mes-assistances', [AssistanceController::class, 'mesAssistances']);
     Route::post('demande-assistance', [AssistanceController::class, 'demandeAssistance']);
-    Route::get('/membres/search', [MembreController::class, 'search']);
+    Route::post('membres/search', [MembreController::class, 'search']);
     Route::apiResource('remboursements', RemboursementController::class);
     Route::post('remboursements/{remboursement}/approve', [RemboursementController::class, 'approve']);
     Route::apiResource('type-assistances', TypeAssistanceController::class);

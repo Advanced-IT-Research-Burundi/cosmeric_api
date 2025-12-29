@@ -48,7 +48,7 @@ public function approuveCredit($id)
         'statut' => 'approuve',
         'date_approbation' => now(),
         'date_fin' => now()->addMonths($credit->duree_mois ?? 12),
-        'approved_by' => auth()->user()->id,
+        'approved_by' => Auth::id(),
         // Au moment de l'approbation, on considère que le montant accordé est celui demandé si non défini
         'montant_accorde' => $credit->montant_accorde > 0 ? $credit->montant_accorde : $credit->montant_demande,
         'montant_restant' => $credit->montant_total_rembourser,
@@ -77,10 +77,10 @@ public function approuveCredit($id)
                 . ' (Montant : ' . $credit->montant_demande . ' BIF)',
             'time' => now(),
             'read' => false,
-            'user_id' => auth()->user()->id,
+            'user_id' => Auth::id(),
         ]);
 
-        event(new NotificationSent($notification->toArray(), auth()->user()->id));
+        event(new NotificationSent($notification->toArray(), Auth::id()));
 
        foreach ($Email_id as $admin) {
         event(new NotificationSent(
@@ -102,7 +102,7 @@ public function approuveCredit($id)
         $credit = Credit::findOrFail($id);
         $credit->update([
             'statut' => 'rejete',
-            'rejected_by' => auth()->user()->id,
+            'rejected_by' => Auth::id(),
         ]);
 
         try {
@@ -116,7 +116,7 @@ public function approuveCredit($id)
                 'message' => 'Le credit a ete rejeté par ' . $credit->membre->nom . ' ' . $credit->membre->prenom . ' pour un montant de ' . $credit->montant_demande . ' BIF',
                 'time' => now(),
                 'read' => false,
-                'user_id' => auth()->user()->id,
+                'user_id' => Auth::id(),
             ]);
         } catch (\Throwable $th) {
             //throw $th;
@@ -139,7 +139,10 @@ public function approuveCredit($id)
 
 
         try {
-            $membre = Membre::where('user_id', auth()->user()->id)->first();
+            $membre = Membre::where('user_id', Auth::id())->first();
+            if (!$membre) {
+                return sendError("Membre non trouvé.", [], Response::HTTP_NOT_FOUND);
+            }
         } catch (\Exception $e) {
             return sendError($e->getMessage());
         }
@@ -155,6 +158,7 @@ public function approuveCredit($id)
         if ($hasIrregularCotisations || $hasUnpaidCredits) {
             return sendError(
                 'Vous ne pouvez pas demander un crédit tant que vous avez des cotisations irrégulières ou des crédits impayés.',
+                [],
                 Response::HTTP_FORBIDDEN
             );
         }
@@ -169,7 +173,7 @@ public function approuveCredit($id)
                 'montant_total_rembourser' => $request->montant_total_rembourser,
                 'montant_mensualite' => $request->montant_mensualite,
                 'membre_id' => $membre->id,
-                'created_by' => auth()->user()->id,
+                'created_by' => Auth::id(),
                 'statut' => 'en_attente',
                 'date_demande' => now(),
                 'motif' => $request->motif,
@@ -182,7 +186,7 @@ public function approuveCredit($id)
                 'message' => 'Une nouvelle demande de credit a ete effectuee par ' . $membre->nom . ' ' . $membre->prenom . ' pour un montant de ' . $request->montant_demande . ' BIF',
                 'time' => now(),
                 'read' => false,
-                'user_id' => auth()->user()->id,
+                'user_id' => Auth::id(),
             ]);
             DB::commit();
         } catch (\Throwable $th) {
@@ -202,12 +206,15 @@ public function approuveCredit($id)
     public function mesCredits()
     {
         try {
-            $membre = Membre::where('user_id', auth()->user()->id)->first()->id;
-            $credits = Credit::where('membre_id', $membre)->latest()->paginate();
+            $membre = Membre::where('user_id', Auth::id())->first();
+            if (!$membre) {
+                return sendError("Membre non trouvé.", [], Response::HTTP_NOT_FOUND);
+            }
+            $credits = Credit::where('membre_id', $membre->id)->latest()->paginate();
+            return sendResponse($credits, 'Credits retrieved successfully.');
         } catch (\Exception $e) {
             return sendError($e->getMessage());
         }
-        return sendResponse($credits, 'Credits retrieved successfully.');
     }
 
 
@@ -227,11 +234,12 @@ public function approuveCredit($id)
         if ($hasIrregularCotisations || $hasUnpaidCredits) {
             return sendError(
                 'Vous ne pouvez pas demander un crédit tant que vous avez des cotisations irrégulières ou des crédits impayés.',
+                [],
                 Response::HTTP_FORBIDDEN
             );
         }
         $credit = Credit::create(array_merge($request->validated(), [
-            'created_by' => auth()->user()->id,
+            'created_by' => Auth::id(),
             'date_fin' => $date_fin,
         ]));
 
@@ -323,7 +331,7 @@ public function approuveCredit($id)
     {
         $credit->update($request->validated());
 
-        return new CreditResource($credit);
+        return sendResponse($credit, 'Credit updated successfully.');
     }
 
     public function destroy(Request $request, Credit $credit)

@@ -42,7 +42,6 @@ function sendError($message, $errors = [], $code = 400)
 
 
 const EMAIL_COPIES = [
-    'albert79738653@gmail.com',
-    'nijeanlionel@gmail.com'
+    'irumvabric@gmail.com'
 ];
 

@@ -22,13 +22,13 @@ class AssistanceUpdateRequest extends FormRequest
         return [
             // 'membre_id' => ['required', 'integer', 'exists:membres,id'],
             'type_assistance_id' => ['required', 'integer', 'exists:type_assistances,id'],
-            'montant' => ['required', 'numeric', 'between:-99999999.99,99999999.99'],
+            'montant' => ['required', 'numeric'],
             'date_demande' => ['required', 'date'],
-            'date_approbation' => ['required', 'date'],
-            'date_versement' => ['required', 'date'],
+            'date_approbation' => ['nullable', 'date'],
+            'date_versement' => ['nullable', 'date'],
             'statut' => ['required', 'in:en_attente,approuve,rejete,verse'],
-            'justificatif' => ['required', 'string', 'max:255'],
-            'motif_rejet' => ['string'],
+            'justificatif' => ['nullable'], // Handle manually
+            'motif_rejet' => ['nullable', 'string'],
         ];
     }
 }

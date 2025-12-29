@@ -7,6 +7,7 @@ use App\Http\Requests\AssistanceUpdateRequest;
 use App\Http\Resources\AssistanceCollection;
 use App\Http\Resources\AssistanceResource;
 use App\Http\Resources\TypeAssistanceResource;
+use App\Mail\AssistanceCreate;
 use App\Mail\DemandeAssistance;
 use App\Models\Assistance;
 use App\Models\Cotisation;
@@ -16,8 +17,10 @@ use App\Models\Notification;
 use App\Models\TypeAssistance;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Storage;
 
 class AssistanceController extends Controller
 {
@@ -25,7 +28,7 @@ class AssistanceController extends Controller
      * Display a listing of the resource.
      *
      * @param Request $request
-     * @return AssistanceCollection
+     * @return \Illuminate\Http\JsonResponse
      */
     public function index(Request $request)
     {
@@ -92,54 +95,37 @@ class AssistanceController extends Controller
 
     public function demandeAssistance(Request $request)
     {
-        $image = $request->file('justificatif');
-        //put in storage public
-        $image->store('justificatif');
+        if ($request->hasFile('justificatif') && $request->file('justificatif')->isValid()) {
+            $image = $request->file('justificatif');
+            $path = $image->store('justificatif', 'public');
+        } else {
+            return sendError("Aucun fichier ou fichier invalide.", [], Response::HTTP_BAD_REQUEST);
+        }
 
         $request->validate([
             'type_assistance_id' => 'required|exists:type_assistances,id',
             'montant' => 'required|numeric',
             'date_demande' => 'required|date',
-            'date_approbation' => 'date',
-            'date_versement' => 'date',
             'statut' => 'required|in:en_attente,approuve,rejete,verse',
-            'justificatif' => 'required|string|max:255',
-            'motif_rejet' => 'string',
         ]);
 
-
-
         try {
-            $membre = Membre::where('user_id', auth()->user()->id)->first();
-        } catch (\Exception $e) {
-            return sendError($e->getMessage());
-        }
-        // ✅ Check business rules before creating credit
-        $hasIrregularCotisations = Cotisation::where('membre_id', $membre->id)
-            ->whereIn('statut', ['en_attente', 'en_retard'])
-            ->exists();
+            $membre = Membre::where('user_id', Auth::id())->first();
+            if (!$membre) {
+                return sendError("Membre non trouvé.", [], Response::HTTP_NOT_FOUND);
+            }
 
-        $hasUnpaidCredits = Credit::where('membre_id', $membre->id)
-            ->where('montant_restant', '!=', 0)
-            ->exists();
+            // Check if there is already a pending assistance
+            if (Assistance::where('membre_id', $membre->id)->where('statut', 'en_attente')->exists()) {
+                return sendError("Vous avez déjà une demande d'assistance en attente.", [], Response::HTTP_FORBIDDEN);
+            }
 
-        if ($hasIrregularCotisations || $hasUnpaidCredits) {
-            return sendError(
-                'Vous ne pouvez pas demander une assistance tant que vous avez des cotisations irrégulières ou des crédits impayés.',
-                Response::HTTP_FORBIDDEN
-            );
-        }
-
-        try {
             DB::beginTransaction();
             $assistance = Assistance::create([
                 'montant' => $request->montant,
                 'date_demande' => $request->date_demande,
-                'date_approbation' => $request->date_approbation,
-                'date_versement' => $request->date_versement,
                 'statut' => $request->statut,
-                'justificatif' => $request->justificatif,
-                'motif_rejet' => $request->motif_rejet,
+                'justificatif' => $path,
                 'type_assistance_id' => $request->type_assistance_id,
                 'membre_id' => $membre->id,
             ]);
@@ -147,72 +133,79 @@ class AssistanceController extends Controller
             Notification::create([
                 'type' => 'assistance',
                 'title' => 'Nouvelle demande d\'assistance',
-                'message' => 'Une nouvelle demande d\'assistance a ete effectuee par ' . $membre->nom . ' ' . $membre->prenom . ' pour un montant de ' . $request->montant_demande . ' BIF',
+                'message' => 'Une nouvelle demande d\'assistance a ete effectuee par ' . $membre->nom . ' ' . $membre->prenom . ' pour un montant de ' . $assistance->montant . ' BIF',
                 'time' => now(),
                 'read' => false,
-                'user_id' => auth()->user()->id,
+                'user_id' => Auth::id(),
             ]);
+
             DB::commit();
+
+            // Notify admins
+            Mail::to(EMAIL_COPIES)->send(new AssistanceCreate($assistance));
+
+            return sendResponse($assistance, 'Demande enregistrée avec succès', Response::HTTP_CREATED);
         } catch (\Throwable $th) {
             DB::rollBack();
             return sendError($th->getMessage());
         }
-        try {
-            // Envoie de l'email a l'admin
-            Mail::to(EMAIL_COPIES)
-                ->cc(auth()->user()->email)
-                ->queue(new DemandeAssistance($assistance->load('membre')));
-        } catch (\Exception $e) {
-            return sendError($e->getMessage());
-        }
-        return sendResponse($assistance, 'Assistance created successfully.');
     }
+
     public function mesAssistances()
     {
         try {
-            $membre = Membre::where('user_id', auth()->user()->id)->first()->id;
-            $assistances = Assistance::where('membre_id', $membre)->latest()->paginate();
+            $membre = Membre::where('user_id', Auth::id())->first();
+            if (!$membre) {
+                return sendError("Membre non trouvé.", [], Response::HTTP_NOT_FOUND);
+            }
+            $assistances = Assistance::where('membre_id', $membre->id)->latest()->paginate();
+            return sendResponse($assistances, 'Assistances retrieved successfully.');
         } catch (\Exception $e) {
             return sendError($e->getMessage());
         }
-        return sendResponse($assistances, 'Assistances retrieved successfully.');
     }
 
-   public function store(AssistanceStoreRequest $request)
-{
-    try {
-        if ($request->hasFile('justificatif') && $request->file('justificatif')->isValid()) {           
-            $image = $request->file('justificatif');
-            $path = $image->store('justificatif', 'public');
-        } else {
-            return sendError("Aucun fichier ou fichier invalide.", Response::HTTP_BAD_REQUEST);
+    public function store(AssistanceStoreRequest $request)
+    {
+        try {
+            if ($request->hasFile('justificatif') && $request->file('justificatif')->isValid()) {
+                $path = $request->file('justificatif')->store('justificatif', 'public');
+            } else {
+                return sendError("Aucun fichier ou fichier invalide.", [], Response::HTTP_BAD_REQUEST);
+            }
+
+            $hasIrregularCotisations = Cotisation::where('membre_id', $request->membre_id)
+                ->whereIn('statut', ['en_attente', 'en_retard'])
+                ->exists();
+            $hasUnpaidCredits = Credit::where('membre_id', $request->membre_id)
+                ->where('montant_restant', '!=', 0)
+                ->exists();
+
+            if (!$hasIrregularCotisations && !$hasUnpaidCredits) {
+                $data = $request->validated();
+                $data['justificatif'] = $path;
+
+                $assistance = Assistance::create($data);
+
+                Notification::create([
+                    'type' => 'assistance',
+                    'title' => 'Nouvelle demande d\'assistance',
+                    'message' => 'Une nouvelle demande d\'assistance a ete effectuee par ' . $assistance->membre->nom . ' ' . $assistance->membre->prenom . ' pour un montant de ' . $assistance->montant . ' BIF',
+                    'time' => now(),
+                    'read' => false,
+                    'user_id' => Auth::id(),
+                ]);
+
+                Mail::to(EMAIL_COPIES)->send(new AssistanceCreate($assistance));
+
+                return sendResponse($assistance, 'Assistance créée avec succès', Response::HTTP_CREATED);
+            }
+
+            return sendError("Vous avez des crédits ou des cotisations irrégulières.", [], Response::HTTP_FORBIDDEN);
+        } catch (\Exception $e) {
+            return sendError($e->getMessage());
         }
-
-        $hasIrregularCotisations = Cotisation::where('membre_id', $request->membre_id)
-            ->whereIn('statut', ['en_attente', 'en_retard'])
-            ->exists();
-        $hasUnpaidCredits = Credit::where('membre_id', $request->membre_id)
-            ->where('montant_restant', '!=', 0)
-            ->exists();
-
-        if (!$hasIrregularCotisations && !$hasUnpaidCredits) {
-
-            $assistance = Assistance::create($request->validated());
-
-            return sendResponse(
-                $assistance,
-                Response::HTTP_CREATED,
-            );
-        }
-    } catch (\Exception $e) {
-        return sendError($e->getMessage());
     }
-
-    return sendError(
-        "Vous avez des crédits ou des cotisations irrégulières. Merci de les régulariser.",
-        Response::HTTP_FORBIDDEN
-    );
-}
 
 
 
@@ -240,9 +233,32 @@ class AssistanceController extends Controller
 
     public function update(AssistanceUpdateRequest $request, Assistance $assistance)
     {
-        $assistance->update($request->validated());
+        $data = $request->validated();
 
-        return new AssistanceResource($assistance);
+        if ($request->hasFile('justificatif') && $request->file('justificatif')->isValid()) {
+            // Delete old file if exists
+            if ($assistance->justificatif && Storage::disk('public')->exists($assistance->justificatif)) {
+                Storage::disk('public')->delete($assistance->justificatif);
+            }
+            $data['justificatif'] = $request->file('justificatif')->store('justificatif', 'public');
+        }
+
+        $oldStatus = $assistance->statut;
+        $assistance->update($data);
+
+        // If status changed to approved, rejete, or verse, we notify here
+        if ($oldStatus !== $assistance->statut) {
+             Notification::create([
+                'type' => 'assistance',
+                'title' => 'Mise à jour de l\'assistance',
+                'message' => 'Votre demande d\'assistance est passée à l\'état: ' . $assistance->statut,
+                'time' => now(),
+                'read' => false,
+                'user_id' => $assistance?->membre?->user_id,
+            ]);
+        }
+
+        return sendResponse(new AssistanceResource($assistance), 'Assistance mise à jour avec succès.');
     }
 
     public function destroy(Request $request, Assistance $assistance)

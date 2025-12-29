@@ -24,8 +24,7 @@
     <h3>Détails de l'Assistance</h3>
     <p>
         <strong>Type d'assistance :</strong> {{ $assistance->typeAssistance->nom ?? 'N/A' }} <br>
-        <strong>Montant demandé :</strong> {{ number_format($assistance->montant_demande, 0, ',', ' ') }} FBu <br>
-        <strong>Motif de la demande :</strong> {{ $assistance->motif }} <br>
+        <strong>Montant demandé :</strong> {{ number_format($assistance->montant, 0, ',', ' ') }} FBu <br>
         <strong>Date de la demande :</strong> {{ \Carbon\Carbon::parse($assistance->date_demande)->format('d/m/Y') }} <br>
         <strong>Statut :</strong> {{ ucfirst($assistance->statut) }} <br>
         <strong>ID de la demande :</strong> {{ $assistance->id }}
