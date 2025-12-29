@@ -58,6 +58,29 @@ class MembreController extends Controller
         return sendResponse($membres, 'Membres récupérés avec succès');
     }
 
+    public function search(Request $request)
+{
+    $search = $request->get('q');
+
+    // Search for members based on provided query
+    $membres = Membre::with('categorie')
+        ->when($search, function ($query) use ($search) {
+            $query->where('matricule', 'like', "%{$search}%")
+                  ->orWhere('nom', 'like', "%{$search}%")
+                  ->orWhere('prenom', 'like', "%{$search}%")
+                  ->orWhere('telephone', 'like', "%{$search}%");
+        })
+        ->limit(10) // Limit for autocomplete
+        ->get();
+
+    // Check if results exist
+    if ($membres->isEmpty()) {
+        return response()->json(['message' => 'No members found'], 404);
+    }
+
+    return response()->json($membres);
+}
+
     public function store(MembreStoreRequest $request)
     {
 
