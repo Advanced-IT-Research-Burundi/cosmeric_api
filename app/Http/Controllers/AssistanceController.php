@@ -15,6 +15,7 @@ use App\Models\Credit;
 use App\Models\Membre;
 use App\Models\Notification;
 use App\Models\TypeAssistance;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
@@ -95,9 +96,15 @@ class AssistanceController extends Controller
 
     public function demandeAssistance(Request $request)
     {
-        if ($request->hasFile('justificatif') && $request->file('justificatif')->isValid()) {
-            $image = $request->file('justificatif');
-            $path = $image->store('justificatif', 'public');
+//         type_assistance_id: "",
+//   montant: 0,
+//   justificatif: "",
+//   document_justificatif: null,
+     $path ="";
+        if ($request->hasFile('document_justificatif') && $request->file('document_justificatif')->isValid()) {
+            $image = $request->file('document_justificatif');
+             $image->move('uploads/justificatifs', time() . '.' . $image->getClientOriginalExtension());
+             $path = 'uploads/justificatifs/' . time() . '.' . $image->getClientOriginalExtension();
         } else {
             return sendError("Aucun fichier ou fichier invalide.", [], Response::HTTP_BAD_REQUEST);
         }
@@ -105,8 +112,6 @@ class AssistanceController extends Controller
         $request->validate([
             'type_assistance_id' => 'required|exists:type_assistances,id',
             'montant' => 'required|numeric',
-            'date_demande' => 'required|date',
-            'statut' => 'required|in:en_attente,approuve,rejete,verse',
         ]);
 
         try {
@@ -114,7 +119,6 @@ class AssistanceController extends Controller
             if (!$membre) {
                 return sendError("Membre non trouvé.", [], Response::HTTP_NOT_FOUND);
             }
-
             // Check if there is already a pending assistance
             if (Assistance::where('membre_id', $membre->id)->where('statut', 'en_attente')->exists()) {
                 return sendError("Vous avez déjà une demande d'assistance en attente.", [], Response::HTTP_FORBIDDEN);
@@ -123,21 +127,20 @@ class AssistanceController extends Controller
             DB::beginTransaction();
             $assistance = Assistance::create([
                 'montant' => $request->montant,
-                'date_demande' => $request->date_demande,
-                'statut' => $request->statut,
+                'date_demande' => now(),
+                'statut' => 'en_attente',
                 'justificatif' => $path,
                 'type_assistance_id' => $request->type_assistance_id,
                 'membre_id' => $membre->id,
             ]);
+            $user_id = User::where('role', 'gestionnaire')->first()->id;
+            Notification::addNotification(
+                'Une nouvelle demande d\'assistance a été effectuée par ' . $membre->nom . ' ' . $membre->prenom . ' pour un montant de ' . $assistance->montant . ' BIF',
+                $user_id,
+                'Nouvelle demande d\'assistance',
+                'assistance',
 
-            Notification::create([
-                'type' => 'assistance',
-                'title' => 'Nouvelle demande d\'assistance',
-                'message' => 'Une nouvelle demande d\'assistance a ete effectuee par ' . $membre->nom . ' ' . $membre->prenom . ' pour un montant de ' . $assistance->montant . ' BIF',
-                'time' => now(),
-                'read' => false,
-                'user_id' => Auth::id(),
-            ]);
+            );
 
             DB::commit();
 

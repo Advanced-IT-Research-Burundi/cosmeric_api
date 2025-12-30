@@ -39,4 +39,16 @@ class Notification extends Model
             'read' => 'boolean',
         ];
     }
+
+    public static function addNotification(  $message, $assignee_id = null,$title='Notification' ,$type='info'){
+        self::create([
+            'type' => $type,
+            'title' => $title,
+            'message' => $message,
+            'time' => now(),
+            'read' => false,
+            'user_id' => auth()->id(),
+            'assignee_id' => $assignee_id,
+        ]);
+    }
 }

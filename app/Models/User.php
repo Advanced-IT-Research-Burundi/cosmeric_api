@@ -87,6 +87,11 @@ class User extends Authenticatable
         return $this->role === $role;
     }
 
+    public function hasRoles(array $roles): bool
+    {
+        return in_array($this->role, $roles);
+    }
+
     public function hasAnyRole(array $roles): bool
     {
         return in_array($this->role, $roles);

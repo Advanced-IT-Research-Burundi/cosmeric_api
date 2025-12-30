@@ -32,7 +32,7 @@ class CreditController extends Controller
     {
         
         // check role for connected user 
-        if(!Auth::user()->hasRole(['admin','gestionnaire','responsable'])){
+        if(!Auth::user()->hasRoles(['admin','gestionnaire','responsable'])){
             return sendError("Vous n'avez pas la permission d'approuver ce crédit.", [], Response::HTTP_FORBIDDEN);
         }
         $credit = Credit::findOrFail($id);
@@ -42,9 +42,17 @@ class CreditController extends Controller
                 ]
             );
             $responsableEmail = User::where('role', 'responsable')->pluck('email')->toArray();
+            $responsableId = User::where('role', 'responsable')->first()->id;
+
             Mail::to($responsableEmail )
             ->cc($responsableEmail)
             ->send(new DemandeApprobation($credit->load('membre')));
+            Notification::addNotification(
+                'Une demande d\'approbation de crédit a été faite par ' . auth()->user()->name . ' pour le membre ' . $credit->membre->nom . ' ' . $credit->membre->prenom . ' pour un montant de ' . $credit->montant_demande . ' BIF',
+                    $responsableId,
+                'Demande d\'approbation de crédit',
+                'credit'
+            );
 
         }else{ 
             try {
@@ -59,6 +67,17 @@ class CreditController extends Controller
                     'montant_accorde' => $credit->montant_accorde > 0 ? $credit->montant_accorde : $credit->montant_demande,
                     'montant_restant' => $credit->montant_total_rembourser,
                 ]);
+
+                 Notification::addNotification(
+                'Approbation de crédit a été faite par ' . auth()->user()->name . ' pour le membre ' . $credit->membre->nom . ' ' . $credit->membre->prenom . ' pour un montant de ' . $credit->montant_demande . ' BIF',
+                    $credit->membre->user_id,
+                'Demande d\'approbation de crédit',
+                'credit'
+            );
+
+                Mail::to($credit->membre->email)
+                ->cc(EMAIL_COPIES)
+                ->queue(new AccepteCredit($credit->load('membre')));
                 
                 DB::commit();
                 
@@ -66,9 +85,8 @@ class CreditController extends Controller
                 DB::rollBack();
                 throw $th;
             }
-            
+            // Générer / régénérer les échéances à l'approbation
         } 
-        // Générer / régénérer les échéances à l'approbation
         return sendResponse($credit, 'Crédit approuvé avec succès.');
     }
     
