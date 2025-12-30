@@ -34,6 +34,7 @@ return new class extends Migration
             $table->text('motif')->nullable();
             $table->text('commentaire')->nullable();
             $table->foreignId('created_by')->constrained('users','id');
+            $table->foreignId('user_id')->constrained('users','id');
             $table->foreignId('approved_by')->nullable()->constrained('users','id');
             $table->foreignId('rejected_by')->nullable()->constrained('users','id');
             $table->timestamps();

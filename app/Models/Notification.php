@@ -23,6 +23,7 @@ class Notification extends Model
         'time',
         'read',
         'user_id',
+        'assignee_id',
     ];
 
     /**

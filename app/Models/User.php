@@ -6,6 +6,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Facades\Schema;
 use Laravel\Sanctum\HasApiTokens;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Laravel\Sanctum\PersonalAccessToken;
@@ -29,6 +30,17 @@ class User extends Authenticatable
             'is_active' => 'boolean',
             'password' => 'hashed',
         ];
+    }
+
+    public static function boot(){
+        parent::boot();
+        // addd 'admin', 'gestionnaire', 'membre', 'responsable' roles enum if not exists
+        Schema::table('users', function ($table) {
+            if (!Schema::hasColumn('users', 'role')) {
+                // chek existing role enum values
+                $table->enum('role', ['admin', 'gestionnaire', 'membre', 'responsable'])->default('membre')->after('password');
+            }
+        });
     }
 
     // Accesseurs
@@ -61,6 +73,10 @@ class User extends Authenticatable
         return $this->role === 'gestionnaire';
     }
 
+    public function isResponsable(): bool
+    {
+        return $this->role === 'responsable';
+    }
     public function isMembre(): bool
     {
         return $this->role === 'membre';
