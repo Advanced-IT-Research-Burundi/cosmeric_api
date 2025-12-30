@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\CreditStoreRequest;
 use App\Http\Requests\CreditUpdateRequest;
 use App\Mail\AccepteCredit;
+use App\Mail\DemandeApprobation;
 use App\Mail\DemandeCredit;
 use App\Mail\RefuserCredit;
 use App\Models\Cotisation;
@@ -18,7 +19,6 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\DB;
-use Symfony\Component\Mime\Email;
 use App\Events\NotificationSent;
 use Illuminate\Support\Facades\Auth;
 
@@ -28,55 +28,47 @@ class CreditController extends Controller
 {
     
     
-    public function approuveCredit($id)
+    public function approuveCredit(Request $request, $id)
     {
-        $credit = Credit::findOrFail($id);
         
-        $credit->update([
-            'statut' => 'approuve',
-            'date_approbation' => now(),
-            'date_fin' => now()->addMonths($credit->duree_mois ?? 12),
-            'approved_by' => Auth::id(),
-            // Au moment de l'approbation, on considère que le montant accordé est celui demandé si non défini
-            'montant_accorde' => $credit->montant_accorde > 0 ? $credit->montant_accorde : $credit->montant_demande,
-            'montant_restant' => $credit->montant_total_rembourser,
-        ]);
-        
-        // Générer / régénérer les échéances à l'approbation
-        $this->generateEcheances($credit);
-        
-        try {
-            // Send email
-            Mail::to($credit->membre->email)
-            ->cc($Email_admin)
-            ->queue(new AccepteCredit($credit->load('membre')));
-            
-            // Create notification in DB
-            $notification = Notification::create([
-                'type' => 'credit',
-                'title' => 'Crédit approuvé',
-                'message' => 'Le crédit a été approuvé pour '
-                . $credit->membre->nom . ' '
-                . $credit->membre->prenom
-                . ' (Montant : ' . $credit->montant_demande . ' BIF)',
-                'time' => now(),
-                'read' => false,
-                'user_id' => Auth::id(),
-                'assignee_id' => $credit->membre->user_id,
-            ]);
-            
-            event(new NotificationSent($notification->toArray(), Auth::id()));
-            
-            foreach ($Email_id as $admin) {
-                event(new NotificationSent(
-                    $notification->toArray(),
-                    $admin
-                ));
-            }
-        } catch (\Throwable $th) {
-            throw $th;
+        // check role for connected user 
+        if(!Auth::user()->hasRole(['admin','gestionnaire','responsable'])){
+            return sendError("Vous n'avez pas la permission d'approuver ce crédit.", [], Response::HTTP_FORBIDDEN);
         }
-        
+        $credit = Credit::findOrFail($id);
+        if(auth()->user()->hasRole('gestionnaire') ){
+            $credit->update([
+                'statut' => 'en_cours',
+                ]
+            );
+            $responsableEmail = User::where('role', 'responsable')->pluck('email')->toArray();
+            Mail::to($responsableEmail )
+            ->cc($responsableEmail)
+            ->send(new DemandeApprobation($credit->load('membre')));
+
+        }else{ 
+            try {
+                DB::beginTransaction();
+                $this->generateEcheances($credit);
+                $credit->update([
+                    'statut' => 'approuve',
+                    'date_approbation' => now(),
+                    'date_fin' => now()->addMonths($credit->duree_mois ?? 12),
+                    'approved_by' => Auth::id(),
+                    // Au moment de l'approbation, on considère que le montant accordé est celui demandé si non défini
+                    'montant_accorde' => $credit->montant_accorde > 0 ? $credit->montant_accorde : $credit->montant_demande,
+                    'montant_restant' => $credit->montant_total_rembourser,
+                ]);
+                
+                DB::commit();
+                
+            }catch (\Throwable $th) {
+                DB::rollBack();
+                throw $th;
+            }
+            
+        } 
+        // Générer / régénérer les échéances à l'approbation
         return sendResponse($credit, 'Crédit approuvé avec succès.');
     }
     
@@ -335,7 +327,7 @@ class CreditController extends Controller
     {
         // On supprime d'abord d'éventuelles anciennes échéances pour éviter les doublons
         try{
-
+            
             DB::beginTransaction();
             $credit->remboursements()->delete();
             $credit->remboursements()->delete();
@@ -359,14 +351,14 @@ class CreditController extends Controller
             // Mettre à jour le montant restant sur le crédit
             $credit->montant_restant = $credit->montant_total_rembourser - $credit->remboursements()->sum('montant_paye');
             $credit->save();
-              DB::commit();
+            DB::commit();
         }catch (\Throwable $th) {
-        
+            
             DB::rollBack();
             throw $th;
         }
         
     }
-
-
+    
+    
 }

@@ -30,6 +30,7 @@ return new class extends Migration
             $table->date('date_demande')->default(now());
             $table->date('date_approbation')->nullable();
             $table->date('date_fin')->nullable();
+            // En cours envoyer envoyer au responsable
             $table->enum('statut', ["en_attente", "approuve", "rejete", "en_cours", "termine"])->default("en_attente");
             $table->text('motif')->nullable();
             $table->text('commentaire')->nullable();
