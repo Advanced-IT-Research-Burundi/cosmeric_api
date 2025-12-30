@@ -8,43 +8,32 @@ use App\Http\Resources\CotisationMensuelleCollection;
 use App\Http\Resources\CotisationMensuelleResource;
 use App\Models\CotisationMensuelle;
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
 
 class CotisationMensuelleController extends Controller
 {
     public function index(Request $request)
     {
 
-        $query = CotisationMensuelle::query();
-
+        
         // prefer explicit inputs instead of overriding $params
-        $search = $request->input('name') ?? $request->input('search');
-        $statut = $request->input('statut');
-        $dateCotisation = $request->input('date_cotisation');
+        $matricule = $request->query('params')['matricule'] ?? null;
+        $name = $request->query('params')['name'] ?? null;
+        $dateCotisation = $request->query('params')['date_cotisation'] ?? null;
 
         // 🔎 Recherche : par nom ou prénom du membre, motif, ID
-        if ($search) {
-            $query->where(function ($q) use ($search) {
-                $q->where('name', 'like', "%{$search}%")
-                    ->orWhere('matricule', 'like', "%{$search}%")
-                    ->orWhere('id', $search);
-            });
+        $query = CotisationMensuelle::query();
+        if ($matricule) {
+          
+            $query->where('matricule', 'like', "%{$matricule}%");
         }
 
-        // 📌 Filtre statut
-        if ($statut) {
-            $query->where('statut', $statut);
+        if ($name) {
+            $query->where('name', 'like', "%{$name}%");
         }
-
-        // 📅 Filtre date_cotisation (exact date)
         if ($dateCotisation) {
-            $query->whereDate('date_cotisation', $dateCotisation);
+            $query->where('date_cotisation', 'like', "%{$dateCotisation}%");
         }
-
-        // 📄 Pagination dynamique
-        $perPage = (int) $request->input('per_page', 15);
-        $cotisationMensuelles = $query->paginate($perPage);
-
+        $cotisationMensuelles = $query->latest()->paginate(10);
         return sendResponse($cotisationMensuelles, 'Cotisation mensuelles retrieved successfully.');
     }
 
