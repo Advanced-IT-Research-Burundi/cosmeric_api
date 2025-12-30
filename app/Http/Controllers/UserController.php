@@ -122,7 +122,7 @@ class UserController extends Controller
             'email' => ['required', 'email', 'unique:users,email'],
             'password' => ['required'],
             'telephone' => ['nullable', 'string', 'max:20'],
-            'role' => ['sometimes', 'in:admin,gestionnaire,membre'],
+            'role' => ['sometimes', 'in:admin,gestionnaire,membre,responsable'],
             'is_active' => ['sometimes', 'boolean'],
         ]);
 

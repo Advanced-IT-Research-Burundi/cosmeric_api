@@ -364,11 +364,8 @@ class CreditController extends Controller
         
             DB::rollBack();
             throw $th;
-
         }
         
-        
-      
     }
 
 
