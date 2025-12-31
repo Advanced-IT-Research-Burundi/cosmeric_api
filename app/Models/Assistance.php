@@ -56,4 +56,9 @@ class Assistance extends Model
     {
         return $this->belongsTo(TypeAssistance::class);
     }
+
+    public function getJustificatifAttribute($value)
+    {
+        return asset( $value);
+    }
 }
