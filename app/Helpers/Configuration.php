@@ -44,7 +44,7 @@ function sendError($message, $errors = [], $code = 400)
 
 function addColumnIfNotExists($table, $column, $type, $after = null)
 {
-    if (!Schema::hasColumn($table, $column)) {
+    if (!Schema::hasColumn($table, column: $column)) {
         Schema::table($table, function ($table) use ($column, $type, $after) {
             $columnDefinition = $table->$type($column)->nullable();
             if ($after) {

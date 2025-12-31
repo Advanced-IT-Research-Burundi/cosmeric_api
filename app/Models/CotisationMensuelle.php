@@ -24,7 +24,15 @@ class CotisationMensuelle extends Model
         'retenu',
         'date_cotisation',
         'user_id',
+        'type'
     ];
+
+    public static function boot()
+    {
+        parent::boot();
+
+        addColumnIfNotExists('cotisation_mensuelles', 'type', 'string', 'deleted_at');
+    }
 
     /**
      * Get the attributes that should be cast.

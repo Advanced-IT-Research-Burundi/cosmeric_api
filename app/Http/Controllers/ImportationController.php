@@ -19,19 +19,19 @@ class ImportationController extends Controller
         if ($existingCotisation) {
             return sendError('Cotisation for this date already exists', [], 409);
         }
-        // checko if cotisations array is present
-        // if (!isset($request->cotisations) || !is_array($request->cotisations)) {
-        //     return sendError('Invalid cotisations data', [], 400);
-        // }
-
-        // check if cotisations array has a valid format
-        // foreach ($request->cotisations as $cotisation) {
-        //     if (!isset($cotisation['name'], $cotisation['matricule'], $cotisation['nomero_dossier'], $cotisation['global'], $cotisation['regle'], $cotisation['restant'], $cotisation['retenu'])) {
-        //         return sendError('Invalid cotisation data', [], 400);
-        //     }
-        // }
-        
+     
         foreach ($request->cotisations as $cotisation) {
+            // Check if  is cotisation or rembouressement
+
+            if($cotisation['matricule'] == null){
+                continue;
+            }
+            // if is cotisation or rembouressement create new cotisation mensuelle
+
+            $type = "COTISATION";
+            if($cotisation['global'] || $cotisation['restant'] ) {
+                $type = "REMBOURSEMENT";
+            }
             CotisationMensuelle::create([
                 'name' => $cotisation['name'],
                 'matricule' => $cotisation['matricule'],
@@ -42,6 +42,7 @@ class ImportationController extends Controller
                 'retenu' => $cotisation['retenu'],
                 'date_cotisation' => $date,
                 'user_id' => auth()->id(),
+                'type' => $type,
             ]);
             
         }

@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\CotisationMensuelleStoreRequest;
 use App\Http\Requests\CotisationMensuelleUpdateRequest;
-use App\Http\Resources\CotisationMensuelleCollection;
 use App\Http\Resources\CotisationMensuelleResource;
 use App\Models\CotisationMensuelle;
 use Illuminate\Http\Request;
@@ -23,7 +22,6 @@ class CotisationMensuelleController extends Controller
         // 🔎 Recherche : par nom ou prénom du membre, motif, ID
         $query = CotisationMensuelle::query();
         if ($matricule) {
-          
             $query->where('matricule', 'like', "%{$matricule}%");
         }
 
@@ -33,7 +31,7 @@ class CotisationMensuelleController extends Controller
         if ($dateCotisation) {
             $query->where('date_cotisation', 'like', "%{$dateCotisation}%");
         }
-        $cotisationMensuelles = $query->latest()->paginate(10);
+        $cotisationMensuelles = $query->latest()->paginate();
         return sendResponse($cotisationMensuelles, 'Cotisation mensuelles retrieved successfully.');
     }
 

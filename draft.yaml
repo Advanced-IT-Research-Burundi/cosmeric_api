@@ -1,5 +1,5 @@
 models:
-  Notification:
+  RemboursementMensuel:
     type: string 255 nullable
     title: string 255 nullable
     message: text nullable
