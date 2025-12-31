@@ -23,7 +23,7 @@ class ImportationController extends Controller
         foreach ($request->cotisations as $cotisation) {
             // Check if  is cotisation or rembouressement
 
-            if($cotisation['matricule'] == null){
+            if($cotisation['matricule'] == null || $cotisation['name'] == null || !is_numeric($cotisation['matricule'])){
                 continue;
             }
             // if is cotisation or rembouressement create new cotisation mensuelle
