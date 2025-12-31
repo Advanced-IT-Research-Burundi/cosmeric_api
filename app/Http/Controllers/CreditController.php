@@ -132,8 +132,6 @@ class CreditController extends Controller
             'montant_mensualite' => 'required|numeric',
         ]);
         
-        
-        
         try {
             $membre = Membre::where('user_id', Auth::id())->first();
             if (!$membre) {
