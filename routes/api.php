@@ -92,4 +92,5 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('notifications-unread-count', [NotificationController::class, 'unreadCount']);
 
     Route::get('cotisation_mensuelles', [CotisationController::class, 'cotisationMensuelles']);
+    Route::get('remboursements_mensuelles', [CotisationController::class, 'remboursementsMensuelles']);
 });
