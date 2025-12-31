@@ -10,10 +10,34 @@ use App\Models\Cotisation;
 use App\Models\CotisationMensuelle;
 use App\Models\Membre;
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
 
 class CotisationController extends Controller
 {
+
+    public function cotisationMensuelles()
+    {
+        /* params%5Bpage%5D=2&params%5Bper_page%5D=50&params%5Bsearch%5D=fffffffff&params%5Bsort_field%5D=&params%5Bsort_order%5D=asc */
+        $params = request()->all();
+        $inputSearch = $params['params']['search'] ?? null;
+        
+        $page = $params['page'] ?? 1; // default page
+        $perPage = $params['per_page'] ?? 10; // default per page
+        $query = CotisationMensuelle::query();
+
+        if ($inputSearch) {
+            $query->where(function ($q) use ($inputSearch) {
+        
+                $q->where('name', 'like', '%' . $inputSearch . '%')
+                    ->orWhere('matricule', 'like', '%' . $inputSearch . '%')
+                    ->orWhere('retenu', 'like', '%' . $inputSearch . '%')
+                    ->orWhere('date_cotisation', 'like', '%' . $inputSearch . '%');
+            });
+        }
+
+        $cotisations = $query->where('type', 'COTISATION')
+        ->latest()->paginate($perPage, ['*'], 'page', $page);
+        return sendResponse($cotisations, 'Cotisations mensuelles retrieved successfully.');
+    }
 
 
     public function dashboard()

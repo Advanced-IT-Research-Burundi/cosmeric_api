@@ -90,4 +90,6 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::put('notifications/{notification}/mark-read', [NotificationController::class, 'markAsRead']);
     Route::post('notifications/mark-all-read', [NotificationController::class, 'markAllAsRead']);
     Route::get('notifications-unread-count', [NotificationController::class, 'unreadCount']);
+
+    Route::get('cotisation_mensuelles', [CotisationController::class, 'cotisationMensuelles']);
 });

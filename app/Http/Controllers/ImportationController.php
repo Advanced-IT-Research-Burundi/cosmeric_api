@@ -19,15 +19,12 @@ class ImportationController extends Controller
         if ($existingCotisation) {
             return sendError('Cotisation for this date already exists', [], 409);
         }
-     
         foreach ($request->cotisations as $cotisation) {
             // Check if  is cotisation or rembouressement
-
             if($cotisation['matricule'] == null || $cotisation['name'] == null || !is_numeric($cotisation['matricule'])){
                 continue;
             }
             // if is cotisation or rembouressement create new cotisation mensuelle
-
             $type = "COTISATION";
             if($cotisation['global'] || $cotisation['restant'] ) {
                 $type = "REMBOURSEMENT";
@@ -48,7 +45,5 @@ class ImportationController extends Controller
         }
 
         return sendResponse([], 'Cotisation created successfully', 201);
-
-
     }
 }
