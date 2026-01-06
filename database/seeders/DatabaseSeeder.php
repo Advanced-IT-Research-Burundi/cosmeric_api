@@ -8,6 +8,7 @@ use App\Models\Configuration;
 use App\Models\Cotisation;
 use App\Models\Credit;
 use App\Models\Membre;
+use App\Models\TypeAssistance;
 use App\Models\User;
 use Database\Factories\AssistanceFactory;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
@@ -94,27 +95,21 @@ class DatabaseSeeder extends Seeder
             // ]);
         }
 
+
+            $typesAssistances = [[ 'mariage', 500000], ['retraite', 400000], ['deces', 300000]];
+
+    foreach ($typesAssistances as $type) {
+        TypeAssistance::firstOrCreate([
+            'nom' => $type[0],
+            'montant_standard' => $type[1],
+            'conditions' => 'Conditions pour ' . $type[0],
+            'documents_requis' => 'Documents requis pour ' . $type[0],
+        ]);
+    }
+
         // Assistance::factory()->count(10)->create();
         // Cotisation::factory()->count(10)->create();
         // Credit::factory()->count(10)->create();
 
-        Configuration::factory()->insert([
-
-            [
-                'cle' => 'Mariage',
-                'valeur' => '300000',
-                'description' => 'Mariage',
-            ],
-            [
-                'cle' => 'Retraite',
-                'valeur' => '500000',
-                'description' => 'Retraite',
-            ],
-            [
-                'cle' => 'Deces',
-                'valeur' => '700000',
-                'description' => 'Deces',
-            ]
-        ]);
     }
 }
