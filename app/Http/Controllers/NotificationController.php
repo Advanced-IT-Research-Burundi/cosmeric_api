@@ -15,17 +15,7 @@ class NotificationController extends Controller
     {
         $user = Auth::user();
 
-        $query = Notification::query();
-
-        if($request->has("memberId")){
-            $query->where("user_id", $request->memberId);
-        }
-
-        if($request->has("read")){
-            $query->where("read", $request->read);
-        }
-
-        $notifications = $query->latest()->get();
+        $notifications = Notification::where('assignee_id', $user->id)->get();
         return sendResponse($notifications, 'Notifications récupérées avec succès.');
     }
 
