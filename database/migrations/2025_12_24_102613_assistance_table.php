@@ -21,7 +21,7 @@ return new class extends Migration
             $table->date('date_demande')->default(now());;
             $table->date('date_approbation')->nullable();
             $table->date('date_versement')->nullable();
-            $table->enum('statut', ["en_attente", "approuve", "rejete", "verse"]);
+            $table->enum('statut', ["en_attente",'en_cours', "approuve", "rejete", "verse"]);
             $table->string('justificatif', 255);
             $table->text('motif_rejet')->nullable();
             $table->text('motif')->nullable();

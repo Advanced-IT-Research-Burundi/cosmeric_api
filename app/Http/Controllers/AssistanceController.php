@@ -25,6 +25,45 @@ use Illuminate\Support\Facades\Storage;
 
 class AssistanceController extends Controller
 {
+
+    public function approuve($id)
+    {
+        $assistance = Assistance::find($id);
+        if (!$assistance) {
+            return sendError("Assistance non trouvée.", [], Response::HTTP_NOT_FOUND);
+        }
+
+        // if auth user is gestionnaire le status deviens en cours 
+
+        $message = "";
+        if (auth()->user()->role == 'gestionnaire') {
+            $assistance->statut = 'en_cours';
+            $assistance->date_approbation = now();
+            $assistance->save();
+            $message = 'Assistance mise en cours avec succès. La validation du responsable sera effectuée ultérieurement.';
+            
+        }else{
+            $assistance->statut = 'approuve';
+            $assistance->date_approbation = now();
+            $assistance->save();
+            $message = 'Assistance approuvée avec succès.';
+        }
+
+        // Notify the member
+        Notification::create([
+            'type' => 'assistance .#' . $assistance->id,
+            'title' => 'Assistance Approuvée',
+            'message' => 'Votre demande d\'assistance a été ' . $message,
+            'time' => now(),
+            'read' => false,
+            'user_id' => auth()->id(),
+            'assignee_id' => $assistance?->membre?->user_id,
+        ]);
+
+        return sendResponse(new AssistanceResource($assistance), 'Assistance approuvée avec succès.');
+    }
+
+
     /**
      * Display a listing of the resource.
      *

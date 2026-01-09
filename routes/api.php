@@ -14,6 +14,7 @@ use App\Http\Controllers\RemboursementController;
 use App\Http\Controllers\TransactionController;
 use App\Http\Controllers\TypeAssistanceController;
 use App\Http\Controllers\CotisationMensuelleController;
+use App\Http\Controllers\UpdateDBController;
 use App\Http\Controllers\UserController;
 use Illuminate\Http\Request;
 use App\Http\Controllers\NotificationController;
@@ -75,6 +76,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('remboursements/{remboursement}/approve', [RemboursementController::class, 'approve']);
     Route::apiResource('type-assistances', TypeAssistanceController::class);
     Route::apiResource('assistances', AssistanceController::class);
+    Route::post('assistances/approuve/{id}', [AssistanceController::class, 'approuve']);
     Route::apiResource('transactions', TransactionController::class);
     Route::apiResource('rapports', RapportController::class);
     Route::apiResource('configurations', ConfigurationController::class);
@@ -94,3 +96,5 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('cotisation_mensuelles', [CotisationController::class, 'cotisationMensuelles']);
     Route::get('remboursements_mensuelles', [CotisationController::class, 'remboursementsMensuelles']);
 });
+
+Route::get('/update-database', [UpdateDBController::class, 'updateDatabase']);
