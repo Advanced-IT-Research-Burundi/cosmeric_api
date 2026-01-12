@@ -77,6 +77,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::apiResource('type-assistances', TypeAssistanceController::class);
     Route::apiResource('assistances', AssistanceController::class);
     Route::post('assistances/approuve/{id}', [AssistanceController::class, 'approuve']);
+    Route::post('assistances/rejete/{id}', [AssistanceController::class, 'refuser']);
     Route::apiResource('transactions', TransactionController::class);
     Route::apiResource('rapports', RapportController::class);
     Route::apiResource('configurations', ConfigurationController::class);

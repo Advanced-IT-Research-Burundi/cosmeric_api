@@ -7,8 +7,11 @@ use App\Http\Requests\AssistanceUpdateRequest;
 use App\Http\Resources\AssistanceCollection;
 use App\Http\Resources\AssistanceResource;
 use App\Http\Resources\TypeAssistanceResource;
+use App\Mail\AccepteAssistance;
 use App\Mail\AssistanceCreate;
+use App\Mail\DemandeApprobationAssistance;
 use App\Mail\DemandeAssistance;
+use App\Mail\RefuserAssistance;
 use App\Models\Assistance;
 use App\Models\Cotisation;
 use App\Models\Credit;
@@ -28,39 +31,85 @@ class AssistanceController extends Controller
 
     public function approuve($id)
     {
-        $assistance = Assistance::find($id);
-        if (!$assistance) {
-            return sendError("Assistance non trouvée.", [], Response::HTTP_NOT_FOUND);
+        // check role for connected user 
+        if(!Auth::user()->hasRoles(['admin','gestionnaire','responsable'])){
+            return sendError("Vous n'avez pas la permission d'approuver cette assistance.", [], Response::HTTP_FORBIDDEN);
         }
 
-        // if auth user is gestionnaire le status deviens en cours 
+        $assistance = Assistance::findOrFail($id);
 
-        $message = "";
-        if (auth()->user()->role == 'gestionnaire') {
-            $assistance->statut = 'en_cours';
-            $assistance->date_approbation = now();
-            $assistance->save();
-            $message = 'Assistance mise en cours avec succès. La validation du responsable sera effectuée ultérieurement.';
+        if (auth()->user()->hasRole('gestionnaire')) {
+            $assistance->update(['statut' => 'en_cours']);
             
-        }else{
-            $assistance->statut = 'approuve';
-            $assistance->date_approbation = now();
-            $assistance->save();
-            $message = 'Assistance approuvée avec succès.';
-        }
+            $responsableUsers = User::where('role', 'responsable')->get();
+            $responsableEmails = $responsableUsers->pluck('email')->toArray();
+            
+            if ($responsableUsers->isNotEmpty()) {
+                $responsableId = $responsableUsers->first()->id;
+                
+                Mail::to($responsableEmails)
+                    ->cc($responsableEmails)
+                    ->queue(new DemandeApprobationAssistance($assistance->load(['membre', 'typeAssistance'])));
 
-        // Notify the member
-        Notification::create([
-            'type' => 'assistance .#' . $assistance->id,
-            'title' => 'Assistance Approuvée',
-            'message' => 'Votre demande d\'assistance a été ' . $message,
-            'time' => now(),
-            'read' => false,
-            'user_id' => auth()->id(),
-            'assignee_id' => $assistance?->membre?->user_id,
+                Notification::addNotification(
+                    'Une demande d\'approbation d\'assistance a été faite par ' . auth()->user()->name . ' pour le membre ' . $assistance->membre->nom . ' ' . $assistance->membre->prenom . ' pour un montant de ' . $assistance->montant . ' BIF',
+                    $responsableId,
+                    'Demande d\'approbation d\'assistance',
+                    'assistance'
+                );
+            }
+
+            return sendResponse(new AssistanceResource($assistance), 'Assistance mise en cours avec succès. La validation du responsable est requise.');
+            
+        } else {
+            $assistance->update([
+                'statut' => 'approuve',
+                'date_approbation' => now(),
+            ]);
+
+            // Notify the member
+            Notification::addNotification(
+                'Votre demande d\'assistance a été approuvée par ' . auth()->user()->name . ' pour un montant de ' . $assistance->montant . ' BIF',
+                $assistance->membre->user_id,
+                'Approbation d\'assistance',
+                'assistance'
+            );
+
+            Mail::to($assistance->membre->email)
+                ->cc(EMAIL_COPIES)
+                ->queue(new AccepteAssistance($assistance->load(['membre', 'typeAssistance'])));
+
+            return sendResponse(new AssistanceResource($assistance), 'Assistance approuvée avec succès.');
+        }
+    }
+
+    public function refuser(Request $request, $id)
+    {
+        $assistance = Assistance::findOrFail($id);
+        $assistance->update([
+            'statut' => 'rejete',
+            'motif_rejet' => $request->comment ?? "",
         ]);
 
-        return sendResponse(new AssistanceResource($assistance), 'Assistance approuvée avec succès.');
+        try {
+            Mail::to($assistance->membre->email)
+                ->cc(EMAIL_COPIES)
+                ->queue(new RefuserAssistance($assistance->load(['membre', 'typeAssistance'])));
+
+            Notification::create([
+                'type' => 'assistance',
+                'title' => 'Assistance rejetée',
+                'message' => 'Votre demande d\'assistance a été rejetée par ' . auth()->user()->name . '. Motif: ' . ($request->comment ?? 'Non spécifié'),
+                'time' => now(),
+                'read' => false,
+                'user_id' => Auth::id(),
+                'assignee_id' => $assistance->membre->user_id,
+            ]);
+        } catch (\Throwable $th) {
+            // Log error
+        }
+
+        return sendResponse(new AssistanceResource($assistance), 'Assistance refusée avec succès.');
     }
 
 
@@ -135,10 +184,7 @@ class AssistanceController extends Controller
 
     public function demandeAssistance(Request $request)
     {
-//         type_assistance_id: "",
-//   montant: 0,
-//   justificatif: "",
-//   document_justificatif: null,
+
      $path ="";
         if ($request->hasFile('document_justificatif') && $request->file('document_justificatif')->isValid()) {
             $image = $request->file('document_justificatif');
@@ -158,6 +204,24 @@ class AssistanceController extends Controller
             if (!$membre) {
                 return sendError("Membre non trouvé.", [], Response::HTTP_NOT_FOUND);
             }
+
+            // ✅ Check business rules before creating assistance
+            $hasIrregularCotisations = Cotisation::where('membre_id', $membre->id)
+                ->whereIn('statut', ['en_attente', 'en_retard'])
+                ->exists();
+
+            $hasUnpaidCredits = Credit::where('membre_id', $membre->id)
+                ->where('montant_restant', '!=', 0)
+                ->exists();
+
+            if ($hasIrregularCotisations || $hasUnpaidCredits) {
+                return sendError(
+                    'Vous ne pouvez pas demander une assistance tant que vous avez des cotisations irrégulières ou des crédits impayés.',
+                    [],
+                    Response::HTTP_FORBIDDEN
+                );
+            }
+
             // Check if there is already a pending assistance
             if (Assistance::where('membre_id', $membre->id)->where('statut', 'en_attente')->exists()) {
                 return sendError("Vous avez déjà une demande d'assistance en attente.", [], Response::HTTP_FORBIDDEN);
