@@ -121,19 +121,21 @@ class AssistanceController extends Controller
      */
     public function index(Request $request)
     {
-
-        $query = Assistance::query();
+        $query = Assistance::query()
+            ->leftJoin('membres', 'assistances.membre_id', '=', 'membres.id')
+            ->leftJoin('type_assistances', 'assistances.type_assistance_id', '=', 'type_assistances.id')
+            ->select('assistances.*');
 
         // Search
         if ($request->has('search') && $request->search) {
             $searchTerm = $request->search;
             $query->where(function ($q) use ($searchTerm) {
-                $q->whereAny(['membre_id', 'type_assistance_id', 'montant', 'date_demande', 'date_approbation', 'date_versement', 'statut', 'justificatif'], 'LIKE', "%{$searchTerm}%")
-                    ->orWhereHas('membre', function ($query) use ($searchTerm) {
-                        $query->where('matricule', 'like', "%{$searchTerm}%")
-                            ->orWhere('nom', 'like', "%{$searchTerm}%")
-                            ->orWhere('prenom', 'like', "%{$searchTerm}%");
-                    });
+                $q->where('assistances.statut', 'LIKE', "%{$searchTerm}%")
+                    ->orWhere('assistances.montant', 'LIKE', "%{$searchTerm}%")
+                    ->orWhere('membres.nom', 'like', "%{$searchTerm}%")
+                    ->orWhere('membres.prenom', 'like', "%{$searchTerm}%")
+                    ->orWhere('membres.matricule', 'like', "%{$searchTerm}%")
+                    ->orWhere('type_assistances.nom', 'like', "%{$searchTerm}%");
             });
         }
 
@@ -141,22 +143,39 @@ class AssistanceController extends Controller
         if ($request->has('filter')) {
             foreach ($request->filter as $field => $value) {
                 if ($value) {
-                    $query->where($field, 'LIKE', "%{$value}%");
+                    // Ensure table prefix for filtered fields if necessary
+                    if (in_array($field, ['statut', 'montant', 'date_demande', 'date_approbation', 'date_versement'])) {
+                        $query->where("assistances.{$field}", 'LIKE', "%{$value}%");
+                    } elseif ($field === 'membre_id') {
+                        $query->where("assistances.{$field}", $value);
+                    } elseif ($field === 'type_assistance_id') {
+                        $query->where("assistances.{$field}", $value);
+                    } else {
+                        $query->where($field, 'LIKE', "%{$value}%");
+                    }
                 }
             }
         }
 
         // Sorting
-        if ($request->has('sort_field') && $request->sort_field) {
-            $query->orderBy(
-                $request->sort_field,
-                $request->sort_order ?? 'asc'
-            );
+        $sortField = $request->input('sort_field', 'assistances.created_at');
+        $sortOrder = $request->input('sort_order', 'desc');
+
+        if ($sortField === 'membre.full_name') {
+            $query->orderBy('membres.nom', $sortOrder)->orderBy('membres.prenom', $sortOrder);
+        } elseif ($sortField === 'type_assistance.nom') {
+            $query->orderBy('type_assistances.nom', $sortOrder);
+        } else {
+            // Ensure we use the correct table prefix for common fields like 'id' or 'created_at'
+            $actualSortField = in_array($sortField, ['id', 'created_at', 'statut', 'montant', 'date_demande', 'date_approbation', 'date_versement']) 
+                ? "assistances.{$sortField}" 
+                : $sortField;
+            $query->orderBy($actualSortField, $sortOrder);
         }
 
         // Pagination
-        $perPage = $request->per_page ?? 10;
-        $assistances = $query->with("typeAssistance")->latest()->paginate($perPage);
+        $perPage = $request->per_page ?? 15;
+        $assistances = $query->with(["membre", "typeAssistance"])->paginate($perPage);
 
         return sendResponse(
             $assistances,

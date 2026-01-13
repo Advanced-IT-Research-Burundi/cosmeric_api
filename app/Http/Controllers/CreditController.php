@@ -247,56 +247,56 @@ class CreditController extends Controller
     
     public function index(Request $request)
     {
-        $params = $request->all();
+        $query = Credit::query()
+            ->leftJoin('membres', 'credits.membre_id', '=', 'membres.id')
+            ->select('credits.*');
         
-        $inputSearch = $params['search'] ?? null;
-        
-        
-        $query = Credit::query();
-        
-        
-        // 🔎 Recherche : par nom ou prénom du membre, motif, ID
-        if ($inputSearch) {
-            $search = $inputSearch;
-            
+        // 🔎 Recherche : par nom ou prénom du membre, motif, ID ou matricule
+        if ($request->has('search') && $request->search) {
+            $search = $request->search;
             $query->where(function ($q) use ($search) {
-                $q->whereHas('membre', function ($m) use ($search) {
-                    $m->where('nom', 'like', "%$search%")
-                    ->orWhere('prenom', 'like', "%$search%");
-                })
-                ->orWhere('motif', 'like', "%$search%")
-                ->orWhere('id', $search);
+                $q->where('membres.nom', 'like', "%$search%")
+                    ->orWhere('membres.prenom', 'like', "%$search%")
+                    ->orWhere('membres.matricule', 'like', "%$search%")
+                    ->orWhere('credits.motif', 'like', "%$search%")
+                    ->orWhere('credits.id', 'like', "%$search%");
             });
         }
         
-        // 📌 Filtre statut
-        if (!empty($params['statut'])) {
-            $query->where('statut', $params['statut']);
+        // 📌 Filtres
+        if ($request->filled('statut')) {
+            $query->where('credits.statut', $request->statut);
         }
         
-        // 📅 Filtre date_demande (start / end)
-        if (!empty($params['date_demande_start'])) {
-            $query->whereDate('date_demande', '>=', $params['date_demande_start']);
+        if ($request->filled('date_demande_start')) {
+            $query->whereDate('credits.date_demande', '>=', $request->date_demande_start);
         }
         
-        if (!empty($params['date_demande_end'])) {
-            $query->whereDate('date_demande', '<=', $params['date_demande_end']);
+        if ($request->filled('date_demande_end')) {
+            $query->whereDate('credits.date_demande', '<=', $request->date_demande_end);
         }
         
-        // 📅 Filtre date_fin précise
-        if (!empty($params['date_fin'])) {
-            $query->whereDate('date_fin', $params['date_fin']);
+        if ($request->filled('date_fin')) {
+            $query->whereDate('credits.date_fin', '>=', $request->date_fin);
         }
         
         // 🔽 Tri dynamique
-        $sortField = $params['sort_field'] ?? 'created_at';
-        $sortOrder = $params['sort_order'] ?? 'desc';
-        
-        $query->orderBy($sortField, $sortOrder);
+        $sortField = $request->input('sort_field', 'credits.created_at');
+        $sortOrder = $request->input('sort_order', 'desc');
+
+        if ($sortField === 'membre.full_name') {
+            $query->orderBy('membres.nom', $sortOrder)->orderBy('membres.prenom', $sortOrder);
+        } else {
+            // Ensure table prefix for common fields
+            $actualSortField = in_array($sortField, ['id', 'created_at', 'statut', 'montant_demande', 'date_demande', 'date_fin']) 
+                ? "credits.{$sortField}" 
+                : $sortField;
+            $query->orderBy($actualSortField, $sortOrder);
+        }
         
         // 📄 Pagination dynamique
-        $perPage = $params['per_page'] ?? 15;
-        $credits = $query->paginate($perPage);
+        $perPage = $request->input('per_page', 15);
+        $credits = $query->with('membre')->paginate($perPage);
         
         return sendResponse($credits, 'Credits retrieved successfully.');
     }

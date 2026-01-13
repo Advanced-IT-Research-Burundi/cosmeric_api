@@ -38,7 +38,31 @@ class UserController extends Controller
 
     public function index(Request $request)
     {
-        $users = User::latest()->paginate();
+        $query = User::query();
+
+        if ($request->has('search') && $request->search) {
+            $search = $request->search;
+            $query->where(function ($q) use ($search) {
+                $q->where('nom', 'like', "%{$search}%")
+                    ->orWhere('prenom', 'like', "%{$search}%")
+                    ->orWhere('email', 'like', "%{$search}%")
+                    ->orWhere('role', 'like', "%{$search}%")
+                    ->orWhere('name', 'like', "%{$search}%");
+            });
+        }
+
+        if ($request->has('sort_field') && $request->sort_field) {
+            $sortField = in_array($request->sort_field, ['id', 'nom', 'prenom', 'email', 'role', 'created_at']) 
+                ? $request->sort_field 
+                : 'created_at';
+            $sortOrder = $request->input('sort_order', 'desc');
+            $query->orderBy($sortField, $sortOrder);
+        } else {
+            $query->latest();
+        }
+
+        $perPage = $request->per_page ?? 15;
+        $users = $query->paginate($perPage);
         return sendResponse($users, 'Users retrieved successfully.');
     }
     // ===== INSCRIPTION =====
@@ -134,7 +158,7 @@ class UserController extends Controller
             'telephone' => $request->telephone,
             'password' => Hash::make($request->password),
             'role' => $request->role ?? 'membre',
-            'is_active' => $request->has('is_active') ? (bool)$request->is_active : true,
+            'is_active' => $request->has('is_active') ? (bool) $request->is_active : true,
         ]);
 
         return sendResponse($user, 'Utilisateur créé avec succès', 201);
@@ -470,7 +494,7 @@ class UserController extends Controller
     {
         try {
             $user = $request->user();
-            $tokens = $user->tokens()->get()->map(function ($token) {
+            $tokens = $user->tokens()->get()->map(function ($token) use ($user) {
                 return [
                     'id' => $token->id,
                     'name' => $token->name,
@@ -558,7 +582,7 @@ class UserController extends Controller
         }
     }
 
-                // ===== MÉTHODES PRIVÉES =====
+    // ===== MÉTHODES PRIVÉES =====
 
     /**
      * Formater la réponse utilisateur

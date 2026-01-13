@@ -14,13 +14,12 @@ use Illuminate\Http\Request;
 class CotisationController extends Controller
 {
 
-    public function remboursementsMensuelles()
+    public function remboursementsMensuelles(Request $request)
     {
-         $params = request()->all();
-        $inputSearch = $params['params']['search'] ?? null;
+        $inputSearch = $request->search ?? null;
         
-        $page = $params['page'] ?? 1; // default page
-        $perPage = $params['per_page'] ?? 15; // default per page
+        $page = $request->page ?? 1; // default page
+        $perPage = $request->per_page ?? 15; // default per page
         $query = CotisationMensuelle::query();
 
         if ($inputSearch) {
@@ -38,14 +37,13 @@ class CotisationController extends Controller
         return sendResponse($cotisations, 'Cotisations mensuelles retrieved successfully.');
     }
 
-    public function cotisationMensuelles()
+    public function cotisationMensuelles(Request $request)
     {
         /* params%5Bpage%5D=2&params%5Bper_page%5D=50&params%5Bsearch%5D=fffffffff&params%5Bsort_field%5D=&params%5Bsort_order%5D=asc */
-        $params = request()->all();
-        $inputSearch = $params['params']['search'] ?? null;
+        $inputSearch = $request->search ?? null;
         
-        $page = $params['page'] ?? 1; // default page
-        $perPage = $params['per_page'] ?? 15; // default per page
+        $page = $request->page ?? 1; // default page
+        $perPage = $request->per_page ?? 15; // default per page
         $query = CotisationMensuelle::query();
 
         if ($inputSearch) {
@@ -203,7 +201,18 @@ for ($i=0; $i < count($membres); $i++) {
             $query->whereDate('date_paiement', '<=', $request->get('date_fin'));
         }
 
-        $cotisations = $query->latest()->paginate(10);
+        // Sorting
+        $sortField = $request->input('sort_field', 'created_at');
+        $sortOrder = $request->input('sort_order', 'desc');
+
+        if (in_array($sortField, ['id', 'reference_paiement', 'montant', 'created_at', 'statut'])) {
+            $query->orderBy($sortField, $sortOrder);
+        } else {
+            $query->latest();
+        }
+
+        $perPage = $request->per_page ?? 15;
+        $cotisations = $query->paginate($perPage);
 
         return sendResponse($cotisations, 'Cotisations retrieved successfully.');
     }
