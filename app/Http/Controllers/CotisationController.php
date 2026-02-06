@@ -69,9 +69,9 @@ class CotisationController extends Controller
         // $totalMembres = Cotisation::distinct('membre_id')->count('membre_id');
         $totalMembres = Cotisation::where('statut', 'paye')->count();
         $totalMontantCotisations = Cotisation::sum('montant');
-        $cotisationsParPeriode = Cotisation::selectRaw('periode_id, COUNT(*) as total, SUM(montant) as total_montant')
-            ->groupBy('periode_id')
-            ->with('periode')
+        $cotisationsParMembre = Cotisation::selectRaw('membre_id, COUNT(*) as total, SUM(montant) as total_montant')
+            ->groupBy('membre_id')
+            ->with('membre')
             ->get();
 
         $data = [
@@ -79,7 +79,7 @@ class CotisationController extends Controller
             'total_cotisations_usd' => $totalCotisationsUSD,
             'total_membres' => $totalMembres,
             'total_montant_cotisations' => $totalMontantCotisations,
-            'cotisations_par_periode' => $cotisationsParPeriode,
+            'cotisations_par_membre' => $cotisationsParMembre,
         ];
 
         return sendResponse($data, 'Données du tableau de bord des cotisations récupérées avec succès.');
@@ -87,17 +87,11 @@ class CotisationController extends Controller
 
     public function cotisationAutomatic(Request $request){
 
-//         $request->validate([
-//             'membre_id' => 'required|exists:membres,id',
-//             'periode_id' => 'required|exists:periodes,id',
-//             'montant' => 'required|numeric',
-//             'devise' => 'required|in:BIF,USD',
-//             'mode_paiement' => 'required|in:espece,virement',
-//             'reference_paiement' => 'required|string|max:255',
-//             'date_paiement' => 'required|date',
-//         ]);
+        $request->validate([
+            'montant' => 'required|numeric',
+        ]);
 
-// $cotisation = Cotisation::where('membre_id', $request->membre_id)->where('periode_id', $request->periode_id)->first();
+        $cotisation = Cotisation::where('membre_id', $request->membre_id)->first();
 //         if($cotisation){
 //             return sendError('Cotisation deja existante');
 //         }
@@ -113,28 +107,28 @@ class CotisationController extends Controller
 //             'date_paiement' => $request->date_paiement,
 //         ]);
 
-$cotisation = Cotisation::where('periode_id', $request->periode_id)->first();
+$cotisation = Cotisation::where('membre_id', $request->membre_id)->first();
 
 if($cotisation){
     return sendError('Cotisation deja existante');
 }
 
-$membres = Membre::whereAny('statut', 'actif')->get();
+$membres = Membre::where('statut', 'actif')->get();
 
 for ($i=0; $i < count($membres); $i++) {
-    $cotisation->create([
-    'statut'=> 'en_attente',
-    'membre_id' => $membres[$i]->id,
-    'periode_id' => $request->periode_id,
-    'montant' => $request->montant,
-    'devise' => $membres[$i]->devise,
-    'mode_paiement' => 'espece',
-    'reference_paiement' => null,
-    'date_paiement' => null,
-]);
+    Cotisation::create([
+        'statut'=> 'en_attente',
+        'membre_id' => $membres[$i]->id,
+        'montant' => $request->montant,
+        'devise' => $membres[$i]->devise,
+        'mode_paiement' => 'espece',
+        'reference_paiement' => null,
+        'date_paiement' => null,
+    ]);
+}
 
         return sendResponse($cotisation, 'Cotisation mise a jour avec succes');
-    }}
+    }
 
     public function mesCotisations()
     {
@@ -146,7 +140,7 @@ for ($i=0; $i < count($membres); $i++) {
     }
     public function index(Request $request)
     {
-        $query = Cotisation::with(['membre', 'periode']);
+        $query = Cotisation::with(['membre']);
 
         // Recherche textuelle
         if ($request->has('search')) {
@@ -181,9 +175,6 @@ for ($i=0; $i < count($membres); $i++) {
             $query->where('membre_id', $request->get('membre_id'));
         }
 
-        if ($request->has('periode_id')) {
-            $query->where('periode_id', $request->get('periode_id'));
-        }
 
         if ($request->has('montant_min')) {
             $query->where('montant', '>=', $request->get('montant_min'));

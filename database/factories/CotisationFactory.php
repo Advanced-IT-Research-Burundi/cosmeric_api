@@ -6,7 +6,6 @@ use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Str;
 use App\Models\Cotisation;
 use App\Models\Membre;
-use App\Models\Periode;
 
 class CotisationFactory extends Factory
 {
@@ -24,7 +23,6 @@ class CotisationFactory extends Factory
     {
         return [
             'membre_id' => Membre::factory(),
-            'periode_id' => Periode::factory(),
             'montant' => fake()->randomFloat(2, 0, 99999999.99),
             'devise' => fake()->randomElement(["FBU","USD"]),
             'date_paiement' => fake()->date(),

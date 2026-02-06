@@ -16,6 +16,9 @@ class MembreController extends Controller
     {
         $query = Membre::with('categorie');
 
+        // dd($query);
+
+
         if ($request->filled('search')) {
             $searchTerm = $request->search;
 
@@ -57,6 +60,7 @@ class MembreController extends Controller
     {
     $search = $request->get('q'); 
 
+
     $membres = Membre::when($search, function ($query) use ($search) {
             $query->where('matricule', 'like', "%{$search}%")
                   ->orWhere('nom', 'like', "%{$search}%")
@@ -67,7 +71,7 @@ class MembreController extends Controller
         ->get();
 
     if ($membres->isEmpty()) {
-        return sendError('No members found', 404);
+        return sendError('Aucun membre trouvé', 404);
     }
 
     return sendResponse($membres, 'Membres récupérés avec succès');

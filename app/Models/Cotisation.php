@@ -10,7 +10,7 @@ class Cotisation extends Model
 {
     use HasFactory;
 
-    protected $with = ['membre', 'periode'];
+    protected $with = ['membre'];
 
     /**
      * The attributes that are mass assignable.
@@ -19,7 +19,6 @@ class Cotisation extends Model
      */
     protected $fillable = [
         'membre_id',
-        'periode_id',
         'montant',
         'devise',
         'date_paiement',
@@ -38,7 +37,6 @@ class Cotisation extends Model
         return [
             'id' => 'integer',
             'membre_id' => 'integer',
-            'periode_id' => 'integer',
             'montant' => 'decimal:2',
             'date_paiement' => 'date',
         ];
@@ -49,8 +47,4 @@ class Cotisation extends Model
         return $this->belongsTo(Membre::class);
     }
 
-    public function periode(): BelongsTo
-    {
-        return $this->belongsTo(Periode::class);
-    }
 }

@@ -15,7 +15,6 @@ class CotisationResource extends JsonResource
         return [
             'id' => $this->id,
             'membre_id' => $this->membre_id,
-            'periode_id' => $this->periode_id,
             'montant' => $this->montant,
             'devise' => $this->devise,
             'date_paiement' => $this->date_paiement,

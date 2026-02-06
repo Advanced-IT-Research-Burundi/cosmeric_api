@@ -21,9 +21,9 @@ class RapportController extends Controller
         // $totalMembres = Cotisation::distinct('membre_id')->count('membre_id');
         $totalMembres = Membre::where('statut', 'actif')->count();
         $taux = 3;
-        $cotisationsParPeriode = Cotisation::selectRaw('periode_id, COUNT(*) as total, SUM(montant) as total_montant')
-            ->groupBy('periode_id')
-            ->with('periode')
+        $cotisationsParMembre = Cotisation::selectRaw('membre_id, COUNT(*) as total, SUM(montant) as total_montant')
+            ->groupBy('membre_id')
+            ->with('membre')
             ->get();
 
         $data = [
@@ -31,7 +31,7 @@ class RapportController extends Controller
             'total_cotisations_usd' => $totalCotisationsUSD,
             'total_membres' => $totalMembres,
             'taux' => $taux,
-            'cotisations_par_periode' => $cotisationsParPeriode,
+            'cotisations_par_membre' => $cotisationsParMembre,
         ];
 
         return sendResponse($data, 'Données du tableau de bord des cotisations récupérées avec succès.');

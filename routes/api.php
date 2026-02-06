@@ -8,7 +8,6 @@ use App\Http\Controllers\CreditController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ImportationController;
 use App\Http\Controllers\MembreController;
-use App\Http\Controllers\PeriodeController;
 use App\Http\Controllers\RapportController;
 use App\Http\Controllers\RemboursementController;
 use App\Http\Controllers\TransactionController;
@@ -57,7 +56,6 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::apiResource('categorie-membres', CategorieMembreController::class);
     Route::apiResource('categories', CategorieMembreController::class);
     Route::apiResource('membres', MembreController::class);
-    Route::apiResource('periodes', PeriodeController::class);
     Route::apiResource('cotisations', CotisationController::class);
     Route::apiResource('configurations', ConfigurationController::class);
     Route::apiResource('credits', CreditController::class);
@@ -71,7 +69,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('mescotisations', [CotisationController::class, 'mesCotisations']);
     Route::get('mes-assistances', [AssistanceController::class, 'mesAssistances']);
     Route::post('demande-assistance', [AssistanceController::class, 'demandeAssistance']);
-    Route::post('membres/search', [MembreController::class, 'search']);
+    Route::post('membres/search={q}', [MembreController::class, 'search']);
     Route::apiResource('remboursements', RemboursementController::class);
     Route::post('remboursements/{remboursement}/approve', [RemboursementController::class, 'approve']);
     Route::apiResource('type-assistances', TypeAssistanceController::class);
