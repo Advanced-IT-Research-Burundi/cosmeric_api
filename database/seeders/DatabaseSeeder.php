@@ -30,6 +30,7 @@ class DatabaseSeeder extends Seeder
             'prenom' => 'Lionel',
             'email' => 'nijeanlionel@gmail.com',
             'password' => Hash::make('password'),
+            'role' => 'admin',
             'is_active' => true,
         ]);
 
