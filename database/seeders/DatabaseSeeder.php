@@ -22,22 +22,61 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // User::factory(10)->create();
+        $users = [
+            [
+                'name' => 'Admin User',
+                'nom' => 'Jean',
+                'prenom' => 'Lionel',
+                'email' => 'nijeanlionel@gmail.com',
+                'password' => Hash::make('password'),
+                'role' => 'admin',
+                'is_active' => true,
+            ],
+            [
+                'name' => 'Admin User',
+                'nom' => 'Jean',
+                'prenom' => 'Lionel',
+                'email' => 'admin@gmail.com',
+                'password' => Hash::make('password'),
+                'role' => 'admin',
+                'is_active' => true,
+            ],
+            [
+                'name' => 'Manager User',
+                'nom' => 'Jean',
+                'prenom' => 'Lionel',
+                'email' => 'manager@gmail.com',
+                'password' => Hash::make('password'),
+                'role' => 'gestionnaire',
+                'is_active' => true,
+            ],
+            [
+                'name' => 'Membre User',
+                'nom' => 'Jean',
+                'prenom' => 'Lionel',
+                'email' => 'membre@gmail.com',
+                'password' => Hash::make('password'),
+                'role' => 'membre',
+                'is_active' => true,
+            ],
+            [
+                'name' => 'Responsable User',
+                'nom' => 'Jean',
+                'prenom' => 'Lionel',
+                'email' => 'responsable@gmail.com',
+                'password' => Hash::make('password'),
+                'role' => 'responsable',
+                'is_active' => true,
+            ],
+        ];
 
-        User::factory()->create([
-            'name' => 'Test User',
-            'nom' => 'Jean',
-            'prenom' => 'Lionel',
-            'email' => 'nijeanlionel@gmail.com',
-            'password' => Hash::make('password'),
-            'role' => 'admin',
-            'is_active' => true,
-        ]);
-
-        $typesassistances = ['mariage', 'retraite', 'deces'];
-
-        foreach ($typesassistances as $key => $value) {
+        foreach ($users as $user) {
+            User::create($user);
         }
+
+        // ==========================
+        // Catégories membres
+        // ==========================
 
         $categorieMembres = [
             [
@@ -73,40 +112,40 @@ class DatabaseSeeder extends Seeder
                 'montant_cotisation' => 5,
                 'devise' => "USD",
                 'frequence_paiement' => "mensuel",
-                'description' => 'Service Externe (Secrétaires d\’ambassade)',
+                'description' => 'Service Externe (Secrétaires d’ambassade)',
             ],
         ];
 
         foreach ($categorieMembres as $categorie) {
-            CategorieMembre::factory()->create($categorie);
+            CategorieMembre::create($categorie);
         }
 
-        for ($i = 0; $i < 20; $i++) {
-            Membre::factory()->create();
-            // Assistance::factory()->create([
-            //     'membre_id' => $i,
-            //     'type_assistance_id' => 1,
-            //     'montant' => fake()->randomFloat(2, 100, 1000),
-            //     'date_demande' => fake()->date(),
-            //     'date_approbation' => fake()->date(),
-            //     'date_versement' => fake()->date(),
-            //     'statut' => fake()->randomElement(["en_attente","approuve","rejete","verse"]),
-            //     'justificatif' => fake()->regexify('[A-Za-z0-9]{255}'),
-            //     'motif_rejet' => fake()->regexify('[A-Za-z0-9]{255}'),
-            // ]);
+        // ==========================
+        // Membres
+        // ==========================
+
+        Membre::factory()->count(20)->create();
+
+        // ==========================
+        // Types d’assistance
+        // ==========================
+
+        $typesAssistances = [
+            ['mariage', 500000],
+            ['retraite', 400000],
+            ['deces', 300000]
+        ];
+
+        foreach ($typesAssistances as $type) {
+            TypeAssistance::firstOrCreate([
+                'nom' => $type[0],
+            ], [
+                'montant_standard' => $type[1],
+                'conditions' => 'Conditions pour ' . $type[0],
+                'documents_requis' => 'Documents requis pour ' . $type[0],
+            ]);
         }
 
-
-            $typesAssistances = [[ 'mariage', 500000], ['retraite', 400000], ['deces', 300000]];
-
-    foreach ($typesAssistances as $type) {
-        TypeAssistance::firstOrCreate([
-            'nom' => $type[0],
-            'montant_standard' => $type[1],
-            'conditions' => 'Conditions pour ' . $type[0],
-            'documents_requis' => 'Documents requis pour ' . $type[0],
-        ]);
-    }
 
         // Assistance::factory()->count(10)->create();
         // Cotisation::factory()->count(10)->create();
