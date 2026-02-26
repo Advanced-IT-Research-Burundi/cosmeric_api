@@ -71,7 +71,7 @@ class DatabaseSeeder extends Seeder
         ];
 
         foreach ($users as $user) {
-            User::create($user);
+            User::firstOrCreate(['email' => $user['email']], $user);
         }
 
         // ==========================
@@ -117,7 +117,7 @@ class DatabaseSeeder extends Seeder
         ];
 
         foreach ($categorieMembres as $categorie) {
-            CategorieMembre::create($categorie);
+            CategorieMembre::firstOrCreate(['nom' => $categorie['nom']], $categorie);
         }
 
         // ==========================
@@ -146,6 +146,26 @@ class DatabaseSeeder extends Seeder
             ]);
         }
 
+
+        // ==========================
+        // Configurations
+        // ==========================
+        $settings = [
+            [
+                'cle' => 'taux_interet_credit',
+                'valeur' => '5',
+                'description' => 'Taux d’intérêt par défaut pour les crédits (en %)'
+            ],
+            [
+                'cle' => 'nom_organisation',
+                'valeur' => 'COSMERIC',
+                'description' => 'Nom de l’organisation'
+            ]
+        ];
+
+        foreach ($settings as $setting) {
+            Configuration::firstOrCreate(['cle' => $setting['cle']], $setting);
+        }
 
         // Assistance::factory()->count(10)->create();
         // Cotisation::factory()->count(10)->create();

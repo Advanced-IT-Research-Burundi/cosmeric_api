@@ -20,6 +20,7 @@ use Illuminate\Support\Facades\Mail;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\DB;
 use App\Events\NotificationSent;
+use App\Models\Configuration;
 use Illuminate\Support\Facades\Auth;
 
 use function PHPSTORM_META\type;
@@ -126,7 +127,7 @@ class CreditController extends Controller
         
         $request->validate([
             'montant_demande' => 'required|numeric',
-            'taux_interet' => 'required|numeric',
+            'taux_interet' => 'nullable|numeric',
             'duree_mois' => 'required|numeric',
             'montant_total_rembourser' => 'required|numeric',
             'montant_mensualite' => 'required|numeric',
@@ -160,9 +161,15 @@ class CreditController extends Controller
         try {
             DB::beginTransaction();
             //code...
+            $tauxInteret = $request->taux_interet;
+            if (empty($tauxInteret)) {
+                $defaultTaux = Configuration::where('cle', 'taux_interet_credit')->value('valeur');
+                $tauxInteret = $defaultTaux ?? 3;
+            }
+
             $credit = Credit::create([
                 'montant_demande' => $request->montant_demande,
-                'taux_interet' => $request->taux_interet,
+                'taux_interet' => $tauxInteret,
                 'duree_mois' => $request->duree_mois,
                 'montant_total_rembourser' => $request->montant_total_rembourser,
                 'montant_mensualite' => $request->montant_mensualite,
@@ -233,7 +240,13 @@ class CreditController extends Controller
                 Response::HTTP_FORBIDDEN
             );
         }
-        $credit = Credit::create(array_merge($request->validated(), [
+        $data = $request->validated();
+        if (!isset($data['taux_interet']) || empty($data['taux_interet'])) {
+            $defaultTaux = Configuration::where('cle', 'taux_interet_credit')->value('valeur');
+            $data['taux_interet'] = $defaultTaux ?? 3;
+        }
+
+        $credit = Credit::create(array_merge($data, [
             'created_by' => Auth::id(),
             'date_fin' => $date_fin,
             'user_id' => Auth::id(),
@@ -296,7 +309,14 @@ class CreditController extends Controller
         
         // 📄 Pagination dynamique
         $perPage = $request->input('per_page', 15);
-        $credits = $query->with('membre')->paginate($perPage);
+        $credits = $query->with(['membre', 'remboursements'])->paginate($perPage);
+        
+        // Append calculated fields for the list
+        $credits->getCollection()->transform(function ($credit) {
+            $credit->montant_deja_paye = $credit->remboursements->sum('montant_paye');
+            $credit->total_penalites = $credit->remboursements->sum('penalite');
+            return $credit;
+        });
         
         return sendResponse($credits, 'Credits retrieved successfully.');
     }

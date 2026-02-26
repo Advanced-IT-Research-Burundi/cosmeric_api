@@ -8,12 +8,13 @@ use App\Models\Credit;
 use App\Models\Remboursement;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Http\Response;
 
 class RemboursementController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Remboursement::query();
+        $query = Remboursement::with('credit.membre');
         // Search
         if ($request->has('search') && $request->search) {
             $searchTerm = $request->search;
