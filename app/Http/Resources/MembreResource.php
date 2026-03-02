@@ -28,8 +28,9 @@ class MembreResource extends JsonResource
 
             // User info
             'user_id'   => $this->user?->id,
-            'nom'       => $this->user?->nom,
-            'prenom'    => $this->user?->prenom,
+            'nom'       => $this->nom,
+            'prenom'    => $this->prenom,
+            'full_name' => $this->full_name,
 
             // Contact
             'matricule' => $this->matricule,
@@ -63,7 +64,7 @@ class MembreResource extends JsonResource
             'assistances'        => AssistanceResource::collection($this->assistances),
             'cotisation'        => CotisationResource::collection($this->cotisations),
 
-            'retard' => Cotisation::where('statut', 'en_retard')->count()
+            'retard' => Cotisation::where('membre_id', $this->id)->where('statut', 'en_retard')->count()
         ];
     }
 }

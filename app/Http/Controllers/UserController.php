@@ -271,6 +271,16 @@ class UserController extends Controller
                 ], 403);
             }
 
+            // Vérification du statut de membre
+            if ($user->role === 'membre') {
+                $membre = $user->membre;
+                if ($membre && $membre->statut === 'inactif') {
+                    return response()->json([
+                        'message' => 'Votre compte est inactif. Veuillez contacter l\'administrateur.',
+                    ], 403);
+                }
+            }
+
             // Révoquer tous les tokens existants si demandé
             if ($request->revoke_other_tokens) {
                 $user->tokens()->delete();

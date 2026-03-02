@@ -53,7 +53,7 @@ class MembreController extends Controller
         $perPage = $request->per_page ?? 10;
         $membres = $query->paginate($perPage);
 
-        return sendResponse($membres, 'Membres récupérés avec succès');
+        return sendResponse(new MembreCollection($membres), 'Membres récupérés avec succès');
     }
 
     public function search(Request $request)
