@@ -230,7 +230,7 @@ class AssistanceController extends Controller
                 ->exists();
 
             $hasUnpaidCredits = Credit::where('membre_id', $membre->id)
-                 ->whereIn('statut', ['en_attente', 'en_cours'])
+                 ->whereIn('statut', [ 'en_cours'])
                 // ->where('montant_restant', '!=', 0)
                 ->exists();
 
