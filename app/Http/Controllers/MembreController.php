@@ -71,7 +71,7 @@ class MembreController extends Controller
         ->get();
 
     if ($membres->isEmpty()) {
-        return sendError('Aucun membre trouvé', 404);
+        return sendError('Aucun membre trouvé', [], 404);
     }
 
     return sendResponse($membres, 'Membres récupérés avec succès');

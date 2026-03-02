@@ -69,7 +69,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('mescotisations', [CotisationController::class, 'mesCotisations']);
     Route::get('mes-assistances', [AssistanceController::class, 'mesAssistances']);
     Route::post('demande-assistance', [AssistanceController::class, 'demandeAssistance']);
-Route::post('membres/search', [MembreController::class, 'search']);
+    Route::post('membres/search', [MembreController::class, 'search']);
     Route::apiResource('remboursements', RemboursementController::class);
     Route::post('remboursements/{remboursement}/approve', [RemboursementController::class, 'approve']);
     Route::apiResource('type-assistances', TypeAssistanceController::class);
@@ -77,6 +77,12 @@ Route::post('membres/search', [MembreController::class, 'search']);
     Route::post('assistances/approuve/{id}', [AssistanceController::class, 'approuve']);
     Route::post('assistances/rejete/{id}', [AssistanceController::class, 'refuser']);
     Route::apiResource('transactions', TransactionController::class);
+    Route::prefix('rapports')->group(function () {
+        Route::get('credits', [RapportController::class, 'getCreditReport']);
+        Route::get('assistances', [RapportController::class, 'getAssistanceReport']);
+        Route::get('remboursements', [RapportController::class, 'getRemboursementReport']);
+        Route::get('cotisations', [RapportController::class, 'getCotisationReport']);
+    });
     Route::apiResource('rapports', RapportController::class);
     Route::apiResource('configurations', ConfigurationController::class);
     Route::apiResource('users', UserController::class);
