@@ -24,6 +24,16 @@ class Remboursement extends Model
         'date_paiement',
         'statut',
         'penalite',
+        'preuve_paiement',
+    ];
+
+    /**
+     * The attributes that should be appends.
+     *
+     * @var array
+     */
+    protected $appends = [
+        'preuve_paiement_url',
     ];
 
     /**
@@ -47,5 +57,15 @@ class Remboursement extends Model
     public function credit(): BelongsTo
     {
         return $this->belongsTo(Credit::class);
+    }
+
+    /**
+     * Get the full URL for the proof of payment.
+     *
+     * @return string|null
+     */
+    public function getPreuvePaiementUrlAttribute(): ?string
+    {
+        return $this->preuve_paiement ? asset($this->preuve_paiement) : null;
     }
 }

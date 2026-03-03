@@ -114,7 +114,16 @@ class RemboursementController extends Controller
         $request->validate([
             'montant_paye' => 'nullable|numeric|min:0',
             'date_paiement' => 'nullable|date',
+            'preuve_paiement' => 'required|file|mimes:jpeg,png,jpg,pdf|max:2048',
         ]);
+
+        $path = null;
+        if ($request->hasFile('preuve_paiement') && $request->file('preuve_paiement')->isValid()) {
+            $file = $request->file('preuve_paiement');
+            $filename = time() . '_' . $file->getClientOriginalName();
+            $file->move(public_path('uploads/preuves_paiements'), $filename);
+            $path = 'uploads/preuves_paiements/' . $filename;
+        }
 
         $montantPaye = $request->input('montant_paye', $remboursement->montant_prevu);
         $datePaiement = $request->input('date_paiement', now());
@@ -133,6 +142,7 @@ class RemboursementController extends Controller
             'date_paiement' => $datePaiement,
             'statut' => $statut,
             'penalite' => $penalite,
+            'preuve_paiement' => $path,
         ]);
 
         // Mettre à jour le crédit lié

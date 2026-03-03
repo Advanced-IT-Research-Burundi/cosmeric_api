@@ -153,12 +153,12 @@ class DatabaseSeeder extends Seeder
         $settings = [
             [
                 'cle' => 'taux_interet_credit',
-                'valeur' => '5',
+                'valeur' => '3',
                 'description' => 'Taux d’intérêt par défaut pour les crédits (en %)'
             ],
             [
                 'cle' => 'nom_organisation',
-                'valeur' => 'COSMERIC',
+                'valeur' => 'CASOMERIC',
                 'description' => 'Nom de l’organisation'
             ]
         ];
