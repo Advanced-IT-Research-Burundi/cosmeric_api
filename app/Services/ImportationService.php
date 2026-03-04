@@ -67,15 +67,31 @@ class ImportationService
                 'is_active' => false,
             ]);
 
+
+            if ($data['retenu'] == 4000) {
+                $category = 1;
+            } else if ($data['retenu'] == 2000) {
+                $category = 2;
+            } else if ($data['retenu'] == 1000) {
+                $category = 3;
+            } else {
+                $category = 3; // Default category
+            }
+
+            $nom = explode(" ", $data['name']);
+            $prenom = $nom[0];
+            $nom = $nom[1];
+
+
             // Create Membre
             $membre = Membre::create([
                 'user_id' => $user->id,
                 'matricule' => $matricule,
-                'nom' => $data['name'] ?? 'Imported',
-                'email' => $matricule . '@cosmeric.com',
+                'nom' => $nom,
+                'email' => strtolower($nom.$prenom). '@cosmeric.com',
                 'telephone' => "+257 00000000",
-                'prenom' => 'User',
-                'categorie_id' => 3, // Default category
+                'prenom' => $prenom,
+                'categorie_id' => $category, // Default category
                 'statut' => 'actif',
                 'date_adhesion' => now(),
             ]);
@@ -89,11 +105,19 @@ class ImportationService
      */
     private function handleCreditAndRemboursement(Membre $membre, array $data, float $retenu, string $date)
     {
-        // Find an active credit
-        $credit = Credit::where('membre_id', $membre->id)
-            ->where('statut', 'approuve')
-            ->where('montant_restant', '>', 0)
-            ->first();
+         $credit = Credit::where('membre_id', $membre->id)
+        ->where('statut', 'approuve')
+        ->where('montant_restant', '>', 0)
+        ->lockForUpdate()
+        ->first();
+
+    if (!$credit) {
+        throw new Exception("No active credit found.");
+    }
+
+    if ($retenu > $credit->montant_restant) {
+        throw new Exception("Payment exceeds remaining balance.");
+    }
 
         //sort the type of input if it is a reimbursement or a cotisation
         $type = "COTISATION";
@@ -101,49 +125,70 @@ class ImportationService
             $type = "REMBOURSEMENT";
         }
 
-        //if type is cotisation do not add it in credit and remboursement tables
+        // If type is cotisation do not add it in credit and remboursement tables
         if ($type === "COTISATION") {
             return;
         }
 
-        // If no active credit, create a new one with the retenu as montant_demande
+        $credit = Credit::where('membre_id', $membre->id)
+            ->where('statut', 'approuve')
+            ->where('montant_restant', '>', 0)
+            ->lockForUpdate()
+            ->first();
 
-        if (!$credit) {
-            $defaultTaux = Configuration::where('cle', 'taux_interet_credit')->value('valeur') ?? 3;
+        if ($credit) {
+            $this->handleRemboursement($credit, $retenu, $date);
+        } else {
             $globalAmount = floatval($data['global'] ?? 0);
+            if ($globalAmount > 0) {
+                $this->createCreditRequest($membre, $data, $globalAmount);
+            }
+        }
+    }
 
-            $credit = Credit::create([
+    /**
+     * Create a new credit request in 'en_attente' status.
+     */
+    private function createCreditRequest(Membre $membre, array $data, float $amount)
+    {
+        $defaultTaux = Configuration::where('cle', 'taux_interet_credit')->value('valeur') ?? 3;
+
+        return Credit::create([
                 'membre_id' => $membre->id,
-                'montant_demande' => $globalAmount,
-                'montant_accorde' => $globalAmount,
+            'montant_demande' => $amount,
+            'montant_accorde' => 0,
                 'taux_interet' => $defaultTaux,
                 'duree_mois' => 12,
-                'montant_total_rembourser' => $globalAmount,
-                'montant_mensualite' => floatval($data['retenu'] ?? 0), // Use current retenu as suggested monthly
+            'montant_total_rembourser' => 0,
+            'montant_mensualite' => 0,
                 'date_demande' => now(),
-                'date_approbation' => now(),
-                'date_fin' => now()->addMonths(12),
-                'statut' => 'approuve',
+            'statut' => 'approuve',
                 'created_by' => auth()->id() ?? $membre->user_id,
                 'user_id' => auth()->id() ?? $membre->user_id,
-                'montant_restant' => $globalAmount,
+            'montant_restant' => 0,
             ]);
         }
 
-        // Create Remboursement
+    /**
+     * Record a reimbursement and update credit balance.
+     */
+    private function handleRemboursement(Credit $credit, float $amount, string $date)
+    {
+        // Ensure we don't overpay
+        $paymentAmount = min($amount, $credit->montant_restant);
+
         Remboursement::create([
             'credit_id' => $credit->id,
             'numero_echeance' => $credit->remboursements()->count() + 1,
-            'montant_prevu' => $retenu,
-            'montant_paye' => $retenu,
+            'montant_prevu' => $paymentAmount,
+            'montant_paye' => $paymentAmount,
             'date_echeance' => Carbon::parse($date)->day(now()->day),
             'date_paiement' => Carbon::parse($date)->day(now()->day),
             'statut' => 'paye',
             'penalite' => 0,
         ]);
 
-        // Update credit remaining amount
-        $credit->decrement('montant_restant', $retenu);
+        $credit->decrement('montant_restant', $paymentAmount);
     }
 
     /**
@@ -169,6 +214,7 @@ class ImportationService
             'date_cotisation' => Carbon::parse($date)->endOfMonth(),
             'statut' => 'paye',
             'mode_paiement' => 'Banque',
+            'date_paiement' => Carbon::parse($date)->endOfMonth(),
             'reference_paiement' => 'Importation - ' . Carbon::now()->timestamp,
         ]);
     }
