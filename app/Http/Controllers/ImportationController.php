@@ -3,15 +3,21 @@
 namespace App\Http\Controllers;
 
 use App\Models\CotisationMensuelle;
+use App\Services\ImportationService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 
 class ImportationController extends Controller
 {
-    //
-    public function cotisation(Request $request){
+    protected $importationService;
 
-        CotisationMensuelle::create($request->all());
+    public function __construct(ImportationService $importationService)
+    {
+        $this->importationService = $importationService;
+    }
+
+    public function cotisation(Request $request)
+    {
         $date = Carbon::parse($request->date_cotisation)->format('Y-m');
 
         // check if date already exists
@@ -19,16 +25,19 @@ class ImportationController extends Controller
         if ($existingCotisation) {
             return sendError('Cotisation for this date already exists', [], 409);
         }
+
         foreach ($request->cotisations as $cotisation) {
-            // Check if  is cotisation or rembouressement
-            if($cotisation['matricule'] == null || $cotisation['name'] == null || !is_numeric($cotisation['matricule'])){
+            // Check if is valid entry
+            if (empty($cotisation['matricule']) || empty($cotisation['name']) || !is_numeric($cotisation['matricule'])) {
                 continue;
             }
-            // if is cotisation or rembouressement create new cotisation mensuelle
+
+            // Staging table entry (existing logic)
             $type = "COTISATION";
-            if($cotisation['global'] || $cotisation['restant'] ) {
+            if (!empty($cotisation['global']) || !empty($cotisation['restant'])) {
                 $type = "REMBOURSEMENT";
             }
+
             CotisationMensuelle::create([
                 'name' => $cotisation['name'],
                 'matricule' => $cotisation['matricule'],
@@ -41,9 +50,11 @@ class ImportationController extends Controller
                 'user_id' => auth()->id(),
                 'type' => $type,
             ]);
-            
         }
 
-        return sendResponse([], 'Cotisation created successfully', 201);
+        // Process business logic via service
+        $this->importationService->processImport($request->cotisations, $date);
+
+        return sendResponse([], 'Cotisation created and processed successfully', 201);
     }
 }

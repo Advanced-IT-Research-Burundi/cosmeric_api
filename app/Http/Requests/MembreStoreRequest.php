@@ -23,7 +23,7 @@ class MembreStoreRequest extends FormRequest
             'matricule' => ['required', 'string', 'max:50'],
             'nom' => ['required', 'string', 'max:100'],
             'prenom' => ['required', 'string', 'max:100'],
-            'email' => ['required', 'email', 'max:150'],
+            'email' => ['nullable', 'email', 'max:150'],
             'telephone' => ['required', 'string', 'max:20'],
             'categorie_id' => ['required', 'integer'],
             'statut' => ['required', 'in:actif,inactif,suspendu'],
