@@ -124,7 +124,7 @@ class DatabaseSeeder extends Seeder
         // Membres
         // ==========================
 
-        Membre::factory()->count(20)->create();
+        // Membre::factory()->count(20)->create();
 
         // ==========================
         // Types d’assistance
