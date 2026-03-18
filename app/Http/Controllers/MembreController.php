@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\MembreStoreRequest;
 use App\Http\Requests\MembreUpdateRequest;
+
 use App\Http\Resources\MembreCollection;
 use App\Http\Resources\MembreResource;
 use App\Models\Membre;
@@ -13,30 +14,72 @@ class MembreController extends Controller
 {
     public function index(Request $request)
     {
-        $query = $request->input('query');
-        $sortBy = $request->input('sort_by', 'id');
-        $sortDirection = $request->input('sort_direction', 'desc');
+        $query = Membre::with('categorie');
 
-        $membresQuery = Membre::query();
+        // dd($query);
 
-        if ($query) {
-            $membresQuery->where(function ($q) use ($query) {
-                $q->where('matricule', 'like', '%' . $query . '%')
-                  ->orWhere('nom', 'like', '%' . $query . '%')
-                  ->orWhere('email', 'like', '%' . $query . '%')
-                  ->orWhere('telephone', 'like', '%' . $query . '%')
-                  ->orWhere('statut', 'like', '%' . $query . '%')
-                  ->orWhere('date_adhesion', 'like', '%' . $query . '%');
+
+        if ($request->filled('search')) {
+            $searchTerm = $request->search;
+
+            $query->where(function ($q) use ($searchTerm) {
+                $q->where('matricule', 'LIKE', "%{$searchTerm}%")
+                    ->orWhere('nom', 'LIKE', "%{$searchTerm}%")
+                    ->orWhere('prenom', 'LIKE', "%{$searchTerm}%")
+                    ->orWhere('email', 'LIKE', "%{$searchTerm}%");
             });
         }
 
-        $membres = $membresQuery->orderBy($sortBy, $sortDirection)->paginate();
 
-        return sendResponse($membres, 'Membres récupérés avec succès');
+        if ($request->has('filter')) {
+            foreach ($request->filter as $field => $value) {
+                if ($value) {
+                    $query->where($field, 'LIKE', "%{$value}%");
+                }
+            }
+        }
+
+        if ($request->has('sort_field') && $request->sort_field) {
+            if ($request->sort_field === 'full_name') {
+                $query->orderByRaw("CONCAT(nom, ' ', prenom) " . ($request->sort_order ?? 'asc'));
+            } else if ($request->sort_field === 'categorie.description') {
+                $query->join('categorie_membres', 'membres.categorie_id', '=', 'categorie_membres.id')
+                    ->orderBy('categorie_membres.description', $request->sort_order ?? 'asc');
+            } else {
+                $query->orderBy($request->sort_field, $request->sort_order ?? 'asc');
+            }
+        }
+
+        $perPage = $request->per_page ?? 10;
+        $membres = $query->paginate($perPage);
+
+        return sendResponse(new MembreCollection($membres), 'Membres récupérés avec succès');
     }
+
+    public function search(Request $request)
+    {
+    $search = $request->get('q'); 
+
+
+    $membres = Membre::when($search, function ($query) use ($search) {
+            $query->where('matricule', 'like', "%{$search}%")
+                  ->orWhere('nom', 'like', "%{$search}%")
+                  ->orWhere('prenom', 'like', "%{$search}%")
+                  ->orWhere('telephone', 'like', "%{$search}%");
+        })
+        ->limit(10)
+        ->get();
+
+    if ($membres->isEmpty()) {
+        return sendError('Aucun membre trouvé', [], 404);
+    }
+
+    return sendResponse($membres, 'Membres récupérés avec succès');
+}
 
     public function store(MembreStoreRequest $request)
     {
+
         $membre = Membre::create($request->validated());
 
         return sendResponse($membre, 'Membre créé avec succès');
@@ -44,7 +87,15 @@ class MembreController extends Controller
 
     public function show(Request $request, Membre $membre)
     {
-        return sendResponse($membre, 'Membre récupéré avec succès');
+        $membre->load('user');
+        $membre->load('categorie');
+        $membre->load('cotisations');
+        $membre->load('credits');
+        $membre->load('assistances');
+
+        $data = $membre;
+
+        return sendResponse(new MembreResource($data), 'Membre récupéré avec succès');
     }
 
     public function update(MembreUpdateRequest $request, Membre $membre)

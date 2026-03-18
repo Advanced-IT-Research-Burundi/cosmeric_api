@@ -23,14 +23,17 @@ class MembreFactory extends Factory
      */
     public function definition(): array
     {
+        $year = now()->year; // ou faker()->year()
+        $sequence = str_pad($this->faker->unique()->numberBetween(1, 9999), 4, '0', STR_PAD_LEFT);
+
         return [
             'user_id' => User::factory(),
-            'matricule' => fake()->regexify('[A-Za-z0-9]{50}'),
-            'nom' => fake()->regexify('[A-Za-z0-9]{100}'),
-            'prenom' => fake()->regexify('[A-Za-z0-9]{100}'),
+            'matricule' => "M-{$year}-{$sequence}",
+            'nom' => fake()->firstName(),
+            'prenom' => fake()->lastName(),
             'email' => fake()->safeEmail(),
-            'telephone' => fake()->regexify('[A-Za-z0-9]{20}'),
-            'categorie_id' => CategorieMembre::factory(),
+            'telephone' => fake()->phoneNumber(),
+            'categorie_id' => fake()->randomElement(CategorieMembre::pluck('id')->toArray()),
             'statut' => fake()->randomElement(["actif","inactif","suspendu"]),
             'date_adhesion' => fake()->date(),
         ];

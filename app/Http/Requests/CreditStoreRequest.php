@@ -29,8 +29,10 @@ class CreditStoreRequest extends FormRequest
             'montant_mensualite' => ['required', 'numeric', 'between:-99999999.99,99999999.99'],
             'date_demande' => ['required', 'date'],
             'date_approbation' => ['required', 'date'],
+            'date_fin'=> ['nullable', 'date'],
             'statut' => ['required', 'in:en_attente,approuve,rejete,en_cours,termine'],
             'motif' => ['required', 'string'],
+            'commentaire' => ['nullable', 'string'],
         ];
     }
 }

@@ -17,8 +17,8 @@ return new class extends Migration
             $table->id();
             $table->string('nom', 100);
             $table->decimal('montant_standard', 10, 2);
-            $table->text('conditions');
-            $table->text('documents_requis');
+            $table->text('conditions')->nullable();
+            $table->text('documents_requis')->nullable();
             $table->timestamps();
             $table->softDeletes();
         });

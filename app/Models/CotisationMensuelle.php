@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Periode extends Model
+class CotisationMensuelle extends Model
 {
     use HasFactory;
 
@@ -15,12 +15,24 @@ class Periode extends Model
      * @var array
      */
     protected $fillable = [
-        'mois',
-        'annee',
-        'statut',
-        'date_debut',
-        'date_fin',
+        'name',
+        'matricule',
+        'nomero_dossier',
+        'global',
+        'regle',
+        'restant',
+        'retenu',
+        'date_cotisation',
+        'user_id',
+        'type'
     ];
+
+    public static function boot()
+    {
+        parent::boot();
+
+        addColumnIfNotExists('cotisation_mensuelles', 'type', 'string', 'deleted_at');
+    }
 
     /**
      * Get the attributes that should be cast.
@@ -31,8 +43,6 @@ class Periode extends Model
     {
         return [
             'id' => 'integer',
-            'date_debut' => 'date',
-            'date_fin' => 'date',
         ];
     }
 }

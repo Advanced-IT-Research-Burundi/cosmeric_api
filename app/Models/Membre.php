@@ -27,6 +27,26 @@ class Membre extends Model
         'date_adhesion',
     ];
 
+    protected $appends = ['full_name'];
+
+    public static function boot()
+    {
+        parent::boot();
+        static::creating(function ($membre) {
+            // Automatically set the user_id if not provided
+            if (!$membre->user_id) {
+                $membre->user_id = auth()->id();
+            }
+        });
+        static::updating(function ($membre) {
+            // Ensure the user_id is set on update
+            if (!$membre->user_id) {
+                $membre->user_id = auth()->id();
+            }
+        });
+    }
+
+
     /**
      * Get the attributes that should be cast.
      *
@@ -49,6 +69,26 @@ class Membre extends Model
 
     public function categorie(): BelongsTo
     {
-        return $this->belongsTo(Categorie::class);
+        return $this->belongsTo(CategorieMembre::class);
+    }
+
+    public function cotisations()
+    {
+        return $this->hasMany(Cotisation::class);
+    }
+
+    public function credits()
+    {
+        return $this->hasMany(Credit::class);
+    }
+
+    public function assistances()
+    {
+        return $this->hasMany(Assistance::class);
+    }
+
+    public function getFullNameAttribute(): string
+    {
+        return "{$this->nom} {$this->prenom}";
     }
 }

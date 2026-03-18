@@ -1,5 +1,7 @@
 <?php
 
+use Illuminate\Support\Facades\Schema;
+
 
 /**
  * Send a JSON response with a success message.
@@ -39,3 +41,20 @@ function sendError($message, $errors = [], $code = 400)
 
     return response()->json($response, $code);
 }
+
+function addColumnIfNotExists($table, $column, $type, $after = null)
+{
+    if (!Schema::hasColumn($table, column: $column)) {
+        Schema::table($table, function ($table) use ($column, $type, $after) {
+            $columnDefinition = $table->$type($column)->nullable();
+            if ($after) {
+                $columnDefinition->after($after);
+            }
+        });
+    }
+}
+
+const EMAIL_COPIES = [
+    'irumvabric@gmail.com'
+];
+

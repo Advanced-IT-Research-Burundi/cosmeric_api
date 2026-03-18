@@ -1,0 +1,4891 @@
+{
+    "openapi": "3.1.0",
+    "info": {
+        "title": "Laravel",
+        "version": "0.0.1"
+    },
+    "servers": [
+        {
+            "url": "http://localhost/api"
+        }
+    ],
+    "security": [
+        {
+            "http": []
+        }
+    ],
+    "paths": {
+        "/assistances": {
+            "get": {
+                "operationId": "assistances.index",
+                "summary": "Display a listing of the resource",
+                "tags": [
+                    "Assistance"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "`AssistanceCollection`",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/AssistanceCollection"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            },
+            "post": {
+                "operationId": "assistances.store",
+                "tags": [
+                    "Assistance"
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/AssistanceStoreRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    }
+                }
+            }
+        },
+        "/assistances/{assistance}": {
+            "get": {
+                "operationId": "assistances.show",
+                "tags": [
+                    "Assistance"
+                ],
+                "parameters": [
+                    {
+                        "name": "assistance",
+                        "in": "path",
+                        "required": true,
+                        "description": "The assistance ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/ModelNotFoundException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            },
+            "put": {
+                "operationId": "assistances.update",
+                "tags": [
+                    "Assistance"
+                ],
+                "parameters": [
+                    {
+                        "name": "assistance",
+                        "in": "path",
+                        "required": true,
+                        "description": "The assistance ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/AssistanceUpdateRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "`AssistanceResource`",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/AssistanceResource"
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/ModelNotFoundException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    }
+                }
+            },
+            "delete": {
+                "operationId": "assistances.destroy",
+                "tags": [
+                    "Assistance"
+                ],
+                "parameters": [
+                    {
+                        "name": "assistance",
+                        "in": "path",
+                        "required": true,
+                        "description": "The assistance ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No content"
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/ModelNotFoundException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/categorie-membres": {
+            "get": {
+                "operationId": "categorie-membres.index",
+                "tags": [
+                    "CategorieMembre"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            },
+            "post": {
+                "operationId": "categorie-membres.store",
+                "tags": [
+                    "CategorieMembre"
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/CategorieMembreStoreRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    }
+                }
+            }
+        },
+        "/categorie-membres/{categorieMembre}": {
+            "get": {
+                "operationId": "categorie-membres.show",
+                "tags": [
+                    "CategorieMembre"
+                ],
+                "parameters": [
+                    {
+                        "name": "categorieMembre",
+                        "in": "path",
+                        "required": true,
+                        "description": "The categorie membre ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/ModelNotFoundException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            },
+            "put": {
+                "operationId": "categorie-membres.update",
+                "tags": [
+                    "CategorieMembre"
+                ],
+                "parameters": [
+                    {
+                        "name": "categorieMembre",
+                        "in": "path",
+                        "required": true,
+                        "description": "The categorie membre ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/CategorieMembreUpdateRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/ModelNotFoundException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    }
+                }
+            },
+            "delete": {
+                "operationId": "categorie-membres.destroy",
+                "tags": [
+                    "CategorieMembre"
+                ],
+                "parameters": [
+                    {
+                        "name": "categorieMembre",
+                        "in": "path",
+                        "required": true,
+                        "description": "The categorie membre ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No content"
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/ModelNotFoundException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/configurations": {
+            "get": {
+                "operationId": "configurations.index",
+                "tags": [
+                    "Configuration"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "`ConfigurationCollection`",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ConfigurationCollection"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            },
+            "post": {
+                "operationId": "configurations.store",
+                "tags": [
+                    "Configuration"
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ConfigurationStoreRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "`ConfigurationResource`",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/ConfigurationResource"
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    }
+                }
+            }
+        },
+        "/configurations/{configuration}": {
+            "get": {
+                "operationId": "configurations.show",
+                "tags": [
+                    "Configuration"
+                ],
+                "parameters": [
+                    {
+                        "name": "configuration",
+                        "in": "path",
+                        "required": true,
+                        "description": "The configuration ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "`ConfigurationResource`",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/ConfigurationResource"
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/ModelNotFoundException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            },
+            "put": {
+                "operationId": "configurations.update",
+                "tags": [
+                    "Configuration"
+                ],
+                "parameters": [
+                    {
+                        "name": "configuration",
+                        "in": "path",
+                        "required": true,
+                        "description": "The configuration ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ConfigurationUpdateRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "`ConfigurationResource`",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/ConfigurationResource"
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/ModelNotFoundException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    }
+                }
+            },
+            "delete": {
+                "operationId": "configurations.destroy",
+                "tags": [
+                    "Configuration"
+                ],
+                "parameters": [
+                    {
+                        "name": "configuration",
+                        "in": "path",
+                        "required": true,
+                        "description": "The configuration ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No content"
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/ModelNotFoundException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/cotisations": {
+            "get": {
+                "operationId": "cotisations.index",
+                "tags": [
+                    "Cotisation"
+                ],
+                "parameters": [
+                    {
+                        "name": "search",
+                        "in": "query",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "statut",
+                        "in": "query",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "devise",
+                        "in": "query",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "mode_paiement",
+                        "in": "query",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "membre_id",
+                        "in": "query",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "periode_id",
+                        "in": "query",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "montant_min",
+                        "in": "query",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "montant_max",
+                        "in": "query",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "date_debut",
+                        "in": "query",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "date_fin",
+                        "in": "query",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            },
+            "post": {
+                "operationId": "cotisations.store",
+                "tags": [
+                    "Cotisation"
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/CotisationStoreRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    }
+                }
+            }
+        },
+        "/cotisations/{cotisation}": {
+            "get": {
+                "operationId": "cotisations.show",
+                "tags": [
+                    "Cotisation"
+                ],
+                "parameters": [
+                    {
+                        "name": "cotisation",
+                        "in": "path",
+                        "required": true,
+                        "description": "The cotisation ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/ModelNotFoundException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            },
+            "put": {
+                "operationId": "cotisations.update",
+                "tags": [
+                    "Cotisation"
+                ],
+                "parameters": [
+                    {
+                        "name": "cotisation",
+                        "in": "path",
+                        "required": true,
+                        "description": "The cotisation ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/CotisationUpdateRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/ModelNotFoundException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    }
+                }
+            },
+            "delete": {
+                "operationId": "cotisations.destroy",
+                "tags": [
+                    "Cotisation"
+                ],
+                "parameters": [
+                    {
+                        "name": "cotisation",
+                        "in": "path",
+                        "required": true,
+                        "description": "The cotisation ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/ModelNotFoundException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/credits": {
+            "get": {
+                "operationId": "credits.index",
+                "tags": [
+                    "Credit"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            },
+            "post": {
+                "operationId": "credits.store",
+                "tags": [
+                    "Credit"
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/CreditStoreRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "`CreditResource`",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/CreditResource"
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    }
+                }
+            }
+        },
+        "/credits/{credit}": {
+            "get": {
+                "operationId": "credits.show",
+                "tags": [
+                    "Credit"
+                ],
+                "parameters": [
+                    {
+                        "name": "credit",
+                        "in": "path",
+                        "required": true,
+                        "description": "The credit ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "`CreditResource`",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/CreditResource"
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/ModelNotFoundException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            },
+            "put": {
+                "operationId": "credits.update",
+                "tags": [
+                    "Credit"
+                ],
+                "parameters": [
+                    {
+                        "name": "credit",
+                        "in": "path",
+                        "required": true,
+                        "description": "The credit ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/CreditUpdateRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "`CreditResource`",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/CreditResource"
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/ModelNotFoundException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    }
+                }
+            },
+            "delete": {
+                "operationId": "credits.destroy",
+                "tags": [
+                    "Credit"
+                ],
+                "parameters": [
+                    {
+                        "name": "credit",
+                        "in": "path",
+                        "required": true,
+                        "description": "The credit ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No content"
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/ModelNotFoundException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/membres": {
+            "get": {
+                "operationId": "membres.index",
+                "tags": [
+                    "Membre"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Format response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            },
+            "post": {
+                "operationId": "membres.store",
+                "tags": [
+                    "Membre"
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/MembreStoreRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    }
+                }
+            }
+        },
+        "/membres/{membre}": {
+            "get": {
+                "operationId": "membres.show",
+                "tags": [
+                    "Membre"
+                ],
+                "parameters": [
+                    {
+                        "name": "membre",
+                        "in": "path",
+                        "required": true,
+                        "description": "The membre ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/ModelNotFoundException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            },
+            "put": {
+                "operationId": "membres.update",
+                "tags": [
+                    "Membre"
+                ],
+                "parameters": [
+                    {
+                        "name": "membre",
+                        "in": "path",
+                        "required": true,
+                        "description": "The membre ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/MembreUpdateRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/ModelNotFoundException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    }
+                }
+            },
+            "delete": {
+                "operationId": "membres.destroy",
+                "tags": [
+                    "Membre"
+                ],
+                "parameters": [
+                    {
+                        "name": "membre",
+                        "in": "path",
+                        "required": true,
+                        "description": "The membre ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/ModelNotFoundException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/periodes": {
+            "get": {
+                "operationId": "periodes.index",
+                "tags": [
+                    "Periode"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            },
+            "post": {
+                "operationId": "periodes.store",
+                "tags": [
+                    "Periode"
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/PeriodeStoreRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    }
+                }
+            }
+        },
+        "/periodes/{periode}": {
+            "get": {
+                "operationId": "periodes.show",
+                "tags": [
+                    "Periode"
+                ],
+                "parameters": [
+                    {
+                        "name": "periode",
+                        "in": "path",
+                        "required": true,
+                        "description": "The periode ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/ModelNotFoundException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            },
+            "put": {
+                "operationId": "periodes.update",
+                "tags": [
+                    "Periode"
+                ],
+                "parameters": [
+                    {
+                        "name": "periode",
+                        "in": "path",
+                        "required": true,
+                        "description": "The periode ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/PeriodeUpdateRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/ModelNotFoundException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    }
+                }
+            },
+            "delete": {
+                "operationId": "periodes.destroy",
+                "tags": [
+                    "Periode"
+                ],
+                "parameters": [
+                    {
+                        "name": "periode",
+                        "in": "path",
+                        "required": true,
+                        "description": "The periode ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/ModelNotFoundException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/rapports": {
+            "get": {
+                "operationId": "rapports.index",
+                "tags": [
+                    "Rapport"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "`RapportCollection`",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/RapportCollection"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            },
+            "post": {
+                "operationId": "rapports.store",
+                "tags": [
+                    "Rapport"
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/RapportStoreRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "`RapportResource`",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/RapportResource"
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    }
+                }
+            }
+        },
+        "/rapports/{rapport}": {
+            "get": {
+                "operationId": "rapports.show",
+                "tags": [
+                    "Rapport"
+                ],
+                "parameters": [
+                    {
+                        "name": "rapport",
+                        "in": "path",
+                        "required": true,
+                        "description": "The rapport ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "`RapportResource`",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/RapportResource"
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/ModelNotFoundException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            },
+            "put": {
+                "operationId": "rapports.update",
+                "tags": [
+                    "Rapport"
+                ],
+                "parameters": [
+                    {
+                        "name": "rapport",
+                        "in": "path",
+                        "required": true,
+                        "description": "The rapport ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/RapportUpdateRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "`RapportResource`",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/RapportResource"
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/ModelNotFoundException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    }
+                }
+            },
+            "delete": {
+                "operationId": "rapports.destroy",
+                "tags": [
+                    "Rapport"
+                ],
+                "parameters": [
+                    {
+                        "name": "rapport",
+                        "in": "path",
+                        "required": true,
+                        "description": "The rapport ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No content"
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/ModelNotFoundException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/remboursements": {
+            "get": {
+                "operationId": "remboursements.index",
+                "tags": [
+                    "Remboursement"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            },
+            "post": {
+                "operationId": "remboursements.store",
+                "tags": [
+                    "Remboursement"
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/RemboursementStoreRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    }
+                }
+            }
+        },
+        "/remboursements/{remboursement}": {
+            "get": {
+                "operationId": "remboursements.show",
+                "tags": [
+                    "Remboursement"
+                ],
+                "parameters": [
+                    {
+                        "name": "remboursement",
+                        "in": "path",
+                        "required": true,
+                        "description": "The remboursement ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/ModelNotFoundException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            },
+            "put": {
+                "operationId": "remboursements.update",
+                "tags": [
+                    "Remboursement"
+                ],
+                "parameters": [
+                    {
+                        "name": "remboursement",
+                        "in": "path",
+                        "required": true,
+                        "description": "The remboursement ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/RemboursementUpdateRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/ModelNotFoundException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    }
+                }
+            },
+            "delete": {
+                "operationId": "remboursements.destroy",
+                "tags": [
+                    "Remboursement"
+                ],
+                "parameters": [
+                    {
+                        "name": "remboursement",
+                        "in": "path",
+                        "required": true,
+                        "description": "The remboursement ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No content"
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/ModelNotFoundException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/transactions": {
+            "get": {
+                "operationId": "transactions.index",
+                "tags": [
+                    "Transaction"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            },
+            "post": {
+                "operationId": "transactions.store",
+                "tags": [
+                    "Transaction"
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/TransactionStoreRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    }
+                }
+            }
+        },
+        "/transactions/{transaction}": {
+            "get": {
+                "operationId": "transactions.show",
+                "tags": [
+                    "Transaction"
+                ],
+                "parameters": [
+                    {
+                        "name": "transaction",
+                        "in": "path",
+                        "required": true,
+                        "description": "The transaction ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "`TransactionResource`",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/TransactionResource"
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/ModelNotFoundException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            },
+            "put": {
+                "operationId": "transactions.update",
+                "tags": [
+                    "Transaction"
+                ],
+                "parameters": [
+                    {
+                        "name": "transaction",
+                        "in": "path",
+                        "required": true,
+                        "description": "The transaction ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/TransactionUpdateRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "`TransactionResource`",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/TransactionResource"
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/ModelNotFoundException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    }
+                }
+            },
+            "delete": {
+                "operationId": "transactions.destroy",
+                "tags": [
+                    "Transaction"
+                ],
+                "parameters": [
+                    {
+                        "name": "transaction",
+                        "in": "path",
+                        "required": true,
+                        "description": "The transaction ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No content"
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/ModelNotFoundException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/type-assistances": {
+            "get": {
+                "operationId": "type-assistances.index",
+                "tags": [
+                    "TypeAssistance"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            },
+            "post": {
+                "operationId": "type-assistances.store",
+                "tags": [
+                    "TypeAssistance"
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/TypeAssistanceStoreRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    }
+                }
+            }
+        },
+        "/type-assistances/{typeAssistance}": {
+            "get": {
+                "operationId": "type-assistances.show",
+                "tags": [
+                    "TypeAssistance"
+                ],
+                "parameters": [
+                    {
+                        "name": "typeAssistance",
+                        "in": "path",
+                        "required": true,
+                        "description": "The type assistance ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/ModelNotFoundException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            },
+            "put": {
+                "operationId": "type-assistances.update",
+                "tags": [
+                    "TypeAssistance"
+                ],
+                "parameters": [
+                    {
+                        "name": "typeAssistance",
+                        "in": "path",
+                        "required": true,
+                        "description": "The type assistance ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/TypeAssistanceUpdateRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/ModelNotFoundException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    }
+                }
+            },
+            "delete": {
+                "operationId": "type-assistances.destroy",
+                "tags": [
+                    "TypeAssistance"
+                ],
+                "parameters": [
+                    {
+                        "name": "typeAssistance",
+                        "in": "path",
+                        "required": true,
+                        "description": "The type assistance ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/ModelNotFoundException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/register": {
+            "post": {
+                "operationId": "user.register",
+                "tags": [
+                    "User"
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "matricule": {
+                                        "type": "string",
+                                        "maxLength": 50
+                                    },
+                                    "categorie_id": {
+                                        "type": "integer"
+                                    },
+                                    "nom": {
+                                        "type": "string",
+                                        "maxLength": 100
+                                    },
+                                    "prenom": {
+                                        "type": "string",
+                                        "maxLength": 100
+                                    },
+                                    "email": {
+                                        "type": "string",
+                                        "format": "email"
+                                    },
+                                    "password": {
+                                        "type": "string"
+                                    },
+                                    "telephone": {
+                                        "type": [
+                                            "string",
+                                            "null"
+                                        ],
+                                        "maxLength": 20
+                                    },
+                                    "password_confirmation": {
+                                        "type": "string"
+                                    }
+                                },
+                                "required": [
+                                    "matricule",
+                                    "categorie_id",
+                                    "nom",
+                                    "prenom",
+                                    "email",
+                                    "password",
+                                    "password_confirmation"
+                                ]
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    }
+                }
+            }
+        },
+        "/login": {
+            "post": {
+                "operationId": "user.login",
+                "tags": [
+                    "User"
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "email": {
+                                        "type": "string",
+                                        "format": "email"
+                                    },
+                                    "password": {
+                                        "type": "string"
+                                    },
+                                    "remember": {
+                                        "type": "boolean"
+                                    },
+                                    "device_name": {
+                                        "type": [
+                                            "string",
+                                            "null"
+                                        ],
+                                        "maxLength": 255
+                                    },
+                                    "revoke_other_tokens": {
+                                        "type": "boolean"
+                                    }
+                                },
+                                "required": [
+                                    "email",
+                                    "password"
+                                ]
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "500": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "enum": [
+                                                "Erreur lors de la connexion"
+                                            ]
+                                        },
+                                        "error": {
+                                            "anyOf": [
+                                                {
+                                                    "type": "string"
+                                                },
+                                                {
+                                                    "type": "string",
+                                                    "enum": [
+                                                        "Erreur interne du serveur"
+                                                    ]
+                                                }
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "message",
+                                        "error"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "enum": [
+                                                "Connexion r\u00e9ussie"
+                                            ]
+                                        },
+                                        "user": {
+                                            "type": "object",
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer"
+                                                },
+                                                "nom": {
+                                                    "type": "string"
+                                                },
+                                                "prenom": {
+                                                    "type": "string"
+                                                },
+                                                "email": {
+                                                    "type": "string"
+                                                },
+                                                "telephone": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "role": {
+                                                    "type": "string"
+                                                },
+                                                "full_name": {
+                                                    "type": "string"
+                                                },
+                                                "is_active": {
+                                                    "type": "boolean"
+                                                },
+                                                "last_login_at": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ],
+                                                    "format": "date-time"
+                                                },
+                                                "email_verified_at": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ],
+                                                    "format": "date-time"
+                                                },
+                                                "created_at": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ],
+                                                    "format": "date-time"
+                                                }
+                                            },
+                                            "required": [
+                                                "id",
+                                                "nom",
+                                                "prenom",
+                                                "email",
+                                                "telephone",
+                                                "role",
+                                                "full_name",
+                                                "is_active",
+                                                "last_login_at",
+                                                "email_verified_at",
+                                                "created_at"
+                                            ]
+                                        },
+                                        "access_token": {
+                                            "type": "string"
+                                        },
+                                        "token_type": {
+                                            "type": "string",
+                                            "enum": [
+                                                "Bearer"
+                                            ]
+                                        },
+                                        "expires_at": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "required": [
+                                        "message",
+                                        "user",
+                                        "access_token",
+                                        "token_type",
+                                        "expires_at"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "enum": [
+                                                "Votre compte est d\u00e9sactiv\u00e9. Contactez l'administrateur."
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "message"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "enum": [
+                                                "Les identifiants fournis sont incorrects."
+                                            ]
+                                        },
+                                        "errors": {
+                                            "type": "object",
+                                            "properties": {
+                                                "email": {
+                                                    "type": "array",
+                                                    "prefixItems": [
+                                                        {
+                                                            "type": "string",
+                                                            "enum": [
+                                                                "Les identifiants fournis sont incorrects."
+                                                            ]
+                                                        }
+                                                    ],
+                                                    "minItems": 1,
+                                                    "maxItems": 1,
+                                                    "additionalItems": false
+                                                }
+                                            },
+                                            "required": [
+                                                "email"
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "message",
+                                        "errors"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "429": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "required": [
+                                        "message"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "enum": [
+                                                "Erreur de validation"
+                                            ]
+                                        },
+                                        "errors": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "required": [
+                                        "message",
+                                        "errors"
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/logout": {
+            "post": {
+                "operationId": "user.logout",
+                "tags": [
+                    "User"
+                ],
+                "responses": {
+                    "500": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "enum": [
+                                                "Erreur lors de la d\u00e9connexion"
+                                            ]
+                                        },
+                                        "error": {
+                                            "anyOf": [
+                                                {
+                                                    "type": "string"
+                                                },
+                                                {
+                                                    "type": "string",
+                                                    "enum": [
+                                                        "Erreur interne du serveur"
+                                                    ]
+                                                }
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "message",
+                                        "error"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "enum": [
+                                                "D\u00e9connexion r\u00e9ussie"
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "message"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/logout-all": {
+            "post": {
+                "operationId": "user.logoutAll",
+                "tags": [
+                    "User"
+                ],
+                "responses": {
+                    "500": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "enum": [
+                                                "Erreur lors de la d\u00e9connexion"
+                                            ]
+                                        },
+                                        "error": {
+                                            "anyOf": [
+                                                {
+                                                    "type": "string"
+                                                },
+                                                {
+                                                    "type": "string",
+                                                    "enum": [
+                                                        "Erreur interne du serveur"
+                                                    ]
+                                                }
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "message",
+                                        "error"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "enum": [
+                                                "D\u00e9connexion de tous les appareils r\u00e9ussie"
+                                            ]
+                                        },
+                                        "tokens_deleted": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "required": [
+                                        "message",
+                                        "tokens_deleted"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/me": {
+            "get": {
+                "operationId": "user.me",
+                "tags": [
+                    "User"
+                ],
+                "responses": {
+                    "500": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "enum": [
+                                                "Erreur lors de la r\u00e9cup\u00e9ration du profil"
+                                            ]
+                                        },
+                                        "error": {
+                                            "anyOf": [
+                                                {
+                                                    "type": "string"
+                                                },
+                                                {
+                                                    "type": "string",
+                                                    "enum": [
+                                                        "Erreur interne du serveur"
+                                                    ]
+                                                }
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "message",
+                                        "error"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "user": {
+                                            "type": "object",
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer"
+                                                },
+                                                "nom": {
+                                                    "type": "string"
+                                                },
+                                                "prenom": {
+                                                    "type": "string"
+                                                },
+                                                "email": {
+                                                    "type": "string"
+                                                },
+                                                "telephone": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "role": {
+                                                    "type": "string"
+                                                },
+                                                "full_name": {
+                                                    "type": "string"
+                                                },
+                                                "is_active": {
+                                                    "type": "boolean"
+                                                },
+                                                "last_login_at": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ],
+                                                    "format": "date-time"
+                                                },
+                                                "email_verified_at": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ],
+                                                    "format": "date-time"
+                                                },
+                                                "created_at": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ],
+                                                    "format": "date-time"
+                                                }
+                                            },
+                                            "required": [
+                                                "id",
+                                                "nom",
+                                                "prenom",
+                                                "email",
+                                                "telephone",
+                                                "role",
+                                                "full_name",
+                                                "is_active",
+                                                "last_login_at",
+                                                "email_verified_at",
+                                                "created_at"
+                                            ]
+                                        },
+                                        "token_info": {
+                                            "type": "object",
+                                            "properties": {
+                                                "name": {
+                                                    "type": "string"
+                                                },
+                                                "abilities": {
+                                                    "type": "string"
+                                                },
+                                                "expires_at": {
+                                                    "type": "string"
+                                                },
+                                                "created_at": {
+                                                    "type": "string"
+                                                },
+                                                "last_used_at": {
+                                                    "type": "string"
+                                                }
+                                            },
+                                            "required": [
+                                                "name",
+                                                "abilities",
+                                                "expires_at",
+                                                "created_at",
+                                                "last_used_at"
+                                            ]
+                                        },
+                                        "active_tokens": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "required": [
+                                        "user",
+                                        "token_info",
+                                        "active_tokens"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/refresh-token": {
+            "post": {
+                "operationId": "user.refreshToken",
+                "tags": [
+                    "User"
+                ],
+                "responses": {
+                    "500": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "enum": [
+                                                "Erreur lors du rafra\u00eechissement du token"
+                                            ]
+                                        },
+                                        "error": {
+                                            "anyOf": [
+                                                {
+                                                    "type": "string"
+                                                },
+                                                {
+                                                    "type": "string",
+                                                    "enum": [
+                                                        "Erreur interne du serveur"
+                                                    ]
+                                                }
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "message",
+                                        "error"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "enum": [
+                                                "Token rafra\u00eechi avec succ\u00e8s"
+                                            ]
+                                        },
+                                        "access_token": {
+                                            "type": "string"
+                                        },
+                                        "token_type": {
+                                            "type": "string",
+                                            "enum": [
+                                                "Bearer"
+                                            ]
+                                        },
+                                        "expires_at": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "required": [
+                                        "message",
+                                        "access_token",
+                                        "token_type",
+                                        "expires_at"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/check-token": {
+            "post": {
+                "operationId": "user.checkToken",
+                "tags": [
+                    "User"
+                ],
+                "responses": {
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    },
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "valid": {
+                                            "type": "boolean"
+                                        },
+                                        "user": {
+                                            "type": "object",
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer"
+                                                },
+                                                "nom": {
+                                                    "type": "string"
+                                                },
+                                                "prenom": {
+                                                    "type": "string"
+                                                },
+                                                "email": {
+                                                    "type": "string"
+                                                },
+                                                "telephone": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "role": {
+                                                    "type": "string"
+                                                },
+                                                "full_name": {
+                                                    "type": "string"
+                                                },
+                                                "is_active": {
+                                                    "type": "boolean"
+                                                },
+                                                "last_login_at": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ],
+                                                    "format": "date-time"
+                                                },
+                                                "email_verified_at": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ],
+                                                    "format": "date-time"
+                                                },
+                                                "created_at": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ],
+                                                    "format": "date-time"
+                                                }
+                                            },
+                                            "required": [
+                                                "id",
+                                                "nom",
+                                                "prenom",
+                                                "email",
+                                                "telephone",
+                                                "role",
+                                                "full_name",
+                                                "is_active",
+                                                "last_login_at",
+                                                "email_verified_at",
+                                                "created_at"
+                                            ]
+                                        },
+                                        "token": {
+                                            "type": "object",
+                                            "properties": {
+                                                "name": {
+                                                    "type": "string"
+                                                },
+                                                "abilities": {
+                                                    "type": "string"
+                                                },
+                                                "expires_at": {
+                                                    "type": "string"
+                                                },
+                                                "expires_in_hours": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "is_expired": {
+                                                    "anyOf": [
+                                                        {
+                                                            "type": "string"
+                                                        },
+                                                        {
+                                                            "type": "boolean"
+                                                        }
+                                                    ]
+                                                }
+                                            },
+                                            "required": [
+                                                "name",
+                                                "abilities",
+                                                "expires_at",
+                                                "expires_in_hours",
+                                                "is_expired"
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "valid",
+                                        "user",
+                                        "token"
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/profile": {
+            "put": {
+                "operationId": "user.updateProfile",
+                "tags": [
+                    "User"
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "nom": {
+                                        "type": "string",
+                                        "maxLength": 100
+                                    },
+                                    "prenom": {
+                                        "type": "string",
+                                        "maxLength": 100
+                                    },
+                                    "email": {
+                                        "type": "string",
+                                        "format": "email"
+                                    },
+                                    "telephone": {
+                                        "type": [
+                                            "string",
+                                            "null"
+                                        ],
+                                        "maxLength": 20
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "500": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "enum": [
+                                                "Erreur lors de la mise \u00e0 jour du profil"
+                                            ]
+                                        },
+                                        "error": {
+                                            "anyOf": [
+                                                {
+                                                    "type": "string"
+                                                },
+                                                {
+                                                    "type": "string",
+                                                    "enum": [
+                                                        "Erreur interne du serveur"
+                                                    ]
+                                                }
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "message",
+                                        "error"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "enum": [
+                                                "Profil mis \u00e0 jour avec succ\u00e8s"
+                                            ]
+                                        },
+                                        "user": {
+                                            "type": "object",
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer"
+                                                },
+                                                "nom": {
+                                                    "type": "string"
+                                                },
+                                                "prenom": {
+                                                    "type": "string"
+                                                },
+                                                "email": {
+                                                    "type": "string"
+                                                },
+                                                "telephone": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "role": {
+                                                    "type": "string"
+                                                },
+                                                "full_name": {
+                                                    "type": "string"
+                                                },
+                                                "is_active": {
+                                                    "type": "boolean"
+                                                },
+                                                "last_login_at": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ],
+                                                    "format": "date-time"
+                                                },
+                                                "email_verified_at": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ],
+                                                    "format": "date-time"
+                                                },
+                                                "created_at": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ],
+                                                    "format": "date-time"
+                                                }
+                                            },
+                                            "required": [
+                                                "id",
+                                                "nom",
+                                                "prenom",
+                                                "email",
+                                                "telephone",
+                                                "role",
+                                                "full_name",
+                                                "is_active",
+                                                "last_login_at",
+                                                "email_verified_at",
+                                                "created_at"
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "message",
+                                        "user"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "enum": [
+                                                "Erreur de validation"
+                                            ]
+                                        },
+                                        "errors": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "required": [
+                                        "message",
+                                        "errors"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/change-password": {
+            "post": {
+                "operationId": "user.changePassword",
+                "tags": [
+                    "User"
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "current_password": {
+                                        "type": "string"
+                                    },
+                                    "password": {
+                                        "type": "string"
+                                    },
+                                    "password_confirmation": {
+                                        "type": "string"
+                                    }
+                                },
+                                "required": [
+                                    "current_password",
+                                    "password",
+                                    "password_confirmation"
+                                ]
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "500": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "enum": [
+                                                "Erreur lors de la modification du mot de passe"
+                                            ]
+                                        },
+                                        "error": {
+                                            "anyOf": [
+                                                {
+                                                    "type": "string"
+                                                },
+                                                {
+                                                    "type": "string",
+                                                    "enum": [
+                                                        "Erreur interne du serveur"
+                                                    ]
+                                                }
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "message",
+                                        "error"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "enum": [
+                                                "Mot de passe modifi\u00e9 avec succ\u00e8s"
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "message"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "anyOf": [
+                                        {
+                                            "type": "object",
+                                            "properties": {
+                                                "message": {
+                                                    "type": "string",
+                                                    "enum": [
+                                                        "Le mot de passe actuel est incorrect."
+                                                    ]
+                                                },
+                                                "errors": {
+                                                    "type": "object",
+                                                    "properties": {
+                                                        "current_password": {
+                                                            "type": "array",
+                                                            "prefixItems": [
+                                                                {
+                                                                    "type": "string",
+                                                                    "enum": [
+                                                                        "Le mot de passe actuel est incorrect."
+                                                                    ]
+                                                                }
+                                                            ],
+                                                            "minItems": 1,
+                                                            "maxItems": 1,
+                                                            "additionalItems": false
+                                                        }
+                                                    },
+                                                    "required": [
+                                                        "current_password"
+                                                    ]
+                                                }
+                                            },
+                                            "required": [
+                                                "message",
+                                                "errors"
+                                            ]
+                                        },
+                                        {
+                                            "type": "object",
+                                            "properties": {
+                                                "message": {
+                                                    "type": "string",
+                                                    "enum": [
+                                                        "Erreur de validation"
+                                                    ]
+                                                },
+                                                "errors": {
+                                                    "type": "string"
+                                                }
+                                            },
+                                            "required": [
+                                                "message",
+                                                "errors"
+                                            ]
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/tokens": {
+            "get": {
+                "operationId": "user.tokens",
+                "tags": [
+                    "User"
+                ],
+                "responses": {
+                    "500": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "enum": [
+                                                "Erreur lors de la r\u00e9cup\u00e9ration des tokens"
+                                            ]
+                                        },
+                                        "error": {
+                                            "anyOf": [
+                                                {
+                                                    "type": "string"
+                                                },
+                                                {
+                                                    "type": "string",
+                                                    "enum": [
+                                                        "Erreur interne du serveur"
+                                                    ]
+                                                }
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "message",
+                                        "error"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "tokens": {
+                                            "type": "string"
+                                        },
+                                        "total": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "required": [
+                                        "tokens",
+                                        "total"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            },
+            "delete": {
+                "operationId": "user.revokeToken",
+                "tags": [
+                    "User"
+                ],
+                "parameters": [
+                    {
+                        "name": "token_id",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "500": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "enum": [
+                                                "Erreur lors de la r\u00e9vocation du token"
+                                            ]
+                                        },
+                                        "error": {
+                                            "anyOf": [
+                                                {
+                                                    "type": "string"
+                                                },
+                                                {
+                                                    "type": "string",
+                                                    "enum": [
+                                                        "Erreur interne du serveur"
+                                                    ]
+                                                }
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "message",
+                                        "error"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "required": [
+                                        "message"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "enum": [
+                                                "Token introuvable"
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "message"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "enum": [
+                                                "Erreur de validation"
+                                            ]
+                                        },
+                                        "errors": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "required": [
+                                        "message",
+                                        "errors"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        }
+    },
+    "components": {
+        "securitySchemes": {
+            "http": {
+                "type": "http",
+                "scheme": "bearer"
+            }
+        },
+        "schemas": {
+            "AssistanceCollection": {
+                "type": "object",
+                "properties": {
+                    "data": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/AssistanceResource"
+                        }
+                    }
+                },
+                "required": [
+                    "data"
+                ],
+                "title": "AssistanceCollection"
+            },
+            "AssistanceResource": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "integer"
+                    },
+                    "membre_id": {
+                        "type": "integer"
+                    },
+                    "type_assistance_id": {
+                        "type": "integer"
+                    },
+                    "montant": {
+                        "type": "string"
+                    },
+                    "date_demande": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "date_approbation": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "date_versement": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "statut": {
+                        "type": "string"
+                    },
+                    "justificatif": {
+                        "type": "string"
+                    },
+                    "motif_rejet": {
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "id",
+                    "membre_id",
+                    "type_assistance_id",
+                    "montant",
+                    "date_demande",
+                    "date_approbation",
+                    "date_versement",
+                    "statut",
+                    "justificatif",
+                    "motif_rejet"
+                ],
+                "title": "AssistanceResource"
+            },
+            "AssistanceStoreRequest": {
+                "type": "object",
+                "properties": {
+                    "membre_id": {
+                        "type": "integer"
+                    },
+                    "type_assistance_id": {
+                        "type": "integer"
+                    },
+                    "montant": {
+                        "type": "number"
+                    },
+                    "date_demande": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "date_approbation": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "date_versement": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "statut": {
+                        "type": "string",
+                        "enum": [
+                            "en_attente",
+                            "approuve",
+                            "rejete",
+                            "verse"
+                        ]
+                    },
+                    "justificatif": {
+                        "type": "string",
+                        "maxLength": 255
+                    },
+                    "motif_rejet": {
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "membre_id",
+                    "type_assistance_id",
+                    "montant",
+                    "date_demande",
+                    "date_approbation",
+                    "date_versement",
+                    "statut",
+                    "justificatif",
+                    "motif_rejet"
+                ],
+                "title": "AssistanceStoreRequest"
+            },
+            "AssistanceUpdateRequest": {
+                "type": "object",
+                "properties": {
+                    "membre_id": {
+                        "type": "integer"
+                    },
+                    "type_assistance_id": {
+                        "type": "integer"
+                    },
+                    "montant": {
+                        "type": "number"
+                    },
+                    "date_demande": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "date_approbation": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "date_versement": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "statut": {
+                        "type": "string",
+                        "enum": [
+                            "en_attente",
+                            "approuve",
+                            "rejete",
+                            "verse"
+                        ]
+                    },
+                    "justificatif": {
+                        "type": "string",
+                        "maxLength": 255
+                    },
+                    "motif_rejet": {
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "membre_id",
+                    "type_assistance_id",
+                    "montant",
+                    "date_demande",
+                    "date_approbation",
+                    "date_versement",
+                    "statut",
+                    "justificatif",
+                    "motif_rejet"
+                ],
+                "title": "AssistanceUpdateRequest"
+            },
+            "CategorieMembreStoreRequest": {
+                "type": "object",
+                "properties": {
+                    "nom": {
+                        "type": "string",
+                        "maxLength": 100
+                    },
+                    "montant_cotisation": {
+                        "type": "number"
+                    },
+                    "devise": {
+                        "type": "string",
+                        "enum": [
+                            "FBU",
+                            "USD"
+                        ]
+                    },
+                    "frequence_paiement": {
+                        "type": "string",
+                        "enum": [
+                            "mensuel",
+                            "semestriel"
+                        ]
+                    },
+                    "description": {
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "nom",
+                    "montant_cotisation",
+                    "devise",
+                    "frequence_paiement",
+                    "description"
+                ],
+                "title": "CategorieMembreStoreRequest"
+            },
+            "CategorieMembreUpdateRequest": {
+                "type": "object",
+                "properties": {
+                    "nom": {
+                        "type": "string",
+                        "maxLength": 100
+                    },
+                    "montant_cotisation": {
+                        "type": "number"
+                    },
+                    "devise": {
+                        "type": "string",
+                        "enum": [
+                            "FBU",
+                            "USD"
+                        ]
+                    },
+                    "frequence_paiement": {
+                        "type": "string",
+                        "enum": [
+                            "mensuel",
+                            "semestriel"
+                        ]
+                    },
+                    "description": {
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "nom",
+                    "montant_cotisation",
+                    "devise",
+                    "frequence_paiement",
+                    "description"
+                ],
+                "title": "CategorieMembreUpdateRequest"
+            },
+            "ConfigurationCollection": {
+                "type": "object",
+                "properties": {
+                    "data": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/ConfigurationResource"
+                        }
+                    }
+                },
+                "required": [
+                    "data"
+                ],
+                "title": "ConfigurationCollection"
+            },
+            "ConfigurationResource": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "integer"
+                    },
+                    "cle": {
+                        "type": "string"
+                    },
+                    "valeur": {
+                        "type": "string"
+                    },
+                    "description": {
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "id",
+                    "cle",
+                    "valeur",
+                    "description"
+                ],
+                "title": "ConfigurationResource"
+            },
+            "ConfigurationStoreRequest": {
+                "type": "object",
+                "properties": {
+                    "cle": {
+                        "type": "string",
+                        "maxLength": 100
+                    },
+                    "valeur": {
+                        "type": "string"
+                    },
+                    "description": {
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "cle",
+                    "valeur",
+                    "description"
+                ],
+                "title": "ConfigurationStoreRequest"
+            },
+            "ConfigurationUpdateRequest": {
+                "type": "object",
+                "properties": {
+                    "cle": {
+                        "type": "string",
+                        "maxLength": 100
+                    },
+                    "valeur": {
+                        "type": "string"
+                    },
+                    "description": {
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "cle",
+                    "valeur",
+                    "description"
+                ],
+                "title": "ConfigurationUpdateRequest"
+            },
+            "CotisationStoreRequest": {
+                "type": "object",
+                "properties": {
+                    "membre_id": {
+                        "type": "integer"
+                    },
+                    "periode_id": {
+                        "type": "integer"
+                    },
+                    "montant": {
+                        "type": "number"
+                    },
+                    "devise": {
+                        "type": "string",
+                        "enum": [
+                            "FBU",
+                            "USD"
+                        ]
+                    },
+                    "date_paiement": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "statut": {
+                        "type": "string",
+                        "enum": [
+                            "paye",
+                            "en_attente",
+                            "en_retard"
+                        ]
+                    },
+                    "mode_paiement": {
+                        "type": "string",
+                        "maxLength": 50
+                    },
+                    "reference_paiement": {
+                        "type": "string",
+                        "maxLength": 100
+                    }
+                },
+                "required": [
+                    "membre_id",
+                    "periode_id",
+                    "montant",
+                    "devise",
+                    "date_paiement",
+                    "statut",
+                    "mode_paiement",
+                    "reference_paiement"
+                ],
+                "title": "CotisationStoreRequest"
+            },
+            "CotisationUpdateRequest": {
+                "type": "object",
+                "properties": {
+                    "membre_id": {
+                        "type": "integer"
+                    },
+                    "periode_id": {
+                        "type": "integer"
+                    },
+                    "montant": {
+                        "type": "number"
+                    },
+                    "devise": {
+                        "type": "string",
+                        "enum": [
+                            "FBU",
+                            "USD"
+                        ]
+                    },
+                    "date_paiement": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "statut": {
+                        "type": "string",
+                        "enum": [
+                            "paye",
+                            "en_attente",
+                            "en_retard"
+                        ]
+                    },
+                    "mode_paiement": {
+                        "type": "string",
+                        "maxLength": 50
+                    },
+                    "reference_paiement": {
+                        "type": "string",
+                        "maxLength": 100
+                    }
+                },
+                "required": [
+                    "membre_id",
+                    "periode_id",
+                    "montant",
+                    "devise",
+                    "date_paiement",
+                    "statut",
+                    "mode_paiement",
+                    "reference_paiement"
+                ],
+                "title": "CotisationUpdateRequest"
+            },
+            "CreditResource": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "integer"
+                    },
+                    "membre_id": {
+                        "type": "integer"
+                    },
+                    "montant_demande": {
+                        "type": "string"
+                    },
+                    "montant_accorde": {
+                        "type": "string"
+                    },
+                    "taux_interet": {
+                        "type": "string"
+                    },
+                    "duree_mois": {
+                        "type": "integer"
+                    },
+                    "montant_total_rembourser": {
+                        "type": "string"
+                    },
+                    "montant_mensualite": {
+                        "type": "string"
+                    },
+                    "date_demande": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "date_approbation": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "statut": {
+                        "type": "string"
+                    },
+                    "motif": {
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "id",
+                    "membre_id",
+                    "montant_demande",
+                    "montant_accorde",
+                    "taux_interet",
+                    "duree_mois",
+                    "montant_total_rembourser",
+                    "montant_mensualite",
+                    "date_demande",
+                    "date_approbation",
+                    "statut",
+                    "motif"
+                ],
+                "title": "CreditResource"
+            },
+            "CreditStoreRequest": {
+                "type": "object",
+                "properties": {
+                    "membre_id": {
+                        "type": "integer"
+                    },
+                    "montant_demande": {
+                        "type": "number"
+                    },
+                    "montant_accorde": {
+                        "type": "number"
+                    },
+                    "taux_interet": {
+                        "type": "number"
+                    },
+                    "duree_mois": {
+                        "type": "integer"
+                    },
+                    "montant_total_rembourser": {
+                        "type": "number"
+                    },
+                    "montant_mensualite": {
+                        "type": "number"
+                    },
+                    "date_demande": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "date_approbation": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "statut": {
+                        "type": "string",
+                        "enum": [
+                            "en_attente",
+                            "approuve",
+                            "rejete",
+                            "en_cours",
+                            "termine"
+                        ]
+                    },
+                    "motif": {
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "membre_id",
+                    "montant_demande",
+                    "montant_accorde",
+                    "taux_interet",
+                    "duree_mois",
+                    "montant_total_rembourser",
+                    "montant_mensualite",
+                    "date_demande",
+                    "date_approbation",
+                    "statut",
+                    "motif"
+                ],
+                "title": "CreditStoreRequest"
+            },
+            "CreditUpdateRequest": {
+                "type": "object",
+                "properties": {
+                    "membre_id": {
+                        "type": "integer"
+                    },
+                    "montant_demande": {
+                        "type": "number"
+                    },
+                    "montant_accorde": {
+                        "type": "number"
+                    },
+                    "taux_interet": {
+                        "type": "number"
+                    },
+                    "duree_mois": {
+                        "type": "integer"
+                    },
+                    "montant_total_rembourser": {
+                        "type": "number"
+                    },
+                    "montant_mensualite": {
+                        "type": "number"
+                    },
+                    "date_demande": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "date_approbation": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "statut": {
+                        "type": "string",
+                        "enum": [
+                            "en_attente",
+                            "approuve",
+                            "rejete",
+                            "en_cours",
+                            "termine"
+                        ]
+                    },
+                    "motif": {
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "membre_id",
+                    "montant_demande",
+                    "montant_accorde",
+                    "taux_interet",
+                    "duree_mois",
+                    "montant_total_rembourser",
+                    "montant_mensualite",
+                    "date_demande",
+                    "date_approbation",
+                    "statut",
+                    "motif"
+                ],
+                "title": "CreditUpdateRequest"
+            },
+            "MembreStoreRequest": {
+                "type": "object",
+                "properties": {
+                    "matricule": {
+                        "type": "string",
+                        "maxLength": 50
+                    },
+                    "nom": {
+                        "type": "string",
+                        "maxLength": 100
+                    },
+                    "prenom": {
+                        "type": "string",
+                        "maxLength": 100
+                    },
+                    "email": {
+                        "type": "string",
+                        "format": "email",
+                        "maxLength": 150
+                    },
+                    "telephone": {
+                        "type": "string",
+                        "maxLength": 20
+                    },
+                    "categorie_id": {
+                        "type": "integer"
+                    },
+                    "statut": {
+                        "type": "string",
+                        "enum": [
+                            "actif",
+                            "inactif",
+                            "suspendu"
+                        ]
+                    },
+                    "date_adhesion": {
+                        "type": "string",
+                        "format": "date-time"
+                    }
+                },
+                "required": [
+                    "matricule",
+                    "nom",
+                    "prenom",
+                    "email",
+                    "telephone",
+                    "categorie_id",
+                    "statut",
+                    "date_adhesion"
+                ],
+                "title": "MembreStoreRequest"
+            },
+            "MembreUpdateRequest": {
+                "type": "object",
+                "properties": {
+                    "matricule": {
+                        "type": "string",
+                        "maxLength": 50
+                    },
+                    "nom": {
+                        "type": "string",
+                        "maxLength": 100
+                    },
+                    "prenom": {
+                        "type": "string",
+                        "maxLength": 100
+                    },
+                    "email": {
+                        "type": "string",
+                        "format": "email",
+                        "maxLength": 150
+                    },
+                    "telephone": {
+                        "type": "string",
+                        "maxLength": 20
+                    },
+                    "categorie_id": {
+                        "type": "integer"
+                    },
+                    "statut": {
+                        "type": "string",
+                        "enum": [
+                            "actif",
+                            "inactif",
+                            "suspendu"
+                        ]
+                    },
+                    "date_adhesion": {
+                        "type": "string",
+                        "format": "date-time"
+                    }
+                },
+                "required": [
+                    "matricule",
+                    "nom",
+                    "prenom",
+                    "email",
+                    "telephone",
+                    "categorie_id",
+                    "statut",
+                    "date_adhesion"
+                ],
+                "title": "MembreUpdateRequest"
+            },
+            "PeriodeStoreRequest": {
+                "type": "object",
+                "properties": {
+                    "type": {
+                        "type": "string",
+                        "enum": [
+                            "mensuel",
+                            "semestre"
+                        ]
+                    },
+                    "mois": {
+                        "type": [
+                            "integer",
+                            "null"
+                        ]
+                    },
+                    "semestre": {
+                        "type": [
+                            "integer",
+                            "null"
+                        ]
+                    },
+                    "annee": {
+                        "type": "integer"
+                    },
+                    "statut": {
+                        "type": "string",
+                        "enum": [
+                            "ouvert",
+                            "ferme"
+                        ]
+                    },
+                    "date_debut": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "date_fin": {
+                        "type": "string",
+                        "format": "date-time"
+                    }
+                },
+                "required": [
+                    "type",
+                    "annee",
+                    "statut",
+                    "date_debut",
+                    "date_fin"
+                ],
+                "title": "PeriodeStoreRequest"
+            },
+            "PeriodeUpdateRequest": {
+                "type": "object",
+                "properties": {
+                    "mois": {
+                        "type": "integer"
+                    },
+                    "annee": {
+                        "type": "integer"
+                    },
+                    "statut": {
+                        "type": "string",
+                        "enum": [
+                            "ouvert",
+                            "ferme"
+                        ]
+                    },
+                    "date_debut": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "date_fin": {
+                        "type": "string",
+                        "format": "date-time"
+                    }
+                },
+                "required": [
+                    "mois",
+                    "annee",
+                    "statut",
+                    "date_debut",
+                    "date_fin"
+                ],
+                "title": "PeriodeUpdateRequest"
+            },
+            "RapportCollection": {
+                "type": "object",
+                "properties": {
+                    "data": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/RapportResource"
+                        }
+                    }
+                },
+                "required": [
+                    "data"
+                ],
+                "title": "RapportCollection"
+            },
+            "RapportResource": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "integer"
+                    },
+                    "titre": {
+                        "type": "string"
+                    },
+                    "type_rapport": {
+                        "type": "string"
+                    },
+                    "periode_debut": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "periode_fin": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "genere_par": {
+                        "type": [
+                            "integer",
+                            "null"
+                        ]
+                    },
+                    "fichier_path": {
+                        "type": "string"
+                    },
+                    "statut": {
+                        "type": "string"
+                    },
+                    "created_at": {
+                        "type": [
+                            "integer",
+                            "null"
+                        ]
+                    }
+                },
+                "required": [
+                    "id",
+                    "titre",
+                    "type_rapport",
+                    "periode_debut",
+                    "periode_fin",
+                    "genere_par",
+                    "fichier_path",
+                    "statut",
+                    "created_at"
+                ],
+                "title": "RapportResource"
+            },
+            "RapportStoreRequest": {
+                "type": "object",
+                "properties": {
+                    "titre": {
+                        "type": "string",
+                        "maxLength": 200
+                    },
+                    "type_rapport": {
+                        "type": "string",
+                        "enum": [
+                            "mensuel",
+                            "semestriel",
+                            "annuel",
+                            "personnalise"
+                        ]
+                    },
+                    "periode_debut": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "periode_fin": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "genere_par": {
+                        "type": "string"
+                    },
+                    "fichier_path": {
+                        "type": "string",
+                        "maxLength": 255
+                    },
+                    "statut": {
+                        "type": "string",
+                        "enum": [
+                            "genere",
+                            "envoye",
+                            "archive"
+                        ]
+                    },
+                    "created_at": {
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "titre",
+                    "type_rapport",
+                    "periode_debut",
+                    "periode_fin",
+                    "genere_par",
+                    "fichier_path",
+                    "statut",
+                    "created_at"
+                ],
+                "title": "RapportStoreRequest"
+            },
+            "RapportUpdateRequest": {
+                "type": "object",
+                "properties": {
+                    "titre": {
+                        "type": "string",
+                        "maxLength": 200
+                    },
+                    "type_rapport": {
+                        "type": "string",
+                        "enum": [
+                            "mensuel",
+                            "semestriel",
+                            "annuel",
+                            "personnalise"
+                        ]
+                    },
+                    "periode_debut": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "periode_fin": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "genere_par": {
+                        "type": "string"
+                    },
+                    "fichier_path": {
+                        "type": "string",
+                        "maxLength": 255
+                    },
+                    "statut": {
+                        "type": "string",
+                        "enum": [
+                            "genere",
+                            "envoye",
+                            "archive"
+                        ]
+                    },
+                    "created_at": {
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "titre",
+                    "type_rapport",
+                    "periode_debut",
+                    "periode_fin",
+                    "genere_par",
+                    "fichier_path",
+                    "statut",
+                    "created_at"
+                ],
+                "title": "RapportUpdateRequest"
+            },
+            "RemboursementStoreRequest": {
+                "type": "object",
+                "properties": {
+                    "credit_id": {
+                        "type": "integer"
+                    },
+                    "numero_echeance": {
+                        "type": "integer"
+                    },
+                    "montant_prevu": {
+                        "type": "number"
+                    },
+                    "montant_paye": {
+                        "type": "number"
+                    },
+                    "date_echeance": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "date_paiement": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "statut": {
+                        "type": "string",
+                        "enum": [
+                            "prevu",
+                            "paye",
+                            "en_retard"
+                        ]
+                    },
+                    "penalite": {
+                        "type": "number"
+                    }
+                },
+                "required": [
+                    "credit_id",
+                    "numero_echeance",
+                    "montant_prevu",
+                    "montant_paye",
+                    "date_echeance",
+                    "date_paiement",
+                    "statut",
+                    "penalite"
+                ],
+                "title": "RemboursementStoreRequest"
+            },
+            "RemboursementUpdateRequest": {
+                "type": "object",
+                "properties": {
+                    "credit_id": {
+                        "type": "integer"
+                    },
+                    "numero_echeance": {
+                        "type": "integer"
+                    },
+                    "montant_prevu": {
+                        "type": "number"
+                    },
+                    "montant_paye": {
+                        "type": "number"
+                    },
+                    "date_echeance": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "date_paiement": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "statut": {
+                        "type": "string",
+                        "enum": [
+                            "prevu",
+                            "paye",
+                            "en_retard"
+                        ]
+                    },
+                    "penalite": {
+                        "type": "number"
+                    }
+                },
+                "required": [
+                    "credit_id",
+                    "numero_echeance",
+                    "montant_prevu",
+                    "montant_paye",
+                    "date_echeance",
+                    "date_paiement",
+                    "statut",
+                    "penalite"
+                ],
+                "title": "RemboursementUpdateRequest"
+            },
+            "TransactionResource": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "integer"
+                    },
+                    "membre_id": {
+                        "type": "integer"
+                    },
+                    "type_transaction": {
+                        "type": "string"
+                    },
+                    "reference_transaction": {
+                        "type": "integer"
+                    },
+                    "montant": {
+                        "type": "string"
+                    },
+                    "devise": {
+                        "type": "string"
+                    },
+                    "sens": {
+                        "type": "string"
+                    },
+                    "date_transaction": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "description": {
+                        "type": "string"
+                    },
+                    "created_at": {
+                        "type": [
+                            "integer",
+                            "null"
+                        ]
+                    }
+                },
+                "required": [
+                    "id",
+                    "membre_id",
+                    "type_transaction",
+                    "reference_transaction",
+                    "montant",
+                    "devise",
+                    "sens",
+                    "date_transaction",
+                    "description",
+                    "created_at"
+                ],
+                "title": "TransactionResource"
+            },
+            "TransactionStoreRequest": {
+                "type": "object",
+                "properties": {
+                    "membre_id": {
+                        "type": "integer"
+                    },
+                    "type_transaction": {
+                        "type": "string",
+                        "enum": [
+                            "cotisation",
+                            "credit",
+                            "remboursement",
+                            "assistance"
+                        ]
+                    },
+                    "reference_transaction": {
+                        "type": "integer"
+                    },
+                    "montant": {
+                        "type": "number"
+                    },
+                    "devise": {
+                        "type": "string",
+                        "enum": [
+                            "FBU",
+                            "USD"
+                        ]
+                    },
+                    "sens": {
+                        "type": "string",
+                        "enum": [
+                            "entree",
+                            "sortie"
+                        ]
+                    },
+                    "date_transaction": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "description": {
+                        "type": "string"
+                    },
+                    "created_at": {
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "membre_id",
+                    "type_transaction",
+                    "reference_transaction",
+                    "montant",
+                    "devise",
+                    "sens",
+                    "date_transaction",
+                    "description",
+                    "created_at"
+                ],
+                "title": "TransactionStoreRequest"
+            },
+            "TransactionUpdateRequest": {
+                "type": "object",
+                "properties": {
+                    "membre_id": {
+                        "type": "integer"
+                    },
+                    "type_transaction": {
+                        "type": "string",
+                        "enum": [
+                            "cotisation",
+                            "credit",
+                            "remboursement",
+                            "assistance"
+                        ]
+                    },
+                    "reference_transaction": {
+                        "type": "integer"
+                    },
+                    "montant": {
+                        "type": "number"
+                    },
+                    "devise": {
+                        "type": "string",
+                        "enum": [
+                            "FBU",
+                            "USD"
+                        ]
+                    },
+                    "sens": {
+                        "type": "string",
+                        "enum": [
+                            "entree",
+                            "sortie"
+                        ]
+                    },
+                    "date_transaction": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "description": {
+                        "type": "string"
+                    },
+                    "created_at": {
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "membre_id",
+                    "type_transaction",
+                    "reference_transaction",
+                    "montant",
+                    "devise",
+                    "sens",
+                    "date_transaction",
+                    "description",
+                    "created_at"
+                ],
+                "title": "TransactionUpdateRequest"
+            },
+            "TypeAssistanceStoreRequest": {
+                "type": "object",
+                "properties": {
+                    "nom": {
+                        "type": "string",
+                        "maxLength": 100
+                    },
+                    "montant_standard": {
+                        "type": "number"
+                    },
+                    "conditions": {
+                        "type": "string"
+                    },
+                    "documents_requis": {
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "nom",
+                    "montant_standard",
+                    "conditions",
+                    "documents_requis"
+                ],
+                "title": "TypeAssistanceStoreRequest"
+            },
+            "TypeAssistanceUpdateRequest": {
+                "type": "object",
+                "properties": {
+                    "nom": {
+                        "type": "string",
+                        "maxLength": 100
+                    },
+                    "montant_standard": {
+                        "type": "number"
+                    },
+                    "conditions": {
+                        "type": "string"
+                    },
+                    "documents_requis": {
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "nom",
+                    "montant_standard",
+                    "conditions",
+                    "documents_requis"
+                ],
+                "title": "TypeAssistanceUpdateRequest"
+            }
+        },
+        "responses": {
+            "ValidationException": {
+                "description": "Validation error",
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "message": {
+                                    "type": "string",
+                                    "description": "Errors overview."
+                                },
+                                "errors": {
+                                    "type": "object",
+                                    "description": "A detailed description of each field that failed validation.",
+                                    "additionalProperties": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            },
+                            "required": [
+                                "message",
+                                "errors"
+                            ]
+                        }
+                    }
+                }
+            },
+            "AuthenticationException": {
+                "description": "Unauthenticated",
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "message": {
+                                    "type": "string",
+                                    "description": "Error overview."
+                                }
+                            },
+                            "required": [
+                                "message"
+                            ]
+                        }
+                    }
+                }
+            },
+            "ModelNotFoundException": {
+                "description": "Not found",
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "message": {
+                                    "type": "string",
+                                    "description": "Error overview."
+                                }
+                            },
+                            "required": [
+                                "message"
+                            ]
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

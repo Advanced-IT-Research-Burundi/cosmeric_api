@@ -21,8 +21,8 @@ class TypeAssistanceFactory extends Factory
     public function definition(): array
     {
         return [
-            'nom' => fake()->regexify('[A-Za-z0-9]{100}'),
-            'montant_standard' => fake()->randomFloat(2, 0, 99999999.99),
+            'nom' => fake()->word(),
+            'montant_standard' => fake()->randomFloat(2, 0, 99999.99),
             'conditions' => fake()->text(),
             'documents_requis' => fake()->text(),
         ];

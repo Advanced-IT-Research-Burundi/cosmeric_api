@@ -21,7 +21,6 @@ class CotisationUpdateRequest extends FormRequest
     {
         return [
             'membre_id' => ['required', 'integer', 'exists:membres,id'],
-            'periode_id' => ['required', 'integer', 'exists:periodes,id'],
             'montant' => ['required', 'numeric', 'between:-99999999.99,99999999.99'],
             'devise' => ['required', 'in:FBU,USD'],
             'date_paiement' => ['required', 'date'],

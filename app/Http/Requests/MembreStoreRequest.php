@@ -20,11 +20,10 @@ class MembreStoreRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'user_id' => ['required', 'integer', 'exists:users,id'],
-            'matricule' => ['required', 'string', 'max:50', 'unique:membres,matricule'],
+            'matricule' => ['required', 'string', 'max:50'],
             'nom' => ['required', 'string', 'max:100'],
             'prenom' => ['required', 'string', 'max:100'],
-            'email' => ['required', 'email', 'max:150'],
+            'email' => ['nullable', 'email', 'max:150'],
             'telephone' => ['required', 'string', 'max:20'],
             'categorie_id' => ['required'],
             'statut' => ['required', 'in:actif,inactif,suspendu'],

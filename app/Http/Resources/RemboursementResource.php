@@ -22,6 +22,7 @@ class RemboursementResource extends JsonResource
             'date_paiement' => $this->date_paiement,
             'statut' => $this->statut,
             'penalite' => $this->penalite,
+            'preuve_paiement' => $this->preuve_paiement ? asset($this->preuve_paiement) : null,
         ];
     }
 }

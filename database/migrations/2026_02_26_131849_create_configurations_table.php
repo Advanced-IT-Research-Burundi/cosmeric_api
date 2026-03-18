@@ -11,18 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::disableForeignKeyConstraints();
-
         Schema::create('configurations', function (Blueprint $table) {
             $table->id();
-            $table->string('cle', 100)->unique();
-            $table->text('valeur');
-            $table->text('description');
+            $table->string('cle')->unique();
+            $table->text('valeur')->nullable();
+            $table->text('description')->nullable();
             $table->timestamps();
-            $table->softDeletes();
         });
-
-        Schema::enableForeignKeyConstraints();
     }
 
     /**

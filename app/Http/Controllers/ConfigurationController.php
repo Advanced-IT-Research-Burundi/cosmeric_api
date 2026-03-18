@@ -12,33 +12,33 @@ use Illuminate\Http\Response;
 
 class ConfigurationController extends Controller
 {
-    public function index(Request $request): Response
+    public function index(Request $request)
     {
         $configurations = Configuration::all();
 
-        return new ConfigurationCollection($configurations);
+        return sendResponse(new ConfigurationCollection($configurations), " Configurations retrieved successfully.   ", 200);
     }
 
-    public function store(ConfigurationStoreRequest $request): Response
+    public function store(ConfigurationStoreRequest $request)
     {
         $configuration = Configuration::create($request->validated());
 
         return new ConfigurationResource($configuration);
     }
 
-    public function show(Request $request, Configuration $configuration): Response
+    public function show(Request $request, Configuration $configuration)
     {
         return new ConfigurationResource($configuration);
     }
 
-    public function update(ConfigurationUpdateRequest $request, Configuration $configuration): Response
+    public function update(ConfigurationUpdateRequest $request, Configuration $configuration)
     {
         $configuration->update($request->validated());
 
         return new ConfigurationResource($configuration);
     }
 
-    public function destroy(Request $request, Configuration $configuration): Response
+    public function destroy(Request $request, Configuration $configuration)
     {
         $configuration->delete();
 

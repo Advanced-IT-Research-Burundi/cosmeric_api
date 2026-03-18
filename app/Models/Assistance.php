@@ -10,6 +10,8 @@ class Assistance extends Model
 {
     use HasFactory;
 
+    protected $with = ['membre', 'typeAssistance'];
+
     /**
      * The attributes that are mass assignable.
      *
@@ -53,5 +55,10 @@ class Assistance extends Model
     public function typeAssistance(): BelongsTo
     {
         return $this->belongsTo(TypeAssistance::class);
+    }
+
+    public function getJustificatifAttribute($value)
+    {
+        return asset( $value);
     }
 }

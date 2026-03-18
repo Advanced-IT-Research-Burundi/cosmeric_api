@@ -20,7 +20,7 @@ class ConfigurationUpdateRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'cle' => ['required', 'string', 'max:100', 'unique:configurations,cle'],
+            'cle' => ['required', 'string', 'max:100', 'unique:configurations,cle,' . $this->route('configuration')->id],
             'valeur' => ['required', 'string'],
             'description' => ['required', 'string'],
         ];
