@@ -357,6 +357,84 @@ class CreditController extends Controller
     }
     
     /**
+     * Paiement libre : distribue un montant sur les échéances non payées.
+     */
+    public function payer(Request $request, $id)
+    {
+        $request->validate([
+            'montant_paye' => 'required|numeric|min:1',
+            'preuve_paiement' => 'required|file|mimes:jpeg,png,jpg,pdf|max:2048',
+        ]);
+
+        $credit = Credit::with('remboursements')->findOrFail($id);
+
+        $montantAPayer = (float) $request->montant_paye;
+
+        if ($montantAPayer > $credit->montant_restant) {
+            return sendError("Le montant dépasse le montant restant du crédit.", [], Response::HTTP_BAD_REQUEST);
+        }
+
+        // Upload de la preuve de paiement
+        $path = null;
+        if ($request->hasFile('preuve_paiement') && $request->file('preuve_paiement')->isValid()) {
+            $file = $request->file('preuve_paiement');
+            $filename = time() . '_' . $file->getClientOriginalName();
+            $file->move(public_path('uploads/preuves_paiements'), $filename);
+            $path = 'uploads/preuves_paiements/' . $filename;
+        }
+
+        try {
+            DB::beginTransaction();
+
+            // Récupérer les échéances non payées triées par numéro
+            $echeancesNonPayees = $credit->remboursements()
+                ->where('statut', '!=', 'paye')
+                ->orderBy('numero_echeance', 'asc')
+                ->get();
+
+            $montantRestant = $montantAPayer;
+
+            foreach ($echeancesNonPayees as $echeance) {
+                if ($montantRestant <= 0) {
+                    break;
+                }
+
+                $montantDu = $echeance->montant_prevu - ($echeance->montant_paye ?? 0);
+
+                if ($montantRestant >= $montantDu) {
+                    // Paiement complet de cette échéance
+                    $echeance->montant_paye = $echeance->montant_prevu;
+                    $echeance->statut = 'paye';
+                    $echeance->date_paiement = now();
+                    $echeance->preuve_paiement = $path;
+                    $montantRestant -= $montantDu;
+                } else {
+                    // Paiement partiel
+                    $echeance->montant_paye = ($echeance->montant_paye ?? 0) + $montantRestant;
+                    $echeance->preuve_paiement = $path;
+                    // Reste en attente ou en retard selon le cas
+                    $montantRestant = 0;
+                }
+
+                $echeance->save();
+            }
+
+            // Mettre à jour le montant restant du crédit
+            $totalPaye = $credit->remboursements()->sum('montant_paye');
+            $credit->montant_restant = max(0, $credit->montant_total_rembourser - $totalPaye);
+            $credit->statut = $credit->montant_restant <= 0 ? 'termine' : $credit->statut;
+            $credit->save();
+
+            DB::commit();
+
+            return sendResponse($credit->fresh()->load('remboursements'), 'Paiement effectué et distribué avec succès.');
+        } catch (\Throwable $th) {
+            DB::rollBack();
+            return sendError("Erreur lors du paiement : " . $th->getMessage(), [], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    /**
     * Génère les échéances (remboursements prévus) pour un crédit donné.
     */
     protected function generateEcheances(Credit $credit): void

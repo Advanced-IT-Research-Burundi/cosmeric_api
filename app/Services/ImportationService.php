@@ -18,6 +18,7 @@ class ImportationService
     /**
      * Process the imported data from staging table (CotisationMensuelle).
      * Moves data from staging to permanent tables: Cotisation, Credit, Remboursement.
+     * Sépare les entrées COTISATION et REMBOURSEMENT.
      *
      * @param array $stagingRecords Array of CotisationMensuelle staging records
      * @param string $date Date of the import (Y-m format)
@@ -26,24 +27,29 @@ class ImportationService
      */
     public function processImport(array $stagingRecords, string $date)
     {
-
-
         foreach ($stagingRecords as $data) {
             if (empty($data['matricule']) || !is_numeric($data['matricule'])) {
                 continue;
             }
 
-            // Resolve or create member
-            $membre = $this->resolveMembre($data);
-
-            // Handle reimbursement (retenu)
-            $retenu = floatval($data['retenu'] ?? 0);
-            if ($retenu > 0) {
-                $this->handleCreditAndRemboursement($membre, $data, $retenu, $date);
+            // Déterminer le type: REMBOURSEMENT si global ou restant est présent
+            $type = "COTISATION";
+            if (!empty($data['global']) || !empty($data['restant'])) {
+                $type = "REMBOURSEMENT";
             }
 
-            // Create cotisation record from staging data
-            $this->processCotisation($membre, $data, $date);
+            if ($type === "COTISATION") {
+                // Pour les cotisations, on essaie de trouver le membre mais ce n'est pas obligatoire
+                $membre = Membre::where('matricule', $data['matricule'])->first();
+                $this->processCotisation($membre, $data, $date);
+            } else {
+                // Pour les remboursements, on doit avoir un membre
+                $membre = $this->resolveMembre($data);
+                $retenu = floatval($data['retenu'] ?? 0);
+                if ($retenu > 0) {
+                    $this->processRemboursement($membre, $data, $retenu, $date);
+                }
+            }
         }
     }
 
@@ -101,52 +107,6 @@ class ImportationService
     }
 
     /**
-     * Handle credit creation and reimbursement.
-     */
-    private function handleCreditAndRemboursement(Membre $membre, array $data, float $retenu, string $date)
-    {
-         $credit = Credit::where('membre_id', $membre->id)
-        ->where('statut', 'approuve')
-        ->where('montant_restant', '>', 0)
-        ->lockForUpdate()
-        ->first();
-
-    if (!$credit) {
-        throw new Exception("No active credit found.");
-    }
-
-    if ($retenu > $credit->montant_restant) {
-        throw new Exception("Payment exceeds remaining balance.");
-    }
-
-        //sort the type of input if it is a reimbursement or a cotisation
-        $type = "COTISATION";
-        if (!empty($data['global']) || !empty($data['restant'])) {
-            $type = "REMBOURSEMENT";
-        }
-
-        // If type is cotisation do not add it in credit and remboursement tables
-        if ($type === "COTISATION") {
-            return;
-        }
-
-        $credit = Credit::where('membre_id', $membre->id)
-            ->where('statut', 'approuve')
-            ->where('montant_restant', '>', 0)
-            ->lockForUpdate()
-            ->first();
-
-        if ($credit) {
-            $this->handleRemboursement($credit, $retenu, $date);
-        } else {
-            $globalAmount = floatval($data['global'] ?? 0);
-            if ($globalAmount > 0) {
-                $this->createCreditRequest($membre, $data, $globalAmount);
-            }
-        }
-    }
-
-    /**
      * Create a new credit request in 'en_attente' status.
      */
     private function createCreditRequest(Membre $membre, array $data, float $amount)
@@ -171,14 +131,26 @@ class ImportationService
 
     /**
      * Record a reimbursement and update credit balance.
+     * Inclut toutes les données d'importation.
      */
-    private function handleRemboursement(Credit $credit, float $amount, string $date)
+    private function handleRemboursement(Credit $credit, array $data, float $amount, string $date)
     {
         // Ensure we don't overpay
         $paymentAmount = min($amount, $credit->montant_restant);
 
+        // Extraire nom et prénom du champ name
+        $nameParts = $this->extractNomPrenom($data['name'] ?? '');
+
         Remboursement::create([
             'credit_id' => $credit->id,
+            'matricule' => $data['matricule'] ?? null,
+            'nom' => $nameParts['nom'],
+            'prenom' => $nameParts['prenom'],
+            'nomero_dossier' => $data['nomero_dossier'] ?? null,
+            'global' => $data['global'] ?? null,
+            'regle' => $data['regle'] ?? null,
+            'restant' => $data['restant'] ?? null,
+            'retenu' => $data['retenu'] ?? null,
             'numero_echeance' => $credit->remboursements()->count() + 1,
             'montant_prevu' => $paymentAmount,
             'montant_paye' => $paymentAmount,
@@ -186,36 +158,73 @@ class ImportationService
             'date_paiement' => Carbon::parse($date)->day(now()->day),
             'statut' => 'paye',
             'penalite' => 0,
+            'is_import' => true,
         ]);
 
         $credit->decrement('montant_restant', $paymentAmount);
     }
 
     /**
-     * Process cotisation: move data from staging to permanent Cotisation table.
+     * Extrait nom et prénom d'une chaîne "Prénom Nom".
      */
-    private function processCotisation(Membre $membre, array $stagingData, string $date)
+    private function extractNomPrenom(string $fullName): array
     {
-        $montantRestant = floatval($stagingData['restant'] ?? 0);
+        $parts = explode(' ', trim($fullName), 2);
+        return [
+            'prenom' => $parts[0] ?? '',
+            'nom' => $parts[1] ?? '',
+        ];
+    }
 
-        CotisationMensuelle::create([
-            'membre_id' => $membre->id,
-            'montant_regle' => floatval($stagingData['regle'] ?? 0),
-            'montant_restant' => $montantRestant,
-            'montant_global' => floatval($stagingData['global'] ?? 0),
-            'montant_retenu' => floatval($stagingData['retenu'] ?? 0),
-            'date_cotisation' => Carbon::parse($date)->endOfMonth(),
-            'statut' => $montantRestant > 0 ? 'partiel' : 'paye',
-        ]);
+    /**
+     * Process cotisation: move data from staging to permanent Cotisation table.
+     * Membre peut être null, dans ce cas on utilise juste le matricule.
+     * Inclut toutes les données d'importation.
+     */
+    private function processCotisation(?Membre $membre, array $stagingData, string $date)
+    {
+        // Extraire nom et prénom du champ name
+        $nameParts = $this->extractNomPrenom($stagingData['name'] ?? '');
 
         Cotisation::create([
-            'membre_id' => $membre->id,
+            'membre_id' => $membre?->id,
+            'matricule' => $stagingData['matricule'],
+            'nom' => $nameParts['nom'],
+            'prenom' => $nameParts['prenom'],
+            'nomero_dossier' => $stagingData['nomero_dossier'] ?? null,
+            'global' => $stagingData['global'] ?? null,
+            'regle' => $stagingData['regle'] ?? null,
+            'restant' => $stagingData['restant'] ?? null,
+            'retenu' => $stagingData['retenu'] ?? null,
             'montant' => floatval($stagingData['retenu'] ?? 0),
-            'date_cotisation' => Carbon::parse($date)->endOfMonth(),
+            'date_paiement' => Carbon::parse($date)->endOfMonth(),
             'statut' => 'paye',
             'mode_paiement' => 'Banque',
-            'date_paiement' => Carbon::parse($date)->endOfMonth(),
             'reference_paiement' => 'Importation - ' . Carbon::now()->timestamp,
+            'is_import' => true,
         ]);
+    }
+
+    /**
+     * Process remboursement: gère le crédit et crée le remboursement.
+     */
+    private function processRemboursement(Membre $membre, array $data, float $retenu, string $date)
+    {
+        $credit = Credit::where('membre_id', $membre->id)
+            ->where('statut', 'approuve')
+            ->where('montant_restant', '>', 0)
+            ->lockForUpdate()
+            ->first();
+
+        if ($credit) {
+            // Si un crédit actif existe, on enregistre le remboursement
+            $this->handleRemboursement($credit, $data, $retenu, $date);
+        } else {
+            // Sinon, on crée une demande de crédit basée sur le montant global
+            $globalAmount = floatval($data['global'] ?? 0);
+            if ($globalAmount > 0) {
+                $this->createCreditRequest($membre, $data, $globalAmount);
+            }
+        }
     }
 }

@@ -62,7 +62,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::post("/credits/approuve/{id}", [CreditController::class, 'approuveCredit']);
     Route::post("/credits/rejete/{id}", [CreditController::class, 'refuserCredit']);
-
+    Route::post("/credits/{id}/payer", [CreditController::class, 'payer']);
 
     Route::get('mescredits', [CreditController::class, 'mesCredits']);
     Route::post('demande-credit', [CreditController::class, 'demandeCredit']);
@@ -97,7 +97,6 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::put('notifications/{notification}/mark-read', [NotificationController::class, 'markAsRead']);
     Route::post('notifications/mark-all-read', [NotificationController::class, 'markAllAsRead']);
     Route::get('notifications-unread-count', [NotificationController::class, 'unreadCount']);
-
     Route::get('cotisation_mensuelles', [CotisationController::class, 'cotisationMensuelles']);
     Route::get('remboursements_mensuelles', [CotisationController::class, 'remboursementsMensuelles']);
 });

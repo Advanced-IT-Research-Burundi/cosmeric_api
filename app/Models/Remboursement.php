@@ -17,6 +17,14 @@ class Remboursement extends Model
      */
     protected $fillable = [
         'credit_id',
+        'matricule',
+        'nom',
+        'prenom',
+        'nomero_dossier',
+        'global',
+        'regle',
+        'restant',
+        'retenu',
         'numero_echeance',
         'montant_prevu',
         'montant_paye',
@@ -25,6 +33,7 @@ class Remboursement extends Model
         'statut',
         'penalite',
         'preuve_paiement',
+        'is_import',
     ];
 
     /**

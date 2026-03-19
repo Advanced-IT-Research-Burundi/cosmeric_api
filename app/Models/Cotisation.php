@@ -19,12 +19,21 @@ class Cotisation extends Model
      */
     protected $fillable = [
         'membre_id',
+        'matricule',
+        'nom',
+        'prenom',
+        'nomero_dossier',
+        'global',
+        'regle',
+        'restant',
+        'retenu',
         'montant',
         'devise',
         'date_paiement',
         'statut',
         'mode_paiement',
         'reference_paiement',
+        'is_import',
     ];
 
     /**
