@@ -16,31 +16,32 @@ class CategorieMembreController extends Controller
     {
         $categorieMembres = CategorieMembre::all();
 
-        return sendResponse($categorieMembres, 'Categorie Membres retrieved successfully.'); 
+        return sendResponse($categorieMembres, 'Catégories de membres récupérées avec succès');
     }
 
     public function store(CategorieMembreStoreRequest $request)
     {
         $categorieMembre = CategorieMembre::create($request->validated());
-        return sendResponse($categorieMembre, 'Categorie Membre created successfully.');
-    }
+
+        return sendResponse($categorieMembre, 'Catégorie de membre créée avec succès');
+    }  
 
     public function show(Request $request, CategorieMembre $categorieMembre)
     {
-        return sendResponse($categorieMembre, 'Categorie Membre retrieved successfully.');
+        return sendResponse($categorieMembre, 'Catégorie de membre récupérée avec succès');
     }
 
     public function update(CategorieMembreUpdateRequest $request, CategorieMembre $categorieMembre)
     {
         $categorieMembre->update($request->validated());
 
-        return sendResponse($categorieMembre, 'Categorie Membre updated successfully.');
+        return sendResponse($categorieMembre, 'Catégorie de membre mise à jour avec succès');
     }
 
     public function destroy(Request $request, CategorieMembre $categorieMembre)
     {
         $categorieMembre->delete();
 
-        return response()->noContent();
+        return sendResponse(null, 'Catégorie de membre supprimée avec succès');
     }
 }
