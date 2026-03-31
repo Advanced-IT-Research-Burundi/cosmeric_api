@@ -16,8 +16,8 @@ class CotisationController extends Controller
 
     public function remboursementsMensuelles(Request $request)
     {
+
         $inputSearch = $request->search ?? null;
-        
         $page = $request->page ?? 1; // default page
         $perPage = $request->per_page ?? 15; // default per page
         $query = CotisationMensuelle::query();
@@ -32,8 +32,7 @@ class CotisationController extends Controller
             });
         }
 
-        $cotisations = $query->where('type', 'REMBOURSEMENT')
-        ->latest()->paginate($perPage, ['*'], 'page', $page);
+        $cotisations = $query->latest()->paginate($perPage, ['*'], 'page', $page);
         return sendResponse($cotisations, 'Cotisations mensuelles retrieved successfully.');
     }
 
@@ -48,7 +47,6 @@ class CotisationController extends Controller
 
         if ($inputSearch) {
             $query->where(function ($q) use ($inputSearch) {
-        
                 $q->where('name', 'like', '%' . $inputSearch . '%')
                     ->orWhere('matricule', 'like', '%' . $inputSearch . '%')
                     ->orWhere('retenu', 'like', '%' . $inputSearch . '%')
@@ -57,7 +55,10 @@ class CotisationController extends Controller
         }
 
         $cotisations = $query->where('type', 'COTISATION')
-        ->latest()->paginate($perPage, ['*'], 'page', $page);
+                             ->orWhere('type', 'REMBOURSEMENT_MANUEL')
+                             ->latest()
+                             ->paginate($perPage, ['*'], 'page', $page);
+
         return sendResponse($cotisations, 'Cotisations mensuelles retrieved successfully.');
     }
 
@@ -211,6 +212,19 @@ for ($i=0; $i < count($membres); $i++) {
     public function store(CotisationStoreRequest $request)
     {
         $cotisation = Cotisation::create($request->validated());
+        // Writte to cotisation_mensuelles
+        $cotisationMensuelle = CotisationMensuelle::create([
+            'name' => $cotisation->membre?->nom . ' ' . $cotisation->membre?->prenom,
+            'matricule' => $cotisation->membre?->matricule,
+            'nomero_dossier' => $cotisation->membre?->nomero_dossier,
+            'global' => $cotisation->montant,
+            'regle' => $cotisation->montant,
+            'restant' => $cotisation->montant,
+            'retenu' => $cotisation->montant,
+            'date_cotisation' => $cotisation->date_paiement,
+            'user_id' => $cotisation->user_id,
+            'type' => 'REMBOURSEMENT_MANUEL'
+        ]);
 
         return sendResponse(new CotisationResource($cotisation), 'Cotisation créée avec succès.');
     }
@@ -230,7 +244,6 @@ for ($i=0; $i < count($membres); $i++) {
     public function destroy(Request $request, Cotisation $cotisation)
     {
         $cotisation->delete();
-
         return sendResponse(null, 'Cotisation supprimée avec succès.');
     }
 }
