@@ -234,13 +234,13 @@ class CreditController extends Controller
         ->where('montant_restant', '!=', 0)
         ->exists();
         
-        if ($hasIrregularCotisations || $hasUnpaidCredits) {
-            return sendError(
-                'Vous ne pouvez pas demander un crédit tant que vous avez des cotisations irrégulières ou des crédits impayés.',
-                [],
-                Response::HTTP_FORBIDDEN
-            );
-        }
+        // if ($hasIrregularCotisations || $hasUnpaidCredits) {
+        //     return sendError(
+        //         'Vous ne pouvez pas demander un crédit tant que vous avez des cotisations irrégulières ou des crédits impayés.',
+        //         [],
+        //         Response::HTTP_FORBIDDEN
+        //     );
+        // }
         $data = $request->validated();
         if (!isset($data['taux_interet']) || empty($data['taux_interet'])) {
             $defaultTaux = Configuration::where('cle', 'taux_interet_credit')->value('valeur');
