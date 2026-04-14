@@ -10,6 +10,7 @@ use App\Models\Cotisation;
 use App\Models\CotisationMensuelle;
 use App\Models\Membre;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class CotisationController extends Controller
 {
@@ -55,7 +56,7 @@ class CotisationController extends Controller
         }
 
         $cotisations = $query->where('type', 'COTISATION')
-                            // ->orWhere('type', 'REMBOURSEMENT_MANUEL')
+                            ->orWhere('type', 'REMBOURSEMENT_MANUEL')
                              ->latest()
                              ->paginate($perPage, ['*'], 'page', $page);
 
@@ -211,7 +212,9 @@ for ($i=0; $i < count($membres); $i++) {
 
     public function store(CotisationStoreRequest $request)
     {
-        $cotisation = Cotisation::create($request->validated());
+        try {
+            DB::beginTransaction();
+             $cotisation = Cotisation::create($request->validated());
         // Writte to cotisation_mensuelles
         $cotisationMensuelle = CotisationMensuelle::create([
             'name' => $cotisation->membre?->nom . ' ' . $cotisation->membre?->prenom,
@@ -225,6 +228,11 @@ for ($i=0; $i < count($membres); $i++) {
             'user_id' => $cotisation->user_id,
             'type' => 'REMBOURSEMENT_MANUEL'
         ]);
+        DB::commit();
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return sendError('Erreur lors de la création de la cotisation.');
+        }
 
         return sendResponse(new CotisationResource($cotisation), 'Cotisation créée avec succès.');
     }
