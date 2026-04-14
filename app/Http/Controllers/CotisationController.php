@@ -55,7 +55,7 @@ class CotisationController extends Controller
         }
 
         $cotisations = $query->where('type', 'COTISATION')
-                             ->orWhere('type', 'REMBOURSEMENT_MANUEL')
+                            // ->orWhere('type', 'REMBOURSEMENT_MANUEL')
                              ->latest()
                              ->paginate($perPage, ['*'], 'page', $page);
 

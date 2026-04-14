@@ -9,6 +9,7 @@ use App\Mail\DemandeApprobation;
 use App\Mail\DemandeCredit;
 use App\Mail\RefuserCredit;
 use App\Models\Cotisation;
+use App\Models\CotisationMensuelle;
 use App\Models\Credit;
 use App\Models\Membre;
 use App\Models\Notification;
@@ -424,6 +425,21 @@ class CreditController extends Controller
             $credit->montant_restant = max(0, $credit->montant_total_rembourser - $totalPaye);
             $credit->statut = $credit->montant_restant <= 0 ? 'termine' : $credit->statut;
             $credit->save();
+
+            // enregistre dans la table paiement 
+
+             $cotisationMensuelle = CotisationMensuelle::create([
+            'name' => $credit->membre?->nom . ' ' . $credit->membre?->prenom,
+            'matricule' => $credit->membre?->matricule,
+            'nomero_dossier' => $credit->membre?->nomero_dossier,
+            'global' => $credit->montant,
+            'regle' => $credit->montant,
+            'restant' => $credit->montant,
+            'retenu' => $credit->montant,
+            'date_cotisation' => $credit->date_paiement,
+            'user_id' => auth()->user()->id,
+            'type' => 'CREDIT'
+        ]);
 
             DB::commit();
 
